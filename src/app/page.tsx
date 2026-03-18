@@ -199,8 +199,8 @@ export default function Home() {
           {/* Right Column (Sidebar) */}
           <div className="lg:col-span-4 space-y-8">
             
-            {/* Quick Actions (Sticky-ish with buffer) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sticky top-32 z-10">
+            {/* Quick Actions (Desktop Sidebar only) */}
+            <div className="hidden lg:grid grid-cols-2 gap-4 lg:sticky lg:top-32 z-30">
               <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-lg shadow-indigo-500/20 active:scale-95 text-sm uppercase tracking-widest">
                 <Wallet className="w-4 h-4" /> Deposit USDT
               </a>
