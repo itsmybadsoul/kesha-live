@@ -1,8 +1,16 @@
 "use client";
 
 import { Flame, ArrowRight } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 export function InvestmentPools() {
+  const { incrementManualTrades } = useUser();
+  
+  const handleInvest = () => {
+    incrementManualTrades();
+    alert("Manual trade opened successfully! Progressing 'Market Maker' quest.");
+  };
+
   return (
     <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6">
@@ -16,7 +24,10 @@ export function InvestmentPools() {
 
       <div className="space-y-4">
         {/* Pool Card 1 */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-orange-500/20 rounded-2xl p-5 relative overflow-hidden group hover:border-orange-500/40 transition-colors cursor-pointer">
+        <div 
+          onClick={handleInvest}
+          className="bg-gradient-to-br from-gray-900 to-gray-800 border border-orange-500/20 rounded-2xl p-5 relative overflow-hidden group hover:border-orange-500/40 transition-colors cursor-pointer"
+        >
           <div className="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider z-10">
             Closing Soon
           </div>
@@ -49,7 +60,10 @@ export function InvestmentPools() {
         </div>
 
         {/* Pool Card 2 */}
-        <div className="bg-gray-900/50 border border-gray-700/50 rounded-2xl p-5 hover:border-gray-600 transition-colors cursor-pointer opacity-80">
+        <div 
+          onClick={handleInvest}
+          className="bg-gray-900/50 border border-gray-700/50 rounded-2xl p-5 hover:border-gray-600 transition-colors cursor-pointer opacity-80"
+        >
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="text-white font-bold text-lg mb-1">Stable Core V1</h3>

@@ -49,6 +49,8 @@ interface UserContextType {
   addTrade: (trade: Trade) => Promise<void>;
   removeTrade: (id: number) => Promise<void>;
   requestDeposit: (amount: string, txid: string) => Promise<void>;
+  manualTradeCount: number;
+  incrementManualTrades: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -56,7 +58,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const INITIAL_QUESTS: Quest[] = [
   { id: 1, title: "Daily Check-in", description: "Log in to the dashboard.", reward: "$5.00", completed: true },
   { id: 2, title: "Social Butterfly", description: "Allocate funds to a new Copy Trader.", reward: "$50.00", completed: false },
-  { id: 3, title: "Market Maker", description: "Open 3 simulated manual trades.", reward: "$15.00", completed: false },
+  { id: 3, title: "Market Maker", description: "Open 3 manual investment positions.", reward: "$15.00", completed: false },
 ];
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -64,6 +66,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [balance, setBalance] = useState<number>(0);
   const [quests, setQuests] = useState<Quest[]>(INITIAL_QUESTS);
   const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
+  const [manualTradeCount, setManualTradeCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = async () => {
@@ -148,6 +151,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await syncUpdates({ trades: newTrades });
   };
 
+  const incrementManualTrades = async () => {
+    const nextCount = manualTradeCount + 1;
+    setManualTradeCount(nextCount);
+    if (nextCount === 3) {
+      await completeQuest(3); // Complete "Market Maker"
+    }
+  };
+
   const requestDeposit = async (amount: string, txid: string) => {
     if (!user?.email) return;
     const res = await fetch("/api/deposit/request", {
@@ -177,6 +188,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addTrade,
         removeTrade,
         requestDeposit,
+        manualTradeCount,
+        incrementManualTrades,
       }}
     >
       {children}
