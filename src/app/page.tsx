@@ -160,17 +160,15 @@ export default function Home() {
             </div>
           </div>
           <div className="w-full h-[600px] rounded-2xl overflow-hidden border border-gray-700/30 shadow-2xl bg-[#131722] relative">
-            <div className="w-full h-full transform scale-[1.08] origin-center translate-y-[-10px]">
+            <div className="w-full h-full transform scale-[1.1] origin-center translate-y-[-15px]">
               <iframe 
                 key={selectedAsset}
                 src={`https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3A${selectedAsset}USDT&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%2C%22widget_logo%22%2C%22header_resolutions%22%2C%22header_chart_type%22%5D&locale=en`}
                 style={{ width: '100%', height: '100%', border: 'none' }}
               ></iframe>
             </div>
-            {/* Precision Branding Masks */}
-            <div className="absolute bottom-0 left-0 right-0 h-14 bg-[#131722] z-20"></div>
-            <div className="absolute top-0 left-0 w-32 h-14 bg-[#131722] z-20"></div>
-            <div className="absolute top-0 right-0 w-32 h-14 bg-[#131722] z-20"></div>
+            {/* Precision Branding Mask (Bottom) */}
+            <div className="absolute bottom-0 left-0 right-0 h-[70px] bg-[#131722] z-20"></div>
           </div>
         </div>
 
