@@ -127,13 +127,13 @@ export default function AdminPage() {
              <div className="flex items-center gap-3 text-emerald-400 mb-2">
               <CheckCircle2 className="w-5 h-5" /> <span className="font-bold">Total Processed</span>
             </div>
-            <p className="text-2xl font-black">1,240</p>
+            <p className="text-2xl font-black">--</p>
           </div>
           <div className="bg-gray-800 border border-gray-700 p-6 rounded-2xl">
              <div className="flex items-center gap-3 text-gray-400 mb-2">
-              <Database className="w-5 h-5" /> <span className="font-bold">System Status</span>
+              <Database className="w-5 h-5" /> <span className="font-bold">Database</span>
             </div>
-            <p className="text-base font-bold text-emerald-400">Edge Runtime Syncing</p>
+            <p className="text-base font-bold text-emerald-400">Cloudflare KV Active</p>
           </div>
         </div>
 
