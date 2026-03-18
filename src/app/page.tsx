@@ -12,22 +12,28 @@ import { ActiveCopiedTrades } from "@/components/ActiveCopiedTrades";
 import { MarketEventsTicker } from "@/components/MarketEventsTicker";
 import { DailyQuests } from "@/components/DailyQuests";
 import { LivePriceTicker } from "@/components/LivePriceTicker";
-import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp } from "lucide-react";
+import { MarketOverview } from "@/components/MarketOverview";
+import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp, BarChart3 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useState } from "react";
 
 export default function Home() {
   const { user, balance, logout } = useUser();
+  const [selectedAsset, setSelectedAsset] = useState("BTC");
+
+  const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30">
       <LivePriceTicker />
       {/* Navbar */}
-      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-10 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">Yield<span className="text-indigo-400">Sphere</span></span>
+            <span className="font-bold text-xl tracking-tight text-white group cursor-pointer">Yield<span className="text-indigo-400">Sphere</span></span>
           </div>
           
           <div className="flex items-center gap-6">
@@ -41,7 +47,7 @@ export default function Home() {
                {user ? (
                  <div className="flex items-center gap-4">
                    <div className="text-right hidden sm:block">
-                     <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Balance</div>
+                     <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Available Balance</div>
                      <div className="text-sm font-black text-emerald-400">${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                    </div>
                    <div className="relative group">
@@ -73,19 +79,45 @@ export default function Home() {
 
         {/* Live Chart Section */}
         <div className="mb-8 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 overflow-hidden">
-          <div className="flex justify-between items-center mb-4 px-2">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-400" /> Market Analysis (Live BTC/USDT)
-            </h3>
-            <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest bg-gray-900/50 px-3 py-1 rounded-full border border-gray-800">Powered by TradingView</span>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 px-2">
+            <div>
+              <h3 className="text-lg font-bold flex items-center gap-2 mb-1">
+                <TrendingUp className="w-5 h-5 text-indigo-400" /> Market Intelligence (Live {selectedAsset}/USDT)
+              </h3>
+              <p className="text-xs text-gray-500">Professional grade technical analysis and real-time order book data.</p>
+            </div>
+            <div className="flex flex-wrap gap-1.5 bg-black/40 p-1 rounded-xl border border-gray-800/50">
+              {chartAssets.map((asset) => (
+                <button
+                  key={asset}
+                  onClick={() => setSelectedAsset(asset)}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-black tracking-tight transition-all ${
+                    selectedAsset === asset 
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
+                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                  }`}
+                >
+                  {asset}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="w-full h-[450px] rounded-2xl overflow-hidden border border-gray-700/30 shadow-2xl">
+          <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-gray-700/30 shadow-2xl bg-gray-900/20">
             <iframe 
-              src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3ABTCUSDT&interval=D&hidesidetoolbar=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en"
+              key={selectedAsset}
+              src={`https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3A${selectedAsset}USDT&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en`}
               style={{ width: '100%', height: '100%', border: 'none' }}
             ></iframe>
           </div>
         </div>
+
+        <div className="mb-10">
+          <MarketOverview />
+        </div>
+
+        <CountdownBanner />
+        
+        <PendingDeposit />
 
         <CountdownBanner />
         

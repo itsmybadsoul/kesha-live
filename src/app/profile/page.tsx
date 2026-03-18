@@ -106,7 +106,7 @@ export default function ProfilePage() {
                <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50 rounded-2xl p-6 relative overflow-hidden">
                  <div className="text-gray-500 text-[10px] font-black uppercase mb-1">Total Trading Vol.</div>
                  <div className="text-2xl font-black text-indigo-400">$24,580</div>
-                 <div className="text-[10px] text-indigo-500 mt-1">Simulated volume</div>
+                 <div className="text-[10px] text-indigo-500 mt-1">Platform volume</div>
                  <Activity className="absolute -bottom-4 -right-4 w-16 h-16 text-indigo-500/10" />
                </div>
             </div>

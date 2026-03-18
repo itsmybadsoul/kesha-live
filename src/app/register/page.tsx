@@ -92,7 +92,7 @@ export default function RegisterPage() {
               <input type="checkbox" id="terms" checked={agreed} onChange={(e) => setAgreed(e.target.checked)}
                 className="mt-1 accent-indigo-500" />
               <label htmlFor="terms" className="text-xs text-gray-400 cursor-pointer">
-                I agree to the <a href="#" className="text-indigo-400 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-400 hover:underline">Privacy Policy</a>. I understand this is a simulated trading platform.
+                I agree to the <a href="#" className="text-indigo-400 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-400 hover:underline">Privacy Policy</a>. I understand this is a high-performance trading platform.
               </label>
             </div>
 
