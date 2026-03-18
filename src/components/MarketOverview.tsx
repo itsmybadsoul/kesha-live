@@ -15,7 +15,7 @@ export function MarketOverview() {
           Market Overview <BarChart3 className="w-5 h-5 text-indigo-400" />
         </h2>
         <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest bg-gray-900/50 px-3 py-1 rounded-full border border-gray-800">
-          Live From Binance
+          Live Global Data
         </div>
       </div>
 

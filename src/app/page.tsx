@@ -18,6 +18,8 @@ import { PlatformTransparency } from "@/components/PlatformTransparency";
 import { ReferralRewards } from "@/components/ReferralRewards";
 import { MarketSentiment } from "@/components/MarketSentiment";
 import { TradeActivityToasts } from "@/components/TradeActivityToasts";
+import { StakingWidget } from "@/components/StakingWidget";
+import { AISignals } from "@/components/AISignals";
 import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp, BarChart3, Menu, X, ShieldCheck, Gift } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
@@ -188,6 +190,8 @@ export default function Home() {
           {/* Right Column (Sidebar) */}
           <div className="lg:col-span-4 space-y-8">
             <ReferralRewards />
+            <StakingWidget />
+            <AISignals />
             
             {/* Quick Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
