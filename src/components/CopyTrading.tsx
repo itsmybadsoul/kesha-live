@@ -3,6 +3,7 @@
 import { Users, TrendingUp, Search, Activity, HeartHandshake } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
+import { Portal } from "./Portal";
 
 const mockTraders = [
   { id: 1, name: "WhaleHunter", type: "High Risk", roi: "+245.5%", winRate: "68%", copiers: 1250, avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Whale", color: "text-rose-500", border: "border-rose-500/20" },
@@ -119,50 +120,52 @@ export function CopyTrading() {
       </div>
       {/* Allocation Modal */}
       {selectedTrader && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedTrader(null)}></div>
-          <div className="bg-gray-900 border border-gray-800 w-full max-w-md rounded-3xl p-8 relative z-20 shadow-2xl">
-            <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
-              Copy <span className="text-indigo-400">{selectedTrader.name}</span>
-            </h2>
-            <p className="text-gray-400 text-sm mb-6 font-medium italic">Enter the amount of USDT you want to allocate to this trader.</p>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Allocation Amount (USDT)</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                  <input 
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-2xl pl-8 pr-4 py-4 text-xl font-black text-white focus:outline-none focus:border-indigo-500 transition-colors"
-                    placeholder="Min 50"
-                  />
+        <Portal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedTrader(null)}></div>
+            <div className="bg-gray-900 border border-gray-800 w-full max-w-md rounded-3xl p-8 relative z-20 shadow-2xl animate-in fade-in zoom-in duration-300">
+              <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                Copy <span className="text-indigo-400">{selectedTrader.name}</span>
+              </h2>
+              <p className="text-gray-400 text-sm mb-6 font-medium italic">Enter the amount of USDT you want to allocate to this trader.</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Allocation Amount (USDT)</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                    <input 
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-2xl pl-8 pr-4 py-4 text-xl font-black text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                      placeholder="Min 50"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-2 flex justify-between">
+                    <span>Available: <span className="text-white font-bold">${balance.toLocaleString()}</span></span>
+                    <span>Min: $50</span>
+                  </p>
                 </div>
-                <p className="text-[10px] text-gray-500 mt-2 flex justify-between">
-                  <span>Available: <span className="text-white font-bold">${balance.toLocaleString()}</span></span>
-                  <span>Min: $50</span>
-                </p>
-              </div>
 
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => setSelectedTrader(null)}
-                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={confirmCopy}
-                  className="flex-[2] bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95"
-                >
-                  Start Copying
-                </button>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setSelectedTrader(null)}
+                    className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={confirmCopy}
+                    className="flex-[2] bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95"
+                  >
+                    Start Copying
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );
