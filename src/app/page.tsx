@@ -119,7 +119,7 @@ export default function Home() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-[1440px] mx-auto px-4 md:px-10 py-8">
         
         <div className="mb-6">
           <MarketEventsTicker />
@@ -183,9 +183,14 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Left Column (Main Focus) */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-10">
             <VIPProgress />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <MarketSentiment />
+               <PlatformTransparency />
+            </div>
             <CopyTrading />
+            <SocialSentimentFeed />
             <DailyQuests />
             <ActiveCopiedTrades />
             <ROICalculator />
@@ -193,12 +198,9 @@ export default function Home() {
 
           {/* Right Column (Sidebar) */}
           <div className="lg:col-span-4 space-y-8">
-            <ReferralRewards />
-            <StakingWidget />
-            <AISignals />
             
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+            {/* Quick Actions (Sticky-ish) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sticky top-28 z-30">
               <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-lg shadow-indigo-500/20 active:scale-95 text-sm uppercase tracking-widest">
                 <Wallet className="w-4 h-4" /> Deposit USDT
               </a>
@@ -207,9 +209,9 @@ export default function Home() {
               </a>
             </div>
 
-            <MarketSentiment />
-            <SocialSentimentFeed />
-            <PlatformTransparency />
+            <ReferralRewards />
+            <StakingWidget />
+            <AISignals />
             <MysteryBox />
             <InvestmentPools />
             <LiveActivityTicker />
