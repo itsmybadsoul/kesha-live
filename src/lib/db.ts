@@ -15,6 +15,12 @@ export interface UserData {
     txid: string;
     timestamp: number;
   } | null;
+  pendingWithdrawal?: {
+    amount: number;
+    method: "CRYPTO" | "BANK";
+    details: string; // Address or IBAN
+    timestamp: number;
+  } | null;
 }
 
 // Global variable for local simulation (cleared on server restart)
@@ -88,4 +94,29 @@ export async function untrackPendingDeposit(email: string, env?: any): Promise<v
   let emails: string[] = JSON.parse(list);
   emails = emails.filter(e => e !== email);
   await putKV("pending_deposits_list", JSON.stringify(emails), env);
+}
+
+export async function getPendingWithdrawals(env?: any): Promise<UserData[]> {
+  const list = await getKV("pending_withdrawals_list", env);
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e, env)));
+  return users.filter((u): u is UserData => !!u && !!u.pendingWithdrawal);
+}
+
+export async function trackPendingWithdrawal(email: string, env?: any): Promise<void> {
+  const list = await getKV("pending_withdrawals_list", env);
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("pending_withdrawals_list", JSON.stringify(emails), env);
+  }
+}
+
+export async function untrackPendingWithdrawal(email: string, env?: any): Promise<void> {
+  const list = await getKV("pending_withdrawals_list", env);
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("pending_withdrawals_list", JSON.stringify(emails), env);
 }

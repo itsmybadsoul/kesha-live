@@ -199,12 +199,12 @@ export default function Home() {
           {/* Right Column (Sidebar) */}
           <div className="lg:col-span-4 space-y-8">
             
-            {/* Quick Actions (Sticky-ish) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sticky top-28 z-30">
+            {/* Quick Actions (Sticky-ish with buffer) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sticky top-32 z-10">
               <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-lg shadow-indigo-500/20 active:scale-95 text-sm uppercase tracking-widest">
                 <Wallet className="w-4 h-4" /> Deposit USDT
               </a>
-              <a href="/deposit" className="bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-colors text-sm uppercase tracking-widest">
+              <a href="/withdraw" className="bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-colors text-sm uppercase tracking-widest">
                 <ArrowRightLeft className="w-4 h-4" /> Withdraw Funds
               </a>
             </div>

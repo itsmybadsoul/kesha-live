@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, untrackPendingDeposit } from "@/lib/db";
+import { getUser, saveUser, untrackPendingDeposit, untrackPendingWithdrawal } from "@/lib/db";
 
 export const runtime = "edge";
 
@@ -8,18 +8,28 @@ export async function POST(req: Request) {
     const { email, action } = await req.json(); // action: "approve" or "reject"
     
     const user = await getUser(email);
-    if (!user || !user.pendingDeposit) {
-      return NextResponse.json({ error: "No pending deposit found" }, { status: 404 });
-    }
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     if (action === "approve") {
-      user.balance += user.pendingDeposit.amount;
+      if (user.pendingDeposit) {
+        user.balance += user.pendingDeposit.amount;
+        user.pendingDeposit = null;
+        await untrackPendingDeposit(email);
+      } else if (user.pendingWithdrawal) {
+        // Balance already checked at request time
+        user.balance -= user.pendingWithdrawal.amount;
+        user.pendingWithdrawal = null;
+        await untrackPendingWithdrawal(email);
+      }
+    } else {
+      // Reject
+      user.pendingDeposit = null;
+      user.pendingWithdrawal = null;
+      await untrackPendingDeposit(email);
+      await untrackPendingWithdrawal(email);
     }
 
-    user.pendingDeposit = null;
     await saveUser(user);
-    await untrackPendingDeposit(email);
-
     return NextResponse.json({ success: true, newBalance: user.balance });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

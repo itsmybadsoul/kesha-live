@@ -12,6 +12,12 @@ export interface User {
     txid: string;
     timestamp: number;
   } | null;
+  pendingWithdrawal?: {
+    amount: number;
+    method: "CRYPTO" | "BANK";
+    details: string;
+    timestamp: number;
+  } | null;
   welcomeExpiry?: number;
   referralStats?: {
     totalInvites: number;
@@ -69,6 +75,7 @@ interface UserContextType {
   addTrade: (trade: any) => Promise<void>;
   removeTrade: (id: number) => Promise<void>;
   requestDeposit: (amount: string, txid: string) => Promise<void>;
+  requestWithdraw: (amount: string, method: "CRYPTO" | "BANK", details: string) => Promise<void>;
   manualTradeCount: number;
   incrementManualTrades: () => Promise<void>;
 }
@@ -246,6 +253,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const requestWithdraw = async (amount: string, method: "CRYPTO" | "BANK", details: string) => {
+    if (!user?.email) return;
+    const res = await fetch("/api/withdraw/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, amount, method, details })
+    });
+    const data = await res.json();
+    if (data.success) {
+      await refreshUser();
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -263,6 +283,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addTrade,
         removeTrade,
         requestDeposit,
+        requestWithdraw,
         manualTradeCount,
         incrementManualTrades,
       }}
