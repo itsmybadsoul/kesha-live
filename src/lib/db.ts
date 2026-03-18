@@ -21,18 +21,34 @@ export interface UserData {
 const mockDB: Record<string, string> = {};
 
 export async function getKV(key: string, env?: any): Promise<string | null> {
-  if (env?.DATABASE) {
-    return await env.DATABASE.get(key);
-  }
+  // 1. Try passed env
+  if (env?.DATABASE) return await env.DATABASE.get(key);
+  // 2. Try process.env (Next.js polyfill)
+  if ((process.env as any).DATABASE) return await (process.env as any).DATABASE.get(key);
+  // 3. Try global (Cloudflare native)
+  if ((globalThis as any).DATABASE) return await (globalThis as any).DATABASE.get(key);
+  
   // Local fallback
   return mockDB[key] || null;
 }
 
 export async function putKV(key: string, value: string, env?: any): Promise<void> {
+  // 1. Try passed env
   if (env?.DATABASE) {
     await env.DATABASE.put(key, value);
     return;
   }
+  // 2. Try process.env (Next.js polyfill)
+  if ((process.env as any).DATABASE) {
+    await (process.env as any).DATABASE.put(key, value);
+    return;
+  }
+  // 3. Try global (Cloudflare native)
+  if ((globalThis as any).DATABASE) {
+    await (globalThis as any).DATABASE.put(key, value);
+    return;
+  }
+  
   // Local fallback
   mockDB[key] = value;
 }
