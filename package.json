@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "pages:build": "next build",
-    "deploy": "npm run pages:build && npx wrangler pages deploy out --project-name=crypto-dashboard"
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "deploy": "npm run pages:build && wrangler pages deploy .vercel/output"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",
