@@ -13,13 +13,17 @@ import { MarketEventsTicker } from "@/components/MarketEventsTicker";
 import { DailyQuests } from "@/components/DailyQuests";
 import { LivePriceTicker } from "@/components/LivePriceTicker";
 import { MarketOverview } from "@/components/MarketOverview";
-import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp, BarChart3 } from "lucide-react";
+import { SocialSentimentFeed } from "@/components/SocialSentimentFeed";
+import { PlatformTransparency } from "@/components/PlatformTransparency";
+import { ReferralRewards } from "@/components/ReferralRewards";
+import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp, BarChart3, Menu, X, ShieldCheck, Gift } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 
 export default function Home() {
   const { user, balance, logout } = useUser();
   const [selectedAsset, setSelectedAsset] = useState("BTC");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
 
@@ -27,35 +31,45 @@ export default function Home() {
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30">
       <LivePriceTicker />
       {/* Navbar */}
-      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-10 z-50">
+      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-10 z-[60]">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-white group cursor-pointer">Yield<span className="text-indigo-400">Sphere</span></span>
+            <span className="font-bold text-xl tracking-tight text-white group cursor-pointer hover:scale-105 transition-transform">Yield<span className="text-indigo-400">Sphere</span></span>
           </div>
           
-          <div className="flex items-center gap-6">
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+          <div className="flex items-center gap-2 md:gap-6">
+            <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-400">
                 <a href="/" className="flex items-center gap-2 text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
                 <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
                 <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><ArrowRightLeft className="w-4 h-4" /> Deposit</a>
             </nav>
 
-            <div className="flex items-center gap-4 border-l border-gray-800 pl-6">
+            <div className="flex items-center gap-2 md:gap-4 border-l border-gray-800 lg:pl-6">
                {user ? (
-                 <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-2 md:gap-4">
                    <div className="text-right hidden sm:block">
                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Available Balance</div>
                      <div className="text-sm font-black text-emerald-400">${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                    </div>
+                   
+                   {/* Mobile Quick Deposit */}
+                   <a href="/deposit" className="lg:hidden p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform">
+                      <ArrowRightLeft className="w-5 h-5" />
+                   </a>
+
                    <div className="relative group">
-                     <img src={user.avatar} alt="User" className="w-9 h-9 rounded-full bg-gray-900 border border-gray-700 transition-transform group-hover:scale-110 cursor-pointer" />
-                     {/* Hidden Admin Link */}
-                     <a href="/admin" className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></a>
+                     <img src={user.avatar} alt="User" className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gray-900 border border-gray-700 transition-transform group-hover:scale-110 cursor-pointer shadow-lg" />
+                     <a href="/admin" className="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></a>
                    </div>
-                   <button onClick={logout} className="p-2 text-gray-500 hover:text-rose-400 transition-colors" title="Logout">
+
+                   <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 text-gray-400 hover:text-white">
+                      {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                   </button>
+
+                   <button onClick={logout} className="hidden md:block p-2 text-gray-500 hover:text-rose-400 transition-colors" title="Logout">
                      <LogOut className="w-5 h-5" />
                    </button>
                  </div>
@@ -68,6 +82,28 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Slide-out Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-gray-900 border-b border-gray-800 p-4 animate-in slide-in-from-top duration-300">
+            <div className="grid grid-cols-1 gap-4">
+              <a href="/" className="flex items-center gap-3 p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 font-bold">
+                 <LayoutDashboard className="w-5 h-5" /> Home Dashboard
+              </a>
+              <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
+                 <User className="w-5 h-5" /> My Personal Profile
+              </a>
+              <a href="/deposit" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
+                 <ArrowRightLeft className="w-5 h-5" /> Funds & Deposits
+              </a>
+              <div className="border-t border-gray-800 my-2 pt-4">
+                <button onClick={logout} className="flex items-center gap-3 p-4 text-rose-500 font-bold w-full">
+                   <LogOut className="w-5 h-5" /> Sign Out of Platform
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Main Content */}
@@ -119,10 +155,6 @@ export default function Home() {
         
         <PendingDeposit />
 
-        <CountdownBanner />
-        
-        <PendingDeposit />
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Left Column (Main Focus) */}
@@ -136,16 +168,20 @@ export default function Home() {
 
           {/* Right Column (Sidebar) */}
           <div className="lg:col-span-4 space-y-8">
+            <ReferralRewards />
+            
             {/* Quick Actions */}
-            <div className="grid grid-cols-2 gap-4">
-              <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-indigo-500/20 active:scale-95">
-                <Wallet className="w-4 h-4" /> Deposit
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+              <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-lg shadow-indigo-500/20 active:scale-95 text-sm uppercase tracking-widest">
+                <Wallet className="w-4 h-4" /> Deposit Funds
               </a>
-              <button disabled className="bg-gray-800/50 cursor-not-allowed border border-gray-700/50 text-gray-500 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+              <button disabled className="bg-gray-800/50 cursor-not-allowed border border-gray-700/50 text-gray-500 font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-colors text-sm">
                 <ArrowRightLeft className="w-4 h-4" /> Withdraw
               </button>
             </div>
 
+            <SocialSentimentFeed />
+            <PlatformTransparency />
             <MysteryBox />
             <InvestmentPools />
             <LiveActivityTicker />

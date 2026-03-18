@@ -12,6 +12,13 @@ export interface User {
     txid: string;
     timestamp: number;
   } | null;
+  welcomeExpiry?: number;
+  referralStats?: {
+    totalInvites: number;
+    milestoneProgress: number;
+    nextMilestone: number;
+    reward: string;
+  };
 }
 
 export interface Quest {
@@ -118,7 +125,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.email]);
 
-  const login = (userData: User) => setUser(userData);
+  const login = (userData: User) => {
+    // Set 24h welcome bonus expiry on first ever appearance
+    if (!userData.welcomeExpiry) {
+      userData.welcomeExpiry = Date.now() + 24 * 60 * 60 * 1000;
+      syncUpdates({ welcomeExpiry: userData.welcomeExpiry });
+    }
+    setUser(userData);
+  };
   const logout = () => {
     setUser(null);
     setQuests(INITIAL_QUESTS);
