@@ -33,6 +33,9 @@ export interface Trade {
   pnl: string;
   time: string;
   isProfit: boolean;
+  allocation: number;
+  startDate?: number;
+  endDate?: number;
 }
 
 interface UserContextType {
@@ -139,8 +142,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await syncUpdates({ quests: updatedQuests, balance: balance + (quests.find(q=>q.id===id)?.completed ? 0 : parseFloat(quests.find(q=>q.id===id)!.reward.replace("$",""))) });
   };
 
-  const addTrade = async (trade: Trade) => {
-    const newTrades = [trade, ...activeTrades];
+  const addTrade = async (trade: any) => {
+    const now = Date.now();
+    const tradeWithDates = {
+      ...trade,
+      startDate: now,
+      endDate: now + 30 * 24 * 60 * 60 * 1000 // 30 days
+    };
+    const newTrades = [tradeWithDates, ...activeTrades];
     setActiveTrades(newTrades);
     await syncUpdates({ trades: newTrades });
   };

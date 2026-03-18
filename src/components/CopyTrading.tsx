@@ -43,7 +43,7 @@ export function CopyTrading() {
       leverage: "10x",
       entry: 64000 + Math.random() * 1000,
       current: 64000 + Math.random() * 1000,
-      pnl: "+1.2%",
+      pnl: "Calculated at maturity",
       time: "Just now",
       isProfit: true,
       allocation: alloc
