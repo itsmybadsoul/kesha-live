@@ -16,15 +16,27 @@ export function CopyTrading() {
   const { addTrade, updateBalance, completeQuest, balance } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [selectedTrader, setSelectedTrader] = useState<any>(null);
+  const [amount, setAmount] = useState<string>("100");
+
   const handleCopy = (trader: any) => {
-    if (balance < 100) {
-      alert("Insufficient balance to start copying!");
+    setSelectedTrader(trader);
+  };
+
+  const confirmCopy = () => {
+    const alloc = parseFloat(amount);
+    if (isNaN(alloc) || alloc < 50) {
+      alert("Minimum allocation is $50");
+      return;
+    }
+    if (balance < alloc) {
+      alert("Insufficient balance!");
       return;
     }
 
     const newTrade = {
       id: Date.now(),
-      trader: trader.name,
+      trader: selectedTrader.name,
       pair: "BTC/USDT",
       type: (Math.random() > 0.5 ? "LONG" : "SHORT") as "LONG" | "SHORT",
       leverage: "10x",
@@ -32,13 +44,15 @@ export function CopyTrading() {
       current: 64000 + Math.random() * 1000,
       pnl: "+1.2%",
       time: "Just now",
-      isProfit: true
+      isProfit: true,
+      allocation: alloc
     };
 
-    updateBalance(-100);
+    updateBalance(-alloc);
     addTrade(newTrade);
     completeQuest(2); // Complete "Social Butterfly"
-    alert(`Started copying ${trader.name}! $100 allocated.`);
+    setSelectedTrader(null);
+    alert(`Started copying ${selectedTrader.name}! $${alloc} allocated.`);
   };
 
   const filteredTraders = mockTraders.filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -103,6 +117,53 @@ export function CopyTrading() {
           </div>
         ))}
       </div>
+      {/* Allocation Modal */}
+      {selectedTrader && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedTrader(null)}></div>
+          <div className="bg-gray-900 border border-gray-800 w-full max-w-md rounded-3xl p-8 relative z-20 shadow-2xl">
+            <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+              Copy <span className="text-indigo-400">{selectedTrader.name}</span>
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 font-medium italic">Enter the amount of USDT you want to allocate to this trader.</p>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Allocation Amount (USDT)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                  <input 
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-2xl pl-8 pr-4 py-4 text-xl font-black text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                    placeholder="Min 50"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-500 mt-2 flex justify-between">
+                  <span>Available: <span className="text-white font-bold">${balance.toLocaleString()}</span></span>
+                  <span>Min: $50</span>
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setSelectedTrader(null)}
+                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={confirmCopy}
+                  className="flex-[2] bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95"
+                >
+                  Start Copying
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

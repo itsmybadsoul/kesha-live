@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Trophy, ChevronRight } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
@@ -33,8 +34,16 @@ export function VIPProgress() {
     bonus = "1%";
   }
 
+  const [showBenefits, setShowBenefits] = useState(false);
   const progress = Math.min((balance / target) * 100, 100);
   const remaining = Math.max(target - balance, 0);
+
+  const tiers = [
+    { name: "Bronze", min: 0, bonus: "0%", perk: "Basic support" },
+    { name: "Silver", min: 1000, bonus: "1%", perk: "Faster withdrawals" },
+    { name: "Gold", min: 2500, bonus: "3%", perk: "Expert trade signals" },
+    { name: "Diamond", min: 5000, bonus: "5%", perk: "Personal manager" }
+  ];
 
   return (
     <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 relative overflow-hidden">
@@ -80,9 +89,47 @@ export function VIPProgress() {
         )}
       </div>
       
-      <button className="w-full mt-4 bg-gray-700/50 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-gray-600/50">
+      <button 
+        onClick={() => setShowBenefits(true)}
+        className="w-full mt-4 bg-gray-700/50 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-gray-600/50"
+      >
         View VIP Benefits <ChevronRight className="w-4 h-4" />
       </button>
+
+      {/* VIP Modal */}
+      {showBenefits && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowBenefits(false)}></div>
+          <div className="bg-gray-900 border border-gray-800 w-full max-w-lg rounded-3xl p-8 relative z-20 shadow-2xl overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
+            <h2 className="text-2xl font-black mb-6 flex items-center gap-3">
+              VIP Tier Privileges <Trophy className="w-6 h-6 text-amber-400" />
+            </h2>
+            
+            <div className="space-y-4">
+              {tiers.map((t) => (
+                <div key={t.name} className={`p-4 rounded-2xl border transition-all ${t.name === tier ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-gray-800/50 border-gray-700/50'}`}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-white text-lg">{t.name}</span>
+                    <span className="text-emerald-400 font-black text-sm">+{t.bonus} APY</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-gray-400">
+                    <span>Min Deposit: ${t.min}</span>
+                    <span className="italic">{t.perk}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              onClick={() => setShowBenefits(false)}
+              className="w-full mt-8 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

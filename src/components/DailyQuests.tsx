@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CheckCircle2, CircleDashed, Gift, Zap } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
@@ -8,6 +9,20 @@ export function DailyQuests() {
 
   const completedCount = quests.filter((q) => q.completed).length;
   const progress = quests.length > 0 ? (completedCount / quests.length) * 100 : 0;
+
+  const [verifyingId, setVerifyingId] = useState<number | null>(null);
+
+  const handleQuestClick = (quest: any) => {
+    if (quest.completed || verifyingId) return;
+    
+    setVerifyingId(quest.id);
+    
+    // Simulate a verification delay
+    setTimeout(() => {
+      completeQuest(quest.id);
+      setVerifyingId(null);
+    }, 2500);
+  };
 
   return (
     <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 lg:p-8 relative overflow-hidden">
@@ -38,22 +53,26 @@ export function DailyQuests() {
         {quests.map((quest) => (
           <div
             key={quest.id}
-            onClick={() => !quest.completed && completeQuest(quest.id)}
+            onClick={() => handleQuestClick(quest)}
             className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
               quest.completed
                 ? "bg-emerald-500/5 border-emerald-500/20 opacity-70"
-                : "bg-gray-900/50 border-gray-700/50 hover:border-indigo-500/40 cursor-pointer group"
+                : verifyingId === quest.id 
+                  ? "bg-indigo-500/5 border-indigo-500/40 animate-pulse"
+                  : "bg-gray-900/50 border-gray-700/50 hover:border-indigo-500/40 cursor-pointer group"
             }`}
           >
             <div className="flex items-center gap-4">
               {quest.completed ? (
                 <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+              ) : verifyingId === quest.id ? (
+                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin shrink-0"></div>
               ) : (
                 <CircleDashed className="w-6 h-6 text-gray-500 group-hover:text-indigo-400 transition-colors shrink-0" />
               )}
               <div>
                 <h3 className={`font-bold text-sm ${quest.completed ? "text-gray-400 line-through" : "text-white"}`}>
-                  {quest.title}
+                  {verifyingId === quest.id ? "Verifying..." : quest.title}
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">{quest.description}</p>
               </div>
