@@ -12,7 +12,7 @@ import { ActiveCopiedTrades } from "@/components/ActiveCopiedTrades";
 import { MarketEventsTicker } from "@/components/MarketEventsTicker";
 import { DailyQuests } from "@/components/DailyQuests";
 import { LivePriceTicker } from "@/components/LivePriceTicker";
-import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 export default function Home() {
@@ -32,8 +32,9 @@ export default function Home() {
           
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
-               <a href="/" className="flex items-center gap-2 text-white"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
-               <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><ArrowRightLeft className="w-4 h-4" /> Deposit</a>
+                <a href="/" className="flex items-center gap-2 text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
+                <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
+                <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><ArrowRightLeft className="w-4 h-4" /> Deposit</a>
             </nav>
 
             <div className="flex items-center gap-4 border-l border-gray-800 pl-6">
@@ -68,6 +69,22 @@ export default function Home() {
         
         <div className="mb-6">
           <MarketEventsTicker />
+        </div>
+
+        {/* Live Chart Section */}
+        <div className="mb-8 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 overflow-hidden">
+          <div className="flex justify-between items-center mb-4 px-2">
+            <h3 className="text-lg font-bold flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-400" /> Market Analysis (Live BTC/USDT)
+            </h3>
+            <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest bg-gray-900/50 px-3 py-1 rounded-full border border-gray-800">Powered by TradingView</span>
+          </div>
+          <div className="w-full h-[450px] rounded-2xl overflow-hidden border border-gray-700/30 shadow-2xl">
+            <iframe 
+              src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3ABTCUSDT&interval=D&hidesidetoolbar=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en"
+              style={{ width: '100%', height: '100%', border: 'none' }}
+            ></iframe>
+          </div>
         </div>
 
         <CountdownBanner />

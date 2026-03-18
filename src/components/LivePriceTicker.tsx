@@ -55,7 +55,7 @@ export function LivePriceTicker() {
   );
 
   return (
-    <div className="bg-[#0A0A0B] border-b border-gray-800 overflow-hidden h-10 flex items-center relative group">
+    <div className="sticky top-0 z-[100] bg-[#0A0A0B] border-b border-gray-800 overflow-hidden h-10 flex items-center group shadow-xl">
       <div className="flex animate-marquee whitespace-nowrap py-2 hover:pause-marquee">
         {/* Double the list for seamless looping */}
         {[...prices, ...prices].map((p, i) => (

@@ -38,18 +38,28 @@ export interface Trade {
   endDate?: number;
 }
 
+export interface Transaction {
+  id: string;
+  type: "DEPOSIT" | "WITHDRAW" | "TRADE" | "REWARD";
+  amount: number;
+  status: "COMPLETED" | "PENDING" | "FAILED";
+  description: string;
+  timestamp: number;
+}
+
 interface UserContextType {
   user: User | null;
   balance: number;
   quests: Quest[];
   activeTrades: Trade[];
+  transactions: Transaction[];
   isLoading: boolean;
   login: (userData: User) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
-  updateBalance: (amount: number) => Promise<void>;
+  updateBalance: (amount: number, description?: string) => Promise<void>;
   completeQuest: (id: number) => Promise<void>;
-  addTrade: (trade: Trade) => Promise<void>;
+  addTrade: (trade: any) => Promise<void>;
   removeTrade: (id: number) => Promise<void>;
   requestDeposit: (amount: string, txid: string) => Promise<void>;
   manualTradeCount: number;
@@ -69,6 +79,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [balance, setBalance] = useState<number>(0);
   const [quests, setQuests] = useState<Quest[]>(INITIAL_QUESTS);
   const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [manualTradeCount, setManualTradeCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -82,6 +93,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setBalance(data.balance);
         if (data.quests?.length) setQuests(data.quests);
         if (data.trades?.length) setActiveTrades(data.trades);
+        if (data.transactions?.length) setTransactions(data.transactions);
       }
     } catch (e) {
       console.error("Failed to sync with cloud", e);
@@ -112,6 +124,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setQuests(INITIAL_QUESTS);
     setBalance(0);
     setActiveTrades([]);
+    setTransactions([]);
   };
 
   const syncUpdates = async (updates: any) => {
@@ -123,23 +136,49 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const updateBalance = async (amount: number) => {
+  const updateBalance = async (amount: number, description: string = "Manual adjustment") => {
     const newBalance = balance + amount;
+    const newTx: Transaction = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: amount > 0 ? "DEPOSIT" : "WITHDRAW",
+      amount: Math.abs(amount),
+      status: "COMPLETED",
+      description,
+      timestamp: Date.now()
+    };
+    const updatedTxs = [newTx, ...transactions];
     setBalance(newBalance);
-    await syncUpdates({ balance: newBalance });
+    setTransactions(updatedTxs);
+    await syncUpdates({ balance: newBalance, transactions: updatedTxs });
   };
 
   const completeQuest = async (id: number) => {
+    let earned = 0;
     const updatedQuests = quests.map((q) => {
       if (q.id === id && !q.completed) {
         const rewardValue = parseFloat(q.reward.replace("$", ""));
-        if (!isNaN(rewardValue)) setBalance(prev => prev + rewardValue);
+        if (!isNaN(rewardValue)) earned = rewardValue;
         return { ...q, completed: true };
       }
       return q;
     });
-    setQuests(updatedQuests);
-    await syncUpdates({ quests: updatedQuests, balance: balance + (quests.find(q=>q.id===id)?.completed ? 0 : parseFloat(quests.find(q=>q.id===id)!.reward.replace("$",""))) });
+
+    if (earned > 0) {
+      const newBalance = balance + earned;
+      const newTx: Transaction = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: "REWARD",
+        amount: earned,
+        status: "COMPLETED",
+        description: `Quest: ${quests.find(q => q.id === id)?.title}`,
+        timestamp: Date.now()
+      };
+      const updatedTxs = [newTx, ...transactions];
+      setBalance(newBalance);
+      setQuests(updatedQuests);
+      setTransactions(updatedTxs);
+      await syncUpdates({ balance: newBalance, quests: updatedQuests, transactions: updatedTxs });
+    }
   };
 
   const addTrade = async (trade: any) => {
@@ -150,8 +189,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       endDate: now + 30 * 24 * 60 * 60 * 1000 // 30 days
     };
     const newTrades = [tradeWithDates, ...activeTrades];
+
+    const newTx: Transaction = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: "TRADE",
+      amount: trade.allocation,
+      status: "COMPLETED",
+      description: `Copy Trade: ${trade.trader} (${trade.pair})`,
+      timestamp: now
+    };
+    const updatedTxs = [newTx, ...transactions];
+
     setActiveTrades(newTrades);
-    await syncUpdates({ trades: newTrades });
+    setTransactions(updatedTxs);
+    await syncUpdates({ trades: newTrades, transactions: updatedTxs });
   };
 
   const removeTrade = async (id: number) => {
@@ -188,6 +239,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         balance,
         quests,
         activeTrades,
+        transactions,
         isLoading,
         login,
         logout,
