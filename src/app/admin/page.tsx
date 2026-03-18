@@ -6,8 +6,13 @@ import { CheckCircle2, XCircle, Clock, ShieldCheck, Mail, Database } from "lucid
 export default function AdminPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [password, setPassword] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  const ADMIN_PWD = "8751721901:AAFgZ-XxGhxUa7W7jDY8BDQoCVhjkJzOUvQ";
 
   const fetchDeposits = async () => {
+    if (!isAuthorized) return;
     setLoading(true);
     try {
       const res = await fetch("/api/admin/deposits");
@@ -37,9 +42,59 @@ export default function AdminPage() {
     }
   };
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PWD) {
+      setIsAuthorized(true);
+    } else {
+      alert("Invalid Admin Password");
+    }
+  };
+
   useEffect(() => {
-    fetchDeposits();
-  }, []);
+    if (isAuthorized) {
+      fetchDeposits();
+    }
+  }, [isAuthorized]);
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+        <div className="max-w-md w-full bg-gray-800/50 backdrop-blur-2xl border border-gray-700/50 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 opacity-50"></div>
+          <div className="relative z-10">
+            <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500">
+               <ShieldCheck className="w-10 h-10 text-indigo-400" />
+            </div>
+            <h1 className="text-3xl font-black text-center mb-2 tracking-tight">Restricted Area</h1>
+            <p className="text-gray-400 text-center mb-8 font-medium">Enter administrative credential to proceed.</p>
+            
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Database className="w-5 h-5 text-gray-500 group-focus-within/input:text-indigo-400 transition-colors" />
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Admin Token Key"
+                  className="block w-full pl-12 pr-4 py-4 bg-gray-900/50 border border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm"
+                  autoFocus
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+              >
+                Unlock Dashboard
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white p-8">
@@ -51,9 +106,14 @@ export default function AdminPage() {
             </h1>
             <p className="text-gray-400 mt-1">Manage pending transactions and user deposits.</p>
           </div>
-          <button onClick={fetchDeposits} className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg border border-gray-700 transition-colors">
-            Refresh Data
-          </button>
+          <div className="flex gap-3">
+            <button onClick={() => setIsAuthorized(false)} className="bg-gray-800/50 hover:bg-rose-500/10 hover:text-rose-400 px-4 py-2 rounded-lg border border-gray-700 transition-all text-sm font-bold flex items-center gap-2">
+               Sign Out
+            </button>
+            <button onClick={fetchDeposits} className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg transition-colors text-sm font-bold">
+              Refresh Data
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -119,14 +179,14 @@ export default function AdminPage() {
                         className="p-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-lg transition-all border border-emerald-500/20 shadow-lg shadow-emerald-500/5"
                         title="Approve Deposit"
                        >
-                         <CheckCircle2 className="w-5 h-5" />
+                          <CheckCircle2 className="w-5 h-5" />
                        </button>
                        <button 
                          onClick={() => handleAction(d.email, "reject")}
                          className="p-2 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg transition-all border border-rose-500/20 shadow-lg shadow-rose-500/5"
                          title="Reject Deposit"
                        >
-                         <XCircle className="w-5 h-5" />
+                          <XCircle className="w-5 h-5" />
                        </button>
                     </div>
                   </td>
