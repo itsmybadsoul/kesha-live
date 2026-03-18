@@ -56,8 +56,11 @@ export default function Home() {
                {user ? (
                  <div className="flex items-center gap-2 md:gap-4">
                    <div className="text-right hidden sm:block">
-                     <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Available Balance</div>
-                     <div className="text-sm font-black text-emerald-400">${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                     <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Net Equity (USDT)</div>
+                     <div className="text-sm font-black text-emerald-400 flex items-center gap-1.5 ml-auto justify-end">
+                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3.5 h-3.5" />
+                        ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                     </div>
                    </div>
                    
                    {/* Mobile Quick Deposit */}
@@ -134,7 +137,10 @@ export default function Home() {
                   <h3 className="text-lg font-bold flex items-center gap-2 mb-1">
                     <TrendingUp className="w-5 h-5 text-indigo-400" /> Market Intelligence ({selectedAsset}/USDT)
                   </h3>
-                  <p className="text-xs text-gray-500">Live technical analysis from our global liquidity network.</p>
+                  <div className="flex items-center gap-1.5">
+                     <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3 h-3 grayscale opacity-40" />
+                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bespoke Liquidity Infrastructure for USDT Holders</p>
+                  </div>
                 </div>
               </div>
             <div className="flex flex-wrap gap-1.5 bg-black/40 p-1 rounded-xl border border-gray-800/50">
@@ -153,18 +159,18 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="w-full h-[550px] rounded-2xl overflow-hidden border border-gray-700/30 shadow-2xl bg-[#0A0A0B] relative">
-            {/* Logo Masking Overlay */}
-            <div className="absolute inset-0 z-10 pointer-events-none border-[12px] border-[#131722] rounded-2xl"></div>
-            <div className="w-full h-full transform scale-[1.03] origin-top translate-y-[-8px]">
+          <div className="w-full h-[600px] rounded-2xl overflow-hidden border border-gray-700/30 shadow-2xl bg-[#131722] relative">
+            <div className="w-full h-full transform scale-[1.08] origin-center translate-y-[-10px]">
               <iframe 
                 key={selectedAsset}
-                src={`https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3A${selectedAsset}USDT&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%2C%22widget_logo%22%2C%22header_resolutions%22%5D&locale=en`}
+                src={`https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3A${selectedAsset}USDT&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%2C%22widget_logo%22%2C%22header_resolutions%22%2C%22header_chart_type%22%5D&locale=en`}
                 style={{ width: '100%', height: '100%', border: 'none' }}
               ></iframe>
             </div>
-            {/* Branding Mask (Bottom) */}
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-[#131722] z-20"></div>
+            {/* Precision Branding Masks */}
+            <div className="absolute bottom-0 left-0 right-0 h-14 bg-[#131722] z-20"></div>
+            <div className="absolute top-0 left-0 w-32 h-14 bg-[#131722] z-20"></div>
+            <div className="absolute top-0 right-0 w-32 h-14 bg-[#131722] z-20"></div>
           </div>
         </div>
 
@@ -196,11 +202,11 @@ export default function Home() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-lg shadow-indigo-500/20 active:scale-95 text-sm uppercase tracking-widest">
-                <Wallet className="w-4 h-4" /> Deposit Funds
+                <Wallet className="w-4 h-4" /> Deposit USDT
               </a>
-              <button disabled className="bg-gray-800/50 cursor-not-allowed border border-gray-700/50 text-gray-500 font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-colors text-sm">
-                <ArrowRightLeft className="w-4 h-4" /> Withdraw
-              </button>
+              <a href="/deposit" className="bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 text-gray-400 font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-colors text-sm uppercase tracking-widest">
+                <ArrowRightLeft className="w-4 h-4" /> Withdraw Funds
+              </a>
             </div>
 
             <MarketSentiment />
@@ -228,8 +234,12 @@ export default function Home() {
                  </div>
               </div>
 
-              <div className="flex flex-col md:flex-row items-center gap-8 text-[12px] text-gray-500 font-bold uppercase tracking-widest">
-                 <a href="#" className="hover:text-indigo-400 transition-colors">Terms of Use</a>
+                 <div className="flex flex-col md:flex-row items-center gap-8 text-[12px] text-gray-500 font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-gray-900 rounded-lg border border-gray-800">
+                       <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3.5 h-3.5 grayscale opacity-50" />
+                       <span className="text-[9px]">USDT TRC20 Accepted</span>
+                    </div>
+                    <a href="#" className="hover:text-indigo-400 transition-colors">Terms of Use</a>
                  <a href="#" className="hover:text-indigo-400 transition-colors">Global Compliance</a>
                  <a href="#" className="hover:text-indigo-400 transition-colors">Data Privacy</a>
                  <div className="hidden md:block w-px h-4 bg-gray-800"></div>

@@ -7,10 +7,10 @@ export function ReferralRewards() {
   const { user } = useUser();
 
   const milestones = [
-    { count: 5, reward: "$25", id: 1 },
-    { count: 10, reward: "$75", id: 2 },
-    { count: 25, reward: "$250", id: 3 },
-    { count: 100, reward: "$1,500", id: 4 },
+    { count: 5, reward: "25 USDT", id: 1 },
+    { count: 10, reward: "75 USDT", id: 2 },
+    { count: 25, reward: "250 USDT", id: 3 },
+    { count: 100, reward: "1,500 USDT", id: 4 },
   ];
 
   const currentInvites = user?.referralStats?.totalInvites || 2; // Default mock for new users
@@ -25,6 +25,10 @@ export function ReferralRewards() {
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
           Referral Rewards <Gift className="w-5 h-5 text-indigo-400" />
         </h3>
+        <div className="flex items-center gap-1 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+           <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-2.5 h-2.5" />
+           <span className="text-[8px] font-black text-indigo-400 uppercase tracking-tighter italic">Tether (USDT) Paid</span>
+        </div>
         <button className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-1 hover:text-white transition-colors">
           View All <ChevronRight className="w-3 h-3" />
         </button>

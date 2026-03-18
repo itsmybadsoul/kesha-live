@@ -9,8 +9,9 @@ export function PlatformTransparency() {
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
           Platform Transparency <ShieldCheck className="w-5 h-5 text-indigo-400" />
         </h3>
-        <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-          Verified
+        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+          <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3 h-3" />
+          USDT Verified
         </div>
       </div>
 
@@ -22,7 +23,7 @@ export function PlatformTransparency() {
              </div>
              <ArrowUpRight className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-2xl font-black text-white tabular-nums">$12,485,000.00</div>
+          <div className="text-2xl font-black text-white tabular-nums">12.4M USDT</div>
           <div className="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-tight">Maintained on-chain liquidity</div>
         </div>
 
@@ -33,7 +34,7 @@ export function PlatformTransparency() {
              </div>
              <ArrowUpRight className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-2xl font-black text-white tabular-nums">$4,821,500.24</div>
+          <div className="text-2xl font-black text-white tabular-nums">4.8M USDT</div>
           <div className="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-tight">Real-time across all nodes</div>
         </div>
 

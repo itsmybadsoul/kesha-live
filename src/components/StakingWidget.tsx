@@ -43,9 +43,9 @@ export function StakingWidget() {
       </div>
 
       <div className="mt-6 flex flex-col gap-3 relative z-10">
-         <button className="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest shadow-xl active:scale-95 flex items-center justify-center gap-2 group">
+         <a href="/deposit" className="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest shadow-xl active:scale-95 flex items-center justify-center gap-2 group">
             Stake USDT <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-         </button>
+         </a>
          <button className="w-full bg-gray-900/50 hover:bg-gray-800 text-gray-400 font-bold py-3 rounded-2xl transition-all text-[10px] border border-gray-700/50 uppercase tracking-widest">
             Stake History
          </button>

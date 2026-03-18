@@ -4,7 +4,7 @@ import { Gift, LockKeyhole } from "lucide-react";
 
 export function MysteryBox() {
   return (
-    <div className="bg-gradient-to-b from-indigo-900/40 to-purple-900/40 border border-indigo-500/30 rounded-3xl p-8 relative overflow-hidden group text-center cursor-pointer transition-all hover:scale-[1.02]">
+    <a href="/deposit" className="bg-gradient-to-b from-indigo-900/40 to-purple-900/40 border border-indigo-500/30 rounded-3xl p-8 relative overflow-hidden group text-center cursor-pointer transition-all hover:scale-[1.02]">
       {/* Glow Effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-fuchsia-500/20 rounded-full blur-3xl group-hover:bg-fuchsia-500/30 transition-colors duration-500"></div>
 
@@ -25,10 +25,10 @@ export function MysteryBox() {
           Deposit <span className="text-white font-bold">$500+</span> to unlock a random bonus up to <span className="text-amber-400 font-bold">$1,000 USDT</span>!
         </p>
 
-        <button className="flex items-center gap-2 bg-gray-900/80 border border-indigo-500/50 hover:bg-gray-800 text-indigo-300 font-medium py-2 px-6 rounded-full transition-colors text-sm">
+        <div className="inline-flex items-center gap-2 bg-gray-900/80 border border-indigo-500/50 hover:bg-gray-800 text-indigo-300 font-medium py-2 px-6 rounded-full transition-colors text-sm">
           <LockKeyhole className="w-4 h-4" /> Locked
-        </button>
+        </div>
       </div>
-    </div>
+    </a>
   );
 }
