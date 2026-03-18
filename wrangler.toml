@@ -1,0 +1,17 @@
+name = "crypto-dashboard"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Removed static output dir to allow Next.js SSR on Cloudflare Pages
+# pages_build_output_dir = "out"
+
+[vars]
+ENVIRONMENT = "production"
+
+[[kv_namespaces]]
+binding = "DATABASE"
+id = "crypto_db"
+
+[build]
+command = "npm run build"
+watch_dir = "src"

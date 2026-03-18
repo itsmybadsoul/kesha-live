@@ -1,0 +1,75 @@
+// This mimics the Cloudflare KV binding for local development.
+// When deployed to Cloudflare, the REAL 'DATABASE' binding will be used.
+
+export interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password?: string;
+  balance: number;
+  avatar: string;
+  quests: any[];
+  trades: any[];
+  pendingDeposit?: {
+    amount: number;
+    txid: string;
+    timestamp: number;
+  } | null;
+}
+
+// Global variable for local simulation (cleared on server restart)
+const mockDB: Record<string, string> = {};
+
+export async function getKV(key: string, env?: any): Promise<string | null> {
+  if (env?.DATABASE) {
+    return await env.DATABASE.get(key);
+  }
+  // Local fallback
+  return mockDB[key] || null;
+}
+
+export async function putKV(key: string, value: string, env?: any): Promise<void> {
+  if (env?.DATABASE) {
+    await env.DATABASE.put(key, value);
+    return;
+  }
+  // Local fallback
+  mockDB[key] = value;
+}
+
+export async function getUser(email: string, env?: any): Promise<UserData | null> {
+  const data = await getKV(`user:${email}`, env);
+  return data ? JSON.parse(data) : null;
+}
+
+export async function saveUser(user: UserData, env?: any): Promise<void> {
+  await putKV(`user:${user.email}`, JSON.stringify(user), env);
+}
+
+export async function getPendingDeposits(env?: any): Promise<UserData[]> {
+  // Normally we'd use a separate KV key or a list operation
+  // For this demo, we'll store a list of emails with pending status
+  const list = await getKV("pending_deposits_list", env);
+  if (!list) return [];
+  
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e, env)));
+  return users.filter((u): u is UserData => !!u && !!u.pendingDeposit);
+}
+
+export async function trackPendingDeposit(email: string, env?: any): Promise<void> {
+  const list = await getKV("pending_deposits_list", env);
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("pending_deposits_list", JSON.stringify(emails), env);
+  }
+}
+
+export async function untrackPendingDeposit(email: string, env?: any): Promise<void> {
+  const list = await getKV("pending_deposits_list", env);
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("pending_deposits_list", JSON.stringify(emails), env);
+}
