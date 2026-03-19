@@ -42,7 +42,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-white group cursor-pointer hover:scale-105 transition-transform">Yield<span className="text-indigo-400">Sphere</span></span>
+            <span className="font-bold text-xl tracking-tight text-white group cursor-pointer hover:scale-105 transition-transform">Block<span className="text-indigo-400">chain</span></span>
           </div>
           
           <div className="flex items-center gap-2 md:gap-6">
@@ -243,7 +243,7 @@ export default function Home() {
                  <a href="#" className="hover:text-indigo-400 transition-colors">Global Compliance</a>
                  <a href="#" className="hover:text-indigo-400 transition-colors">Data Privacy</a>
                  <div className="hidden md:block w-px h-4 bg-gray-800"></div>
-                 <span className="text-gray-700">© 2026 YieldSphere Infrastructure Limited</span>
+                 <span className="text-gray-700">© 2026 Blockchain Infrastructure Limited</span>
               </div>
            </div>
         </div>

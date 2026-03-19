@@ -61,7 +61,7 @@ export default function RegisterPage() {
         <div className="bg-gray-800/60 backdrop-blur-2xl border border-gray-700/60 rounded-3xl p-8 shadow-2xl">
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-bold text-white">Create your account</h1>
-            <p className="text-gray-400 text-sm mt-2">Join thousands of traders on YieldSphere.</p>
+            <p className="text-gray-400 text-sm mt-2">Join thousands of traders on Blockchain.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

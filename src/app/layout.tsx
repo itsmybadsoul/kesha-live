@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "YieldSphere - Crypto Investment Platform",
+  title: "Blockchain - Crypto Investment Platform",
   description: "Secure, high-yield crypto investment and exchange platform.",
 };
 

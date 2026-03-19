@@ -6,11 +6,11 @@ import { useState } from "react";
 import { Portal } from "./Portal";
 
 const mockTraders = [
-  { id: 1, name: "WhaleHunter", type: "High Risk", roi: "+245.5%", winRate: "68%", copiers: 1250, avatar: "/trader_whalehunter_1773855276449.png", color: "text-rose-500", border: "border-rose-500/20" },
+  { id: 1, name: "WhaleHunter", type: "High Risk", roi: "+245.5%", winRate: "68%", copiers: 1250, avatar: "/trader1.png", color: "text-rose-500", border: "border-rose-500/20" },
   { id: 2, name: "SteadyHands", type: "Low Risk", roi: "+45.2%", winRate: "92%", copiers: 8400, avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=256&h=256&auto=format&fit=crop", color: "text-emerald-500", border: "border-emerald-500/20" },
-  { id: 3, name: "AlphaBot AI", type: "Algorithmic", roi: "+112.8%", winRate: "81%", copiers: 4320, avatar: "/trader_alphabot_1773856062328.png", color: "text-indigo-500", border: "border-indigo-500/20" },
-  { id: 4, name: "DeFi Degen", type: "Extreme", roi: "+890.1%", winRate: "42%", copiers: 890, avatar: "/trader_defidegen_1773856292864.png", color: "text-orange-500", border: "border-orange-500/20" },
-  { id: 5, name: "MacroTrend", type: "Moderate", roi: "+88.4%", winRate: "75%", copiers: 3100, avatar: "/trader_macrotrend_1773856327177.png", color: "text-cyan-500", border: "border-cyan-500/20" }
+  { id: 3, name: "AlphaBot AI", type: "Algorithmic", roi: "+112.8%", winRate: "81%", copiers: 4320, avatar: "/trader3.png", color: "text-indigo-500", border: "border-indigo-500/20" },
+  { id: 4, name: "DeFi Degen", type: "Extreme", roi: "+890.1%", winRate: "42%", copiers: 890, avatar: "/trader4.png", color: "text-orange-500", border: "border-orange-500/20" },
+  { id: 5, name: "MacroTrend", type: "Moderate", roi: "+88.4%", winRate: "75%", copiers: 3100, avatar: "/trader5.png", color: "text-cyan-500", border: "border-cyan-500/20" }
 ];
 
 export function CopyTrading() {
