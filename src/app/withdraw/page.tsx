@@ -10,19 +10,32 @@ export default function WithdrawPage() {
   const { user, balance, requestWithdraw } = useUser();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<"CRYPTO" | "BANK">("CRYPTO");
-  const [details, setDetails] = useState("");
+  const [iban, setIban] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [cryptoAddress, setCryptoAddress] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !details) return alert("Please fill in all fields.");
+    
+    let finalDetails = "";
+    if (method === "CRYPTO") {
+      if (!cryptoAddress) return alert("Please enter your wallet address.");
+      finalDetails = cryptoAddress;
+    } else {
+      if (!iban || !accountName || !bankName) return alert("Please fill in all banking details.");
+      finalDetails = `IBAN: ${iban} | Name: ${accountName} | Bank: ${bankName}`;
+    }
+
+    if (!amount) return alert("Please enter an amount.");
     
     const withdrawAmount = parseFloat(amount);
     if (withdrawAmount > balance) return alert("Insufficient balance.");
     if (withdrawAmount < 20) return alert("Minimum withdrawal is $20.");
 
     setLoading(true);
-    await requestWithdraw(amount, method, details);
+    await requestWithdraw(amount, method, finalDetails);
     setLoading(false);
     alert("Withdrawal request submitted! Our finance team will process it within 24 hours.");
     router.push("/");
@@ -101,18 +114,58 @@ export default function WithdrawPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                {method === "CRYPTO" ? "USDT (TRC20) Wallet Address" : "Bank IBAN & Account Holder Name"}
-              </label>
-              <textarea
-                placeholder={method === "CRYPTO" ? "Enter your TRC20 destination address" : "Enter IBAN, SWIFT, and Full Name"}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                rows={3}
-                className="w-full bg-gray-900 border border-gray-700 focus:border-indigo-500 rounded-2xl px-5 py-4 text-white focus:outline-none transition-all font-mono text-sm resize-none"
-                required
-              />
+            <div className="space-y-6">
+              {method === "CRYPTO" ? (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">USDT (TRC20) Wallet Address</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your TRC20 destination address"
+                    value={cryptoAddress}
+                    onChange={(e) => setCryptoAddress(e.target.value)}
+                    className="w-full bg-gray-900 border border-gray-700 focus:border-indigo-500 rounded-2xl px-5 py-4 text-white focus:outline-none transition-all font-mono text-sm"
+                    required
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Beneficiary Full Name</label>
+                    <input
+                      type="text"
+                      placeholder="Account Holder Name"
+                      value={accountName}
+                      onChange={(e) => setAccountName(e.target.value)}
+                      className="w-full bg-gray-900 border border-gray-700 focus:border-indigo-500 rounded-2xl px-5 py-4 text-white focus:outline-none transition-all text-sm font-bold"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Bank IBAN</label>
+                      <input
+                        type="text"
+                        placeholder="International Bank Account Number"
+                        value={iban}
+                        onChange={(e) => setIban(e.target.value)}
+                        className="w-full bg-gray-900 border border-gray-700 focus:border-indigo-500 rounded-2xl px-5 py-4 text-white focus:outline-none transition-all font-mono text-sm"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Beneficiary Bank Name</label>
+                      <input
+                        type="text"
+                        placeholder="Name of your bank"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        className="w-full bg-gray-900 border border-gray-700 focus:border-indigo-500 rounded-2xl px-5 py-4 text-white focus:outline-none transition-all text-sm font-bold"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex flex-col gap-4">
