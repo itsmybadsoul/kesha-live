@@ -25,6 +25,7 @@ export interface User {
     nextMilestone: number;
     reward: string;
   };
+  balance: number;
   holdings: Record<string, number>;
 }
 
@@ -307,7 +308,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updatedTxs = [newTx, ...transactions];
     setBalance(newBalance);
     setTransactions(updatedTxs);
-    setUser({ ...user, holdings: currentHoldings });
+    setUser({ ...user, balance: newBalance, holdings: currentHoldings });
     
     await syncUpdates({ 
       balance: newBalance, 
