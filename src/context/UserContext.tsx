@@ -25,6 +25,7 @@ export interface User {
     nextMilestone: number;
     reward: string;
   };
+  holdings: Record<string, number>;
 }
 
 export interface Quest {
@@ -78,6 +79,7 @@ interface UserContextType {
   requestWithdraw: (amount: string, method: "CRYPTO" | "BANK", details: string) => Promise<void>;
   manualTradeCount: number;
   incrementManualTrades: () => Promise<void>;
+  tradeAsset: (from: string, to: string, amount: number, price: number) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -108,6 +110,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.quests?.length) setQuests(data.quests);
         if (data.trades?.length) setActiveTrades(data.trades);
         if (data.transactions?.length) setTransactions(data.transactions);
+        if (data.manualTradeCount) setManualTradeCount(data.manualTradeCount);
       }
     } catch (e) {
       console.error("Failed to sync with cloud", e);
@@ -265,6 +268,55 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await refreshUser();
     }
   };
+  const tradeAsset = async (from: string, to: string, amount: number, price: number) => {
+    if (!user) return;
+    
+    const currentHoldings = { ...(user.holdings || {}) };
+    let newBalance = balance;
+    
+    // 1. Validate & Deduct Source
+    if (from === "USD") {
+       if (balance < amount) throw new Error("Insufficient USD balance");
+       newBalance -= amount;
+    } else {
+       if ((currentHoldings[from] || 0) < amount) throw new Error(`Insufficient ${from} holdings`);
+       currentHoldings[from] -= amount;
+    }
+
+    // 2. Add Destination
+    const received = from === "USD" ? amount / price : (to === "USD" ? amount * price : (amount * price)); 
+    // Simplified: For Swap it's more complex, but for Buy/Sell this works.
+    // If Swap: from (crypto) -> USD -> to (crypto)
+    
+    if (to === "USD") {
+      newBalance += received;
+    } else {
+      currentHoldings[to] = (currentHoldings[to] || 0) + (from === "USD" ? amount / price : amount);
+      // Note: Swap logic will be handled by the component calculating the correct 'amount' to add
+    }
+
+    const newTx: Transaction = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: "TRADE",
+      amount: amount,
+      status: "COMPLETED",
+      description: `${from} to ${to} Exchange`,
+      timestamp: Date.now()
+    };
+
+    const updatedTxs = [newTx, ...transactions];
+    setBalance(newBalance);
+    setTransactions(updatedTxs);
+    setUser({ ...user, holdings: currentHoldings });
+    
+    await syncUpdates({ 
+      balance: newBalance, 
+      holdings: currentHoldings, 
+      transactions: updatedTxs 
+    });
+    
+    if (from === "USD") await incrementManualTrades();
+  };
 
   return (
     <UserContext.Provider
@@ -286,6 +338,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         requestWithdraw,
         manualTradeCount,
         incrementManualTrades,
+        tradeAsset,
       }}
     >
       {children}

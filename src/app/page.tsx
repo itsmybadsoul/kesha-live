@@ -20,12 +20,18 @@ import { MarketSentiment } from "@/components/MarketSentiment";
 import { TradeActivityToasts } from "@/components/TradeActivityToasts";
 import { StakingWidget } from "@/components/StakingWidget";
 import { AISignals } from "@/components/AISignals";
-import { LayoutDashboard, Wallet, ArrowRightLeft, Settings, LogOut, User, TrendingUp, BarChart3, Menu, X, ShieldCheck, Gift } from "lucide-react";
+import { SwapTrade } from "@/components/SwapTrade";
+import { TrendingUp, Wallet, LayoutDashboard, User, ArrowRightLeft, LogOut, Menu, X, Coins, PieChart, ShieldCheck, Gift, Settings, BarChart3 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 
 export default function Home() {
-  const { user, balance, logout } = useUser();
+  const { user, balance, logout, activeTrades } = useUser();
+  const totalEquity = balance + (activeTrades.reduce((acc, t) => acc + t.allocation, 0)) + 
+    Object.entries(user?.holdings || {}).reduce((acc, [symbol, amount]) => {
+      const prices: Record<string, number> = { BTC: 64230, ETH: 3450, SOL: 145, BNB: 580, XRP: 0.6, ADA: 0.4, DOGE: 0.1, TRX: 0.1 };
+      return acc + (amount * (prices[symbol] || 0));
+    }, 0);
   const [selectedAsset, setSelectedAsset] = useState("BTC");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -174,6 +180,50 @@ export default function Home() {
 
         <div className="mb-10">
           <MarketOverview />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+           <div className="lg:col-span-7">
+              <SwapTrade />
+           </div>
+           <div className="lg:col-span-5">
+              <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 lg:p-8 h-full shadow-2xl">
+                 <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                       <PieChart className="w-5 h-5 text-emerald-400" /> My Holdings
+                    </h3>
+                    <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Live Portfolio</div>
+                 </div>
+                 <div className="space-y-4">
+                    {Object.entries(user?.holdings || {}).length > 0 ? (
+                      Object.entries(user?.holdings || {}).map(([symbol, amount]) => (
+                        amount > 0 && (
+                          <div key={symbol} className="flex items-center justify-between p-4 bg-black/20 border border-gray-800 rounded-2xl hover:border-gray-700 transition-all group">
+                             <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center font-black text-xs text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                   {symbol[0]}
+                                </div>
+                                <div>
+                                   <div className="text-sm font-black text-white">{symbol}</div>
+                                   <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Main Wallet</div>
+                                </div>
+                             </div>
+                             <div className="text-right">
+                                <div className="text-sm font-black text-white">{amount.toFixed(6)}</div>
+                                <div className="text-[10px] text-emerald-400 font-bold">~${(amount * (symbol === "BTC" ? 64230 : (symbol === "ETH" ? 3450 : (symbol === "SOL" ? 145 : 1)))).toLocaleString()}</div>
+                             </div>
+                          </div>
+                        )
+                      ))
+                    ) : (
+                      <div className="text-center py-10 opacity-40">
+                         <Coins className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                         <p className="text-sm font-bold text-gray-500">No assets held yet. Start trading to build your portfolio!</p>
+                      </div>
+                    )}
+                 </div>
+              </div>
+           </div>
         </div>
 
         <CountdownBanner />

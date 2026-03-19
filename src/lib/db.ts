@@ -21,6 +21,7 @@ export interface UserData {
     details: string; // Address or IBAN
     timestamp: number;
   } | null;
+  holdings: Record<string, number>;
 }
 
 // Global variable for local simulation (cleared on server restart)
