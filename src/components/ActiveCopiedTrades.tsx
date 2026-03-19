@@ -80,7 +80,7 @@ export function ActiveCopiedTrades() {
               </div>
               
               <div className="mt-4 text-[9px] text-gray-600 uppercase font-black tracking-widest text-center border-t border-gray-700/30 pt-2 italic">
-                Locked Maturity: Term Ends {new Date(trade.endDate || 0).toLocaleDateString()}
+                Locked Maturity: Term Ends {trade.endDate ? new Date(trade.endDate).toLocaleDateString() : "Calculating..."}
               </div>
             </div>
           );

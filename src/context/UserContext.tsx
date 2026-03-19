@@ -109,7 +109,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(data);
         setBalance(data.balance);
         if (data.quests?.length) setQuests(data.quests);
-        if (data.trades?.length) setActiveTrades(data.trades);
+        if (data.trades?.length) {
+          const repairedTrades = data.trades.map((t: any) => {
+             const now = Date.now();
+             const start = t.startDate || now;
+             const end = t.endDate || (start + 30 * 24 * 60 * 60 * 1000);
+             return { ...t, startDate: start, endDate: end };
+          });
+          setActiveTrades(repairedTrades);
+        }
         if (data.transactions?.length) setTransactions(data.transactions);
         if (data.manualTradeCount) setManualTradeCount(data.manualTradeCount);
       }
