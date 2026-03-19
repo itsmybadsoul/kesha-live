@@ -22,7 +22,8 @@ export async function POST(req: Request) {
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
       quests: [],
       trades: [],
-      pendingDeposit: null
+      pendingDeposit: null,
+      holdings: {}
     };
 
     await saveUser(newUser);
