@@ -1,5 +1,6 @@
+"use client";
 import React, { useEffect, useState } from "react";
-import { Activity, ArrowRight, Zap, TrendingUp, TrendingDown, Target } from "lucide-react";
+import { Activity, Zap, TrendingUp, TrendingDown, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const TRADERS = [

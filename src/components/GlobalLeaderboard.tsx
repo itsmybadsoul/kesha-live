@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Trophy, Medal, Star, TrendingUp, ChevronUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
