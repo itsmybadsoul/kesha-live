@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function WithdrawPage() {
   const router = useRouter();
   const { user, balance, requestWithdraw } = useUser();
+  const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<"CRYPTO" | "BANK">("CRYPTO");
   const [iban, setIban] = useState("");
@@ -21,23 +23,23 @@ export default function WithdrawPage() {
     
     let finalDetails = "";
     if (method === "CRYPTO") {
-      if (!cryptoAddress) return alert("Please enter your wallet address.");
+      if (!cryptoAddress) { toast("Please enter your wallet address.", "warning"); return; }
       finalDetails = cryptoAddress;
     } else {
-      if (!iban || !accountName || !bankName) return alert("Please fill in all banking details.");
+      if (!iban || !accountName || !bankName) { toast("Please fill in all banking details.", "warning"); return; }
       finalDetails = `IBAN: ${iban} | Name: ${accountName} | Bank: ${bankName}`;
     }
 
-    if (!amount) return alert("Please enter an amount.");
+    if (!amount) { toast("Please enter an amount.", "warning"); return; }
     
     const withdrawAmount = parseFloat(amount);
-    if (withdrawAmount > balance) return alert("Insufficient balance.");
-    if (withdrawAmount < 20) return alert("Minimum withdrawal is $20.");
+    if (withdrawAmount > balance) { toast("Insufficient balance.", "error"); return; }
+    if (withdrawAmount < 20) { toast("Minimum withdrawal is $20.", "warning"); return; }
 
     setLoading(true);
     await requestWithdraw(amount, method, finalDetails);
     setLoading(false);
-    alert("Withdrawal request submitted! Our finance team will process it within 24 hours.");
+    toast("Withdrawal request submitted! Our finance team will process it within 24 hours.", "success");
     router.push("/");
   };
 

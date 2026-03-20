@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { TrendingUp, TrendingDown, Clock, Activity, AlertTriangle, ShieldCheck } from "lucide-react";
 import { OptionsChart } from "@/components/OptionsChart";
 
@@ -20,6 +21,7 @@ const ASSETS: Record<string, number> = {
 
 export default function FuturesOptions() {
   const { user, balance, placeOptionsTrade, resolveOptionsTrade, refreshUser } = useUser();
+  const { toast } = useToast();
   const [selectedAsset, setSelectedAsset] = useState("BTC");
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState<number>(3);
@@ -66,9 +68,9 @@ export default function FuturesOptions() {
       const strike = livePrice;
       await placeOptionsTrade(selectedAsset, amount, direction, duration, strike);
       setAmount("");
-      alert(`Trade placed: ${selectedAsset} contracts ${direction} at $${strike.toLocaleString()}`);
+      toast(`Trade placed! ${selectedAsset} ${direction} at $${strike.toLocaleString()}`, "success");
     } catch (e: any) {
-      alert(e.message || "Failed to place trade");
+      toast(e.message || "Failed to place trade", "error");
     } finally {
       setPlacing(false);
     }

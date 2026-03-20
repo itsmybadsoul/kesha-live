@@ -2,6 +2,7 @@
 
 import { Users, TrendingUp, Search, Activity, HeartHandshake } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { useState } from "react";
 import { Portal } from "./Portal";
 
@@ -15,6 +16,7 @@ const mockTraders = [
 
 export function CopyTrading() {
   const { addTrade, updateBalance, completeQuest, balance } = useUser();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
 
   const [selectedTrader, setSelectedTrader] = useState<any>(null);
@@ -27,11 +29,11 @@ export function CopyTrading() {
   const confirmCopy = () => {
     const alloc = parseFloat(amount);
     if (isNaN(alloc) || alloc < 50) {
-      alert("Minimum allocation is $50");
+      toast("Minimum allocation is $50", "warning");
       return;
     }
     if (balance < alloc) {
-      alert("Insufficient balance!");
+      toast("Insufficient balance!", "error");
       return;
     }
 
@@ -53,7 +55,7 @@ export function CopyTrading() {
     addTrade(newTrade);
     completeQuest(2); // Complete "Social Butterfly"
     setSelectedTrader(null);
-    alert(`Started copying ${selectedTrader.name}! $${alloc} allocated.`);
+    toast(`Started copying ${selectedTrader.name}! $${alloc} allocated.`, "success");
   };
 
   const filteredTraders = mockTraders.filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()));

@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { ArrowDownUp, Info, Wallet, RefreshCw, ChevronDown, TrendingUp } from "lucide-react";
 
 export function SwapTrade() {
   const { balance, user, tradeAsset } = useUser();
+  const { toast } = useToast();
   const [fromAsset, setFromAsset] = useState("USD");
   const [toAsset, setToAsset] = useState("BTC");
   const [amount, setAmount] = useState("");
@@ -57,9 +59,9 @@ export function SwapTrade() {
       const price = fromAsset === "USD" ? getPrice(toAsset) : (toAsset === "USD" ? getPrice(fromAsset) : getPrice(fromAsset));
       await tradeAsset(fromAsset, toAsset, parseFloat(amount), price);
       setAmount("");
-      alert("Trade executed successfully!");
+      toast("Trade executed successfully!", "success");
     } catch (e: any) {
-      alert(e.message || "Trade failed");
+      toast(e.message || "Trade failed", "error");
     } finally {
       setLoading(false);
     }

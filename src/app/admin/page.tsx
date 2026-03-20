@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast } from "@/context/ToastContext";
 import { CheckCircle2, XCircle, Clock, ShieldCheck, Mail, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown } from "lucide-react";
 
 export default function AdminPage() {
@@ -11,6 +12,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const { toast } = useToast();
 
   const ADMIN_PWD = "8751721901:AAFgZ-XxGhxUa7W7jDY8BDQoCVhjkJzOUvQ";
 
@@ -48,11 +50,11 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`${action === "approve" ? "Approved" : "Rejected"} successfully!`);
+        toast(`${action === "approve" ? "✅ Approved" : "❌ Rejected"} successfully!`, action === "approve" ? "success" : "warning");
         fetchData();
       }
     } catch (e) {
-      alert("Action failed.");
+      toast("Action failed.", "error");
     }
   };
 
@@ -65,11 +67,11 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`Market successfully manipulated: user forced to ${adminResult}!`);
+        toast(`🎯 User forced to ${adminResult}!`, "success");
         fetchData();
       }
     } catch (e) {
-      alert("Manipulation failed.");
+      toast("Manipulation failed.", "error");
     }
   };
 
@@ -78,7 +80,7 @@ export default function AdminPage() {
     if (password === ADMIN_PWD) {
       setIsAuthorized(true);
     } else {
-      alert("Invalid Admin Password");
+      toast("Invalid Admin Password", "error");
     }
   };
 

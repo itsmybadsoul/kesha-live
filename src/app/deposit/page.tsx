@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { Wallet, Copy, CheckCircle2, ArrowLeft, Info } from "lucide-react";
 
 export default function DepositPage() {
   const router = useRouter();
   const { requestDeposit, user } = useUser();
+  const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [txid, setTxid] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,12 +25,12 @@ export default function DepositPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !txid) return alert("Please fill in all fields.");
+    if (!amount || !txid) { toast("Please fill in all fields.", "warning"); return; }
     
     setLoading(true);
     await requestDeposit(amount, txid);
     setLoading(false);
-    alert("Deposit request submitted! It will appear in your balance once verified by admin.");
+    toast("Deposit request submitted! It will appear in your balance once verified.", "success");
     router.push("/");
   };
 
