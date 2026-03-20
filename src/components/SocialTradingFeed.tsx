@@ -59,7 +59,7 @@ export function SocialTradingFeed() {
   };
 
   return (
-    <div className="bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col h-full relative overflow-hidden">
+    <div className="bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl"></div>
       

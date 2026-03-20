@@ -272,6 +272,7 @@ export default function Home() {
             </div>
             <CopyTrading />
             <SocialTradingFeed />
+            <GlobalLeaderboard />
             <DailyQuests />
             <ActiveCopiedTrades />
             <ROICalculator />
@@ -291,7 +292,6 @@ export default function Home() {
             </div>
 
             <ReferralRewards />
-            <GlobalLeaderboard />
             <StakingWidget />
             <AISignals />
             <MysteryBox />
