@@ -14,8 +14,10 @@ import { DailyQuests } from "@/components/DailyQuests";
 import { LivePriceTicker } from "@/components/LivePriceTicker";
 import { MarketOverview } from "@/components/MarketOverview";
 import { SocialSentimentFeed } from "@/components/SocialSentimentFeed";
+import { SocialTradingFeed } from "@/components/SocialTradingFeed";
 import { PlatformTransparency } from "@/components/PlatformTransparency";
 import { ReferralRewards } from "@/components/ReferralRewards";
+import { GlobalLeaderboard } from "@/components/GlobalLeaderboard";
 import { MarketSentiment } from "@/components/MarketSentiment";
 import { TradeActivityToasts } from "@/components/TradeActivityToasts";
 import { StakingWidget } from "@/components/StakingWidget";
@@ -132,6 +134,30 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-[1440px] mx-auto px-4 md:px-10 py-8">
         
+        {user && !user.hasDepositBonus && (
+          <div className="mb-8 p-6 md:p-8 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-emerald-500/20 border border-indigo-500/30 rounded-3xl relative overflow-hidden group shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+               <div className="flex items-center gap-6">
+                 <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-3xl p-0.5 shadow-[0_0_40px_rgba(99,102,241,0.4)]">
+                    <div className="w-full h-full bg-gray-900 rounded-[22px] flex items-center justify-center">
+                       <span className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-emerald-400">+5%</span>
+                    </div>
+                 </div>
+                 <div>
+                    <h3 className="text-xl md:text-2xl font-black text-white mb-2 tracking-tight flex items-center gap-2">
+                       First-Time Deposit Bonus! <Gift className="w-6 h-6 text-emerald-400" />
+                    </h3>
+                    <p className="text-sm md:text-base text-indigo-200/80 font-medium max-w-xl">Deposit <strong className="text-white">$100 USDT or more</strong> right now and we will instantly credit your account with a permanent <strong className="text-emerald-400">+5% Cash Bonus</strong>! (One-time only)</p>
+                 </div>
+               </div>
+               <a href="/deposit" className="shrink-0 w-full md:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:scale-105 transition-transform rounded-2xl text-black font-black uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(52,211,153,0.3)] flex items-center justify-center gap-2">
+                  Claim Bonus Now <ArrowRightLeft className="w-4 h-4" />
+               </a>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6">
           <MarketEventsTicker />
         </div>
@@ -245,7 +271,7 @@ export default function Home() {
                <PlatformTransparency />
             </div>
             <CopyTrading />
-            <SocialSentimentFeed />
+            <SocialTradingFeed />
             <DailyQuests />
             <ActiveCopiedTrades />
             <ROICalculator />
@@ -265,6 +291,7 @@ export default function Home() {
             </div>
 
             <ReferralRewards />
+            <GlobalLeaderboard />
             <StakingWidget />
             <AISignals />
             <MysteryBox />

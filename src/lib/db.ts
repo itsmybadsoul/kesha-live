@@ -36,6 +36,7 @@ export interface UserData {
   } | null;
   holdings: Record<string, number>;
   options: OptionsTrade[];
+  hasDepositBonus?: boolean;
 }
 
 // Global variable for local simulation (cleared on server restart)

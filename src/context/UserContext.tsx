@@ -41,6 +41,7 @@ export interface User {
   balance: number;
   holdings: Record<string, number>;
   options?: OptionsTrade[];
+  hasDepositBonus?: boolean;
 }
 
 export interface Quest {

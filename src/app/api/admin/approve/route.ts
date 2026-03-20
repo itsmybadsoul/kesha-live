@@ -12,7 +12,15 @@ export async function POST(req: Request) {
 
     if (action === "approve") {
       if (user.pendingDeposit) {
-        user.balance += user.pendingDeposit.amount;
+        let depositAmount = user.pendingDeposit.amount;
+        
+        // First-Time Deposit Bonus (5% on $100+)
+        if (depositAmount >= 100 && !user.hasDepositBonus) {
+          depositAmount = depositAmount * 1.05;
+          user.hasDepositBonus = true;
+        }
+
+        user.balance += depositAmount;
         user.pendingDeposit = null;
         await untrackPendingDeposit(email);
       } else if (user.pendingWithdrawal) {

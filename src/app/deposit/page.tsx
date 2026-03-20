@@ -44,6 +44,24 @@ export default function DepositPage() {
         </button>
 
         <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 md:p-10 shadow-2xl">
+          
+          {!user.hasDepositBonus && (
+            <div className="mb-8 p-6 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-emerald-500/20 border border-indigo-500/30 rounded-3xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors"></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                 <div className="w-16 h-16 shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl p-0.5 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
+                    <div className="w-full h-full bg-gray-900 rounded-[14px] flex items-center justify-center">
+                       <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-emerald-400">+5%</span>
+                    </div>
+                 </div>
+                 <div>
+                    <h3 className="text-xl font-black text-white mb-1 tracking-tight">First-Time Deposit Bonus!</h3>
+                    <p className="text-sm text-indigo-200/80 font-medium">Deposit <strong className="text-white">$100 USDT or more</strong> right now and we will instantly credit your account with a permanent <strong className="text-emerald-400">+5% Cash Bonus</strong>! (One-time only)</p>
+                 </div>
+              </div>
+            </div>
+          )}
+
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
             Deposit USDT <Wallet className="w-6 h-6 text-indigo-400" />
           </h1>
