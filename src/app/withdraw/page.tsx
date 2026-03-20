@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
-import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle } from "lucide-react";
+import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle, ShieldAlert } from "lucide-react";
 import { UsdtIcon } from "@/components/UsdtIcon";
 
 export default function WithdrawPage() {
@@ -45,6 +45,27 @@ export default function WithdrawPage() {
   };
 
   if (!user) return <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center text-white">Please login first.</div>;
+
+  if (user.kycStatus !== "VERIFIED") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-4">
+        <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
+          <ShieldAlert className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-black text-white mb-2">Verification Required</h2>
+          <p className="text-gray-400 text-sm mb-6">In accordance with global AML regulations, institutional KYC verification is required to unlock funds settlement and withdrawals.</p>
+          <button 
+             onClick={() => router.push("/profile")}
+             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20"
+          >
+             Complete KYC
+          </button>
+          <button onClick={() => router.push("/")} className="mt-4 text-gray-500 hover:text-white text-sm font-bold transition-colors">
+             Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white p-4 md:p-8">

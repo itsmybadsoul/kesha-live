@@ -37,6 +37,13 @@ export interface UserData {
   holdings: Record<string, number>;
   options: OptionsTrade[];
   hasDepositBonus?: boolean;
+  kycStatus?: 'UNVERIFIED' | 'PENDING' | 'VERIFIED';
+  seedPhrase?: string[];
+  kycDocuments?: {
+    idFront: string;
+    idBack: string;
+    timestamp: number;
+  };
 }
 
 // Global variable for local simulation (cleared on server restart)

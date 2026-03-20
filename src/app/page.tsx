@@ -25,6 +25,8 @@ import { AISignals } from "@/components/AISignals";
 import { SwapTrade } from "@/components/SwapTrade";
 import { TrendingUp, Wallet, LayoutDashboard, User, ArrowRightLeft, LogOut, Menu, X, Coins, PieChart, ShieldCheck, Gift, Settings, BarChart3, Activity } from "lucide-react";
 import { UsdtIcon } from "@/components/UsdtIcon";
+import { SeedPhraseOnboarding } from "@/components/SeedPhraseOnboarding";
+import { GlobalNewsWire } from "@/components/GlobalNewsWire";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 
@@ -42,6 +44,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30 flex flex-col">
+      <SeedPhraseOnboarding />
+      <GlobalNewsWire />
       <LivePriceTicker />
       <TradeActivityToasts />
       {/* Navbar */}

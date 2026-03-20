@@ -3,6 +3,8 @@
 import { useUser } from "@/context/UserContext";
 import { LivePriceTicker } from "@/components/LivePriceTicker";
 import { User, Wallet, TrendingUp, History, ArrowUpRight, ArrowDownRight, Award, ShieldCheck } from "lucide-react";
+import { KYCPortal } from "@/components/KYCPortal";
+import { DigitalMembershipCard } from "@/components/DigitalMembershipCard";
 
 export default function ProfilePage() {
   const { user, balance, transactions, activeTrades } = useUser();
@@ -44,36 +46,10 @@ export default function ProfilePage() {
       <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Left: User Card */}
+          {/* Left: User Card & KYC */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-8 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-indigo-500/10 to-transparent"></div>
-              <div className="relative">
-                <img src={user.avatar} alt="Avatar" className="w-24 h-24 rounded-full mx-auto border-4 border-gray-900 shadow-2xl mb-4" />
-                <div className="absolute bottom-4 right-1/2 translate-x-12 bg-emerald-500 w-5 h-5 rounded-full border-4 border-gray-900" title="Active"></div>
-              </div>
-              <h2 className="text-2xl font-black">{user.firstName} {user.lastName}</h2>
-              <p className="text-gray-500 text-sm mb-6">{user.email}</p>
-              
-              <div className="grid grid-cols-2 gap-4 text-left">
-                <div className="bg-gray-900/50 p-4 rounded-2xl border border-gray-700/30">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Account Level</div>
-                  <div className="text-sm font-bold text-indigo-400 flex items-center gap-1">
-                    <Award className="w-3.5 h-3.5" /> Silver VIP
-                  </div>
-                </div>
-                <div className="bg-gray-900/50 p-4 rounded-2xl border border-gray-700/30">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Identity</div>
-                  <div className="text-sm font-bold text-emerald-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Verified
-                  </div>
-                </div>
-              </div>
-
-              <button className="w-full mt-6 bg-gray-700/50 hover:bg-gray-700 text-white font-bold py-3 rounded-xl transition-all text-sm border border-gray-600/30 active:scale-95">
-                Edit Settings
-              </button>
-            </div>
+            <DigitalMembershipCard />
+            <KYCPortal />
 
             {/* Quick Stats */}
             <div className="bg-gray-800/40 border border-gray-700/50 rounded-3xl p-6 space-y-4">

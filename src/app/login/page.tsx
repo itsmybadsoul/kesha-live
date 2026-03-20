@@ -9,6 +9,8 @@ export default function LoginPage() {
   const { login } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [seedPhrase, setSeedPhrase] = useState("");
+  const [loginType, setLoginType] = useState<"PASSWORD" | "RECOVERY">("PASSWORD");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,10 +20,13 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const endpoint = loginType === "PASSWORD" ? "/api/auth/login" : "/api/auth/recover";
+      const body = loginType === "PASSWORD" ? { email, password } : { email, seedPhrase: seedPhrase.trim() };
+      
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (data.success) {
@@ -56,6 +61,23 @@ export default function LoginPage() {
             <p className="text-gray-400 text-sm mt-2">Sign in to your account to continue trading.</p>
           </div>
 
+          <div className="flex gap-2 mb-8 bg-gray-900/50 p-1.5 rounded-xl border border-gray-700/50">
+            <button
+              type="button"
+              onClick={() => setLoginType("PASSWORD")}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "PASSWORD" ? "bg-indigo-600 shadow-md text-white" : "text-gray-400 hover:text-white"}`}
+            >
+              Password
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginType("RECOVERY")}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "RECOVERY" ? "bg-amber-600 shadow-md text-white" : "text-gray-400 hover:text-white"}`}
+            >
+              Recovery Phrase
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
@@ -67,19 +89,36 @@ export default function LoginPage() {
                 className="w-full bg-gray-900/60 border border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors"
               />
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-300">Password</label>
-                <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</a>
+
+            {loginType === "PASSWORD" ? (
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-300">Password</label>
+                  <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</a>
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-gray-900/60 border border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors"
+                />
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-gray-900/60 border border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors"
-              />
-            </div>
+            ) : (
+               <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-300">12-Word Seed Phrase</label>
+                  </div>
+                  <textarea
+                    value={seedPhrase}
+                    onChange={(e) => setSeedPhrase(e.target.value)}
+                    placeholder="word1 word2 word3..."
+                    rows={3}
+                    className="w-full bg-gray-900/60 border border-amber-900/50 hover:border-amber-600 focus:border-amber-500 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors font-mono text-sm leading-relaxed"
+                  />
+                  <p className="text-[10px] text-amber-500 mt-2 font-medium">Use spaces to separate your recovery words.</p>
+               </div>
+            )}
 
             {error && (
               <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">

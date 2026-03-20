@@ -42,6 +42,8 @@ export interface User {
   holdings: Record<string, number>;
   options?: OptionsTrade[];
   hasDepositBonus?: boolean;
+  kycStatus?: 'UNVERIFIED' | 'PENDING' | 'VERIFIED';
+  seedPhrase?: string[];
 }
 
 export interface Quest {
@@ -98,6 +100,8 @@ interface UserContextType {
   tradeAsset: (from: string, to: string, amount: number, price: number) => Promise<void>;
   placeOptionsTrade: (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => Promise<void>;
   resolveOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ win: boolean; amount: number } | null>;
+  updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED') => Promise<void>;
+  setSeedPhrase: (phrase: string[]) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -371,6 +375,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
+  const updateKYCStatus = async (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED') => {
+    if (!user) return;
+    setUser({ ...user, kycStatus: status });
+    await syncUpdates({ kycStatus: status });
+  };
+
+  const setSeedPhrase = async (phrase: string[]) => {
+    if (!user) return;
+    setUser({ ...user, seedPhrase: phrase });
+    await syncUpdates({ seedPhrase: phrase });
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -394,6 +410,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         tradeAsset,
         placeOptionsTrade,
         resolveOptionsTrade,
+        updateKYCStatus,
+        setSeedPhrase,
       }}
     >
       {children}
