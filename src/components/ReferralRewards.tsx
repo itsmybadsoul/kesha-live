@@ -2,6 +2,7 @@
 
 import { useUser } from "@/context/UserContext";
 import { Users, Gift, ChevronRight, Share2, Award } from "lucide-react";
+import { UsdtIcon } from "./UsdtIcon";
 
 export function ReferralRewards() {
   const { user } = useUser();
@@ -26,7 +27,7 @@ export function ReferralRewards() {
           Referral Rewards <Gift className="w-5 h-5 text-indigo-400" />
         </h3>
         <div className="flex items-center gap-1 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-           <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-2.5 h-2.5" />
+           <UsdtIcon className="w-2.5 h-2.5" />
            <span className="text-[8px] font-black text-indigo-400 uppercase tracking-tighter italic">Tether (USDT) Paid</span>
         </div>
         <button className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-1 hover:text-white transition-colors">

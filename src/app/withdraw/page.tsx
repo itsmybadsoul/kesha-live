@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle } from "lucide-react";
+import { UsdtIcon } from "@/components/UsdtIcon";
 
 export default function WithdrawPage() {
   const router = useRouter();
@@ -64,7 +65,7 @@ export default function WithdrawPage() {
              <div className="space-y-1">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available for Settlement</span>
                 <div className="text-2xl font-black text-white flex items-center gap-2">
-                   <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-5 h-5" />
+                   <UsdtIcon className="w-5 h-5" />
                    ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
              </div>

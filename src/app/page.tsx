@@ -24,6 +24,7 @@ import { StakingWidget } from "@/components/StakingWidget";
 import { AISignals } from "@/components/AISignals";
 import { SwapTrade } from "@/components/SwapTrade";
 import { TrendingUp, Wallet, LayoutDashboard, User, ArrowRightLeft, LogOut, Menu, X, Coins, PieChart, ShieldCheck, Gift, Settings, BarChart3, Activity } from "lucide-react";
+import { UsdtIcon } from "@/components/UsdtIcon";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 
@@ -57,7 +58,8 @@ export default function Home() {
             <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-400">
                 <a href="/" className="flex items-center gap-2 text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
                 <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
-                <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><ArrowRightLeft className="w-4 h-4" /> Deposit</a>
+                 <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
+                 <a href="/withdraw" className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors font-bold"><ArrowRightLeft className="w-4 h-4" /> Withdraw</a>
                 <a href="/futures" className="flex items-center gap-2 text-indigo-400 font-black hover:text-indigo-300 transition-colors uppercase tracking-widest"><Activity className="w-4 h-4 animate-pulse" /> Pro Options</a>
             </nav>
 
@@ -67,13 +69,15 @@ export default function Home() {
                    <div className="text-right hidden sm:block">
                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Net Equity (USDT)</div>
                      <div className="text-sm font-black text-emerald-400 flex items-center gap-1.5 ml-auto justify-end">
-                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3.5 h-3.5" />
+                      <UsdtIcon className="w-3.5 h-3.5" />
                         ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                      </div>
                    </div>
-                   
-                   {/* Mobile Quick Deposit */}
-                   <a href="/deposit" className="lg:hidden p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform">
+                                      {/* Mobile Deposit / Withdraw */}
+                   <a href="/deposit" className="lg:hidden p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform" title="Deposit">
+                      <Wallet className="w-5 h-5" />
+                   </a>
+                   <a href="/withdraw" className="lg:hidden p-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-300 active:scale-90 transition-transform" title="Withdraw">
                       <ArrowRightLeft className="w-5 h-5" />
                    </a>
 
@@ -175,7 +179,7 @@ export default function Home() {
                     <TrendingUp className="w-5 h-5 text-indigo-400" /> Market Intelligence ({selectedAsset}/USDT)
                   </h3>
                   <div className="flex items-center gap-1.5">
-                     <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3 h-3 grayscale opacity-40" />
+                     <UsdtIcon className="w-3 h-3 grayscale opacity-40" />
                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Bespoke Liquidity Infrastructure for USDT Holders</p>
                   </div>
                 </div>
@@ -318,7 +322,7 @@ export default function Home() {
 
                  <div className="flex flex-col md:flex-row items-center gap-8 text-[12px] text-gray-500 font-bold uppercase tracking-widest">
                     <div className="flex items-center gap-2 px-3 py-1 bg-gray-900 rounded-lg border border-gray-800">
-                       <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3.5 h-3.5 grayscale opacity-50" />
+                       <UsdtIcon className="w-3.5 h-3.5 grayscale opacity-50" />
                        <span className="text-[9px]">USDT TRC20 Accepted</span>
                     </div>
                     <a href="#" className="hover:text-indigo-400 transition-colors">Terms of Use</a>

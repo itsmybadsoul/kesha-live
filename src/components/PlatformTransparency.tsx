@@ -1,6 +1,7 @@
 "use client";
 
 import { ShieldCheck, BarChart3, Database, Globe, ArrowUpRight } from "lucide-react";
+import { UsdtIcon } from "./UsdtIcon";
 
 export function PlatformTransparency() {
   return (
@@ -10,7 +11,7 @@ export function PlatformTransparency() {
           Platform Transparency <ShieldCheck className="w-5 h-5 text-indigo-400" />
         </h3>
         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-          <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" className="w-3 h-3" />
+          <UsdtIcon className="w-3 h-3" />
           USDT Verified
         </div>
       </div>
