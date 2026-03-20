@@ -7,16 +7,27 @@ interface OptionsChartProps {
   asset: string;
   basePrice: number;
   activeTrade?: OptionsTrade;
+  onPriceUpdate?: (price: number) => void;
 }
 
-export function OptionsChart({ asset, basePrice, activeTrade }: OptionsChartProps) {
+export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: OptionsChartProps) {
   const [dataPoints, setDataPoints] = useState<number[]>([]);
   const lastPriceRef = useRef(basePrice);
 
   useEffect(() => {
-    // Reset when asset changes
-    setDataPoints(Array(50).fill(basePrice));
-    lastPriceRef.current = basePrice;
+    // Generate organic historical initial points Instead of a flat line
+    let currentPoint = basePrice;
+    const initialPoints = [];
+    const volatility = basePrice * 0.0002;
+    for (let i = 0; i < 50; i++) {
+        initialPoints.push(currentPoint);
+        currentPoint += (Math.random() - 0.5) * volatility;
+    }
+    // Reverse so the last point is closest to current
+    initialPoints.reverse();
+    setDataPoints(initialPoints);
+    lastPriceRef.current = initialPoints[initialPoints.length - 1];
+    if (onPriceUpdate) onPriceUpdate(lastPriceRef.current);
   }, [asset, basePrice]);
 
   useEffect(() => {
@@ -31,15 +42,15 @@ export function OptionsChart({ asset, basePrice, activeTrade }: OptionsChartProp
         const totalDuration = activeTrade.durationMinutes * 60 * 1000;
         const urgency = Math.min(timeElapsed / totalDuration, 1);
         
-        // If Admin set a result, manipulate heavily!
+        // If Admin set a result, manipulate naturally!
         if (activeTrade.adminResult) {
-           const forceMultiplier = urgency * Object.keys(activeTrade).length; // Just scaling up
            const directionSign = activeTrade.direction === "UP" ? 1 : -1;
            const targetSign = activeTrade.adminResult === "WIN" ? directionSign : -directionSign;
            
-           // Force price in the target direction aggressively
-           const forceMove = targetSign * volatility * 8 * urgency; 
-           nextPrice += forceMove + (Math.random() - 0.5) * volatility; // Still add some noise
+           // Bias the random walk instead of drawing a straight line
+           const bias = targetSign * volatility * 0.6; // Subtle strong bias
+           // High volatility + bias
+           nextPrice += bias + (Math.random() - 0.5) * (volatility * 2);
         } else {
            // Normal random walk
            nextPrice += randomMove;
@@ -54,6 +65,7 @@ export function OptionsChart({ asset, basePrice, activeTrade }: OptionsChartProp
       }
 
       lastPriceRef.current = nextPrice;
+      if (onPriceUpdate) onPriceUpdate(nextPrice);
       
       setDataPoints(prev => {
         const newData = [...prev.slice(1), nextPrice];

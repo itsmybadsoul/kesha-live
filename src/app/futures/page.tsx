@@ -25,6 +25,12 @@ export default function FuturesOptions() {
   const [duration, setDuration] = useState<number>(3);
   const [placing, setPlacing] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [livePrice, setLivePrice] = useState(ASSETS["BTC"]);
+
+  // Sync initial live price when asset changes
+  useEffect(() => {
+    setLivePrice(ASSETS[selectedAsset]);
+  }, [selectedAsset]);
 
   // Polling loop for active trade resolution & admin intercepts
   useEffect(() => {
@@ -57,7 +63,7 @@ export default function FuturesOptions() {
     if (!amount || parseFloat(amount) <= 0) return;
     setPlacing(true);
     try {
-      const strike = ASSETS[selectedAsset];
+      const strike = livePrice;
       await placeOptionsTrade(selectedAsset, amount, direction, duration, strike);
       setAmount("");
       alert(`Trade placed: ${selectedAsset} contracts ${direction} at $${strike.toLocaleString()}`);
@@ -112,7 +118,9 @@ export default function FuturesOptions() {
                      }`}
                    >
                      <div className="text-xs font-black text-white mb-1">{sym}/USD</div>
-                     <div className={`text-sm font-bold ${selectedAsset === sym ? "text-indigo-100" : "text-gray-400"}`}>${price.toLocaleString()}</div>
+                     <div className={`text-sm font-bold ${selectedAsset === sym ? "text-indigo-100" : "text-gray-400"}`}>
+                       ${selectedAsset === sym ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) : price.toLocaleString()}
+                     </div>
                    </button>
                  ))}
                </div>
@@ -123,6 +131,7 @@ export default function FuturesOptions() {
                     asset={selectedAsset} 
                     basePrice={ASSETS[selectedAsset]} 
                     activeTrade={activeTrade} 
+                    onPriceUpdate={setLivePrice}
                   />
                </div>
             </div>
