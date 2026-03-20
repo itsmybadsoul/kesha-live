@@ -48,7 +48,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-white group cursor-pointer hover:scale-105 transition-transform">Block<span className="text-indigo-400">chain</span></span>
+            <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform">Blockchain</a>
           </div>
           
           <div className="flex items-center gap-2 md:gap-6">
