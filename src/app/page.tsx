@@ -40,7 +40,7 @@ export default function Home() {
   const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30 flex flex-col">
       <LivePriceTicker />
       <TradeActivityToasts />
       {/* Navbar */}
@@ -281,7 +281,7 @@ export default function Home() {
           <div className="lg:col-span-4 space-y-8">
             
             {/* Quick Actions (Desktop Sidebar only) */}
-            <div className="hidden lg:grid grid-cols-2 gap-4 lg:sticky lg:top-32 z-30">
+            <div className="hidden lg:grid grid-cols-2 gap-4">
               <a href="/deposit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-lg shadow-indigo-500/20 active:scale-95 text-sm uppercase tracking-widest">
                 <Wallet className="w-4 h-4" /> Deposit USDT
               </a>
