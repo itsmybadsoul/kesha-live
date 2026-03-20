@@ -2,6 +2,19 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+export interface OptionsTrade {
+  id: string;
+  asset: string;
+  amount: number;
+  direction: "UP" | "DOWN";
+  strikePrice: number;
+  startTime: number;
+  durationMinutes: number;
+  status: "ACTIVE" | "COMPLETED";
+  adminResult: "WIN" | "LOSE" | null;
+  payout: number;
+}
+
 export interface User {
   firstName: string;
   lastName: string;
@@ -27,6 +40,7 @@ export interface User {
   };
   balance: number;
   holdings: Record<string, number>;
+  options?: OptionsTrade[];
 }
 
 export interface Quest {
@@ -81,6 +95,8 @@ interface UserContextType {
   manualTradeCount: number;
   incrementManualTrades: () => Promise<void>;
   tradeAsset: (from: string, to: string, amount: number, price: number) => Promise<void>;
+  placeOptionsTrade: (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => Promise<void>;
+  resolveOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ win: boolean; amount: number } | null>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -327,6 +343,33 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (from === "USD") await incrementManualTrades();
   };
 
+  const placeOptionsTrade = async (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => {
+    if (!user?.email) return;
+    const res = await fetch("/api/options/place", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, asset, amount, direction, durationMinutes, strikePrice })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    await refreshUser();
+  };
+
+  const resolveOptionsTrade = async (tradeId: string, currentPrice: number) => {
+    if (!user?.email) return null;
+    const res = await fetch("/api/options/resolve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, tradeId, currentPrice })
+    });
+    const data = await res.json();
+    if (data.success) {
+      await refreshUser();
+      return { win: data.win, amount: data.amount };
+    }
+    return null;
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -348,6 +391,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         manualTradeCount,
         incrementManualTrades,
         tradeAsset,
+        placeOptionsTrade,
+        resolveOptionsTrade,
       }}
     >
       {children}

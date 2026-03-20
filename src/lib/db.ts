@@ -1,6 +1,19 @@
 // This mimics the Cloudflare KV binding for local development.
 // When deployed to Cloudflare, the REAL 'DATABASE' binding will be used.
 
+export interface OptionsTrade {
+  id: string;
+  asset: string;
+  amount: number;
+  direction: "UP" | "DOWN";
+  strikePrice: number;
+  startTime: number;
+  durationMinutes: number;
+  status: "ACTIVE" | "COMPLETED";
+  adminResult: "WIN" | "LOSE" | null;
+  payout: number;
+}
+
 export interface UserData {
   firstName: string;
   lastName: string;
@@ -22,6 +35,7 @@ export interface UserData {
     timestamp: number;
   } | null;
   holdings: Record<string, number>;
+  options: OptionsTrade[];
 }
 
 // Global variable for local simulation (cleared on server restart)
@@ -120,4 +134,35 @@ export async function untrackPendingWithdrawal(email: string, env?: any): Promis
   let emails: string[] = JSON.parse(list);
   emails = emails.filter(e => e !== email);
   await putKV("pending_withdrawals_list", JSON.stringify(emails), env);
+}
+
+// Global active options tracking
+export async function getActiveOptionsUsers(env?: any): Promise<UserData[]> {
+  const list = await getKV("active_options_users", env);
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e, env)));
+  // Return users who actually have active options remaining
+  return users.filter((u): u is UserData => !!u && u.options?.some(o => o.status === "ACTIVE"));
+}
+
+export async function trackActiveOptionsUser(email: string, env?: any): Promise<void> {
+  const list = await getKV("active_options_users", env);
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("active_options_users", JSON.stringify(emails), env);
+  }
+}
+
+export async function untrackActiveOptionsUser(email: string, env?: any): Promise<void> {
+  // We only untrack if the user has NO active options left
+  const user = await getUser(email, env);
+  if (user && user.options?.some(o => o.status === "ACTIVE")) return;
+  
+  const list = await getKV("active_options_users", env);
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("active_options_users", JSON.stringify(emails), env);
 }

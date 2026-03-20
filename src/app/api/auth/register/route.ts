@@ -23,7 +23,8 @@ export async function POST(req: Request) {
       quests: [],
       trades: [],
       pendingDeposit: null,
-      holdings: {}
+      holdings: {},
+      options: []
     };
 
     await saveUser(newUser);

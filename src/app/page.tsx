@@ -21,7 +21,7 @@ import { TradeActivityToasts } from "@/components/TradeActivityToasts";
 import { StakingWidget } from "@/components/StakingWidget";
 import { AISignals } from "@/components/AISignals";
 import { SwapTrade } from "@/components/SwapTrade";
-import { TrendingUp, Wallet, LayoutDashboard, User, ArrowRightLeft, LogOut, Menu, X, Coins, PieChart, ShieldCheck, Gift, Settings, BarChart3 } from "lucide-react";
+import { TrendingUp, Wallet, LayoutDashboard, User, ArrowRightLeft, LogOut, Menu, X, Coins, PieChart, ShieldCheck, Gift, Settings, BarChart3, Activity } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 
@@ -56,6 +56,7 @@ export default function Home() {
                 <a href="/" className="flex items-center gap-2 text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
                 <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
                 <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><ArrowRightLeft className="w-4 h-4" /> Deposit</a>
+                <a href="/futures" className="flex items-center gap-2 text-indigo-400 font-black hover:text-indigo-300 transition-colors uppercase tracking-widest"><Activity className="w-4 h-4 animate-pulse" /> Pro Options</a>
             </nav>
 
             <div className="flex items-center gap-2 md:gap-4 border-l border-gray-800 lg:pl-6">
@@ -107,6 +108,10 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-4">
               <a href="/" className="flex items-center gap-3 p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 font-bold">
                  <LayoutDashboard className="w-5 h-5" /> Home Dashboard
+              </a>
+              <a href="/futures" className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 font-black uppercase tracking-widest mt-2 overflow-hidden relative">
+                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 animate-translate-x"></div>
+                 <Activity className="w-5 h-5 animate-pulse" /> Pro Options Trading
               </a>
               <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
                  <User className="w-5 h-5" /> My Personal Profile
