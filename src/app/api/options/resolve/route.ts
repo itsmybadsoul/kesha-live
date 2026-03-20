@@ -41,6 +41,11 @@ export async function POST(req: Request) {
 
     await saveUser(user);
     await untrackActiveOptionsUser(email); // Removes from active tracking if no active left
+    
+    // Stamp to global history ledger
+    import("@/lib/db").then((db) => {
+       db.addGlobalOptionsHistory(user.options[tradeIndex], email);
+    });
 
     return NextResponse.json({ success: true, win: isWin, amount: isWin ? trade.payout : 0, balance: user.balance, options: user.options });
   } catch (error) {

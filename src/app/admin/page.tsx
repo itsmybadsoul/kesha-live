@@ -7,6 +7,7 @@ export default function AdminPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [options, setOptions] = useState<any[]>([]);
+  const [optionsHistory, setOptionsHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -17,17 +18,20 @@ export default function AdminPage() {
     if (!isAuthorized) return;
     setLoading(true);
     try {
-      const [depRes, withRes, optRes] = await Promise.all([
+      const [depRes, withRes, optRes, histRes] = await Promise.all([
         fetch("/api/admin/deposits"),
         fetch("/api/admin/withdrawals"),
-        fetch("/api/admin/options")
+        fetch("/api/admin/options"),
+        fetch("/api/admin/options/history")
       ]);
       const depData = await depRes.json();
       const withData = await withRes.json();
       const optData = await optRes.json();
+      const histData = await histRes.json();
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);
       if (optData.activeTrades) setOptions(optData.activeTrades);
+      if (histData.history) setOptionsHistory(histData.history);
     } catch (e) {
       console.error(e);
     } finally {
@@ -292,6 +296,70 @@ export default function AdminPage() {
                             </button>
                           </div>
                         )}
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Global Operations History Archive */}
+        <div className="mt-10 mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            Global Trade History <Database className="w-5 h-5 text-gray-500" />
+          </h2>
+          <div className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400">
+             {optionsHistory.length} Settled Contracts
+          </div>
+        </div>
+
+        <div className="bg-gray-800/20 border border-gray-700/50 rounded-3xl overflow-hidden mb-20 opacity-80 hover:opacity-100 transition-opacity">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-900 border-b border-gray-700 text-gray-500 text-[10px] font-black uppercase tracking-widest">
+                <th className="px-6 py-4">Settled At</th>
+                <th className="px-6 py-4">User</th>
+                <th className="px-6 py-4">Contract</th>
+                <th className="px-6 py-4">Direction / Strike</th>
+                <th className="px-6 py-4 text-right">Result</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-700/30">
+              {loading ? (
+                <tr><td colSpan={5} className="px-6 py-10 text-center text-gray-600 animate-pulse font-bold uppercase text-[10px] tracking-widest">Loading history ledger...</td></tr>
+              ) : optionsHistory.length === 0 ? (
+                <tr><td colSpan={5} className="px-6 py-10 text-center text-gray-600 italic text-xs font-mono">Ledger is empty. No completed trades yet.</td></tr>
+              ) : (
+                optionsHistory.map((hist, i) => {
+                  const isUp = hist.direction === "UP";
+                  // Payout > 0 means they won.
+                  const userWon = hist.payout && hist.payout > 0;
+                  return (
+                    <tr key={`${hist.id}-${i}`} className="hover:bg-gray-700/20 transition-colors">
+                      <td className="px-6 py-4 text-xs font-mono text-gray-400">
+                         {new Date(hist.resolvedAt || hist.startTime).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-xs font-bold text-gray-300">
+                         {hist.email}
+                      </td>
+                      <td className="px-6 py-4 text-xs font-black text-gray-200">{hist.asset}/USD <span className="text-[10px] text-gray-500 font-mono font-medium ml-2">{hist.durationMinutes}m</span></td>
+                      <td className="px-6 py-4">
+                         <div className={`text-[10px] font-black uppercase tracking-widest ${isUp ? "text-emerald-500" : "text-rose-500"}`}>
+                           {hist.direction} @ ${hist.strikePrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                         </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                         {hist.adminResult ? (
+                            <div className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${hist.adminResult === "WIN" ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20" : "text-rose-400 bg-rose-500/10 border border-rose-500/20"}`}>
+                               Forced {hist.adminResult}
+                            </div>
+                         ) : (
+                            <div className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${userWon ? "text-emerald-500" : "text-gray-500"}`}>
+                               {userWon ? "Won" : "Lost"}
+                            </div>
+                         )}
                       </td>
                     </tr>
                   )

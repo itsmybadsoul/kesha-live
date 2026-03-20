@@ -209,12 +209,12 @@ export default function FuturesOptions() {
                  </div>
                </div>
 
-               {/* Active Options Tracker */}
+             {/* Active Options Tracker */}
                <div className="flex-1 bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
                  <h2 className="text-sm font-black text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
                    Active Positions <span className="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded-full">{allActiveTrades.length}</span>
                  </h2>
-                 <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-none">
+                 <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-none max-h-[400px]">
                     {allActiveTrades.length === 0 ? (
                       <div className="text-center py-10 opacity-30">
                         <Activity className="w-10 h-10 mx-auto text-gray-500 mb-3" />
@@ -255,6 +255,47 @@ export default function FuturesOptions() {
                                  )}
                                </div>
                              </div>
+                          </div>
+                        )
+                      })
+                    )}
+                 </div>
+               </div>
+
+               {/* Recent History Tracker */}
+               <div className="flex-1 bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
+                 <h2 className="text-sm font-black text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
+                   Recent History <span className="text-gray-500 font-mono text-[10px] bg-black/50 px-2 py-0.5 rounded-full">Last 24</span>
+                 </h2>
+                 <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-none max-h-[300px]">
+                    {historyTrades.length === 0 ? (
+                      <div className="text-center py-10 opacity-30 border border-dashed border-gray-700 rounded-2xl">
+                        <Clock className="w-10 h-10 mx-auto text-gray-500 mb-3" />
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No Recent Settled Trades</p>
+                      </div>
+                    ) : (
+                      // Reverse to show newest first, then slice
+                      [...historyTrades].reverse().slice(0, 24).map(trade => {
+                        const isUp = trade.direction === "UP";
+                        const won = trade.payout && trade.payout > 0;
+                        return (
+                          <div key={trade.id} className="bg-black/40 border border-gray-800 rounded-xl p-4 flex justify-between items-center hover:border-gray-600 transition-colors">
+                            <div className="flex flex-col gap-1">
+                               <div className="flex items-center gap-2">
+                                  <span className="text-xs font-black text-gray-300">{trade.asset}</span>
+                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${isUp ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                    {trade.direction}
+                                  </span>
+                               </div>
+                               <div className="text-[10px] text-gray-500 font-mono">
+                                  Strike: ${trade.strikePrice.toLocaleString(undefined, { maximumFractionDigits: 2 })} 
+                               </div>
+                            </div>
+                            <div className="text-right">
+                               <div className={`text-sm font-black ${won ? 'text-emerald-400' : 'text-gray-500'}`}>
+                                  {won ? `+$${trade.payout.toLocaleString()}` : 'Settled - $0'}
+                               </div>
+                            </div>
                           </div>
                         )
                       })

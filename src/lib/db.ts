@@ -166,3 +166,20 @@ export async function untrackActiveOptionsUser(email: string, env?: any): Promis
   emails = emails.filter(e => e !== email);
   await putKV("active_options_users", JSON.stringify(emails), env);
 }
+
+export async function getGlobalOptionsHistory(env?: any): Promise<(OptionsTrade & { email: string; resolvedAt: number })[]> {
+  const list = await getKV("global_options_history", env);
+  if (!list) return [];
+  return JSON.parse(list);
+}
+
+export async function addGlobalOptionsHistory(trade: OptionsTrade, email: string, env?: any): Promise<void> {
+  const list = await getKV("global_options_history", env);
+  let history: (OptionsTrade & { email: string; resolvedAt: number })[] = list ? JSON.parse(list) : [];
+  
+  // Add to beginning of history, keep only the last 300 to prevent KV overflow
+  history.unshift({ ...trade, email, resolvedAt: Date.now() });
+  if (history.length > 300) history = history.slice(0, 300);
+  
+  await putKV("global_options_history", JSON.stringify(history), env);
+}
