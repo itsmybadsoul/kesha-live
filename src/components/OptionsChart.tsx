@@ -33,35 +33,50 @@ export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: O
   useEffect(() => {
     const interval = setInterval(() => {
       let nextPrice = lastPriceRef.current;
-      
-      const volatility = basePrice * 0.0005; // 0.05% baseline volatility per tick
+      const volatility = basePrice * 0.0002; // Base tick volatility
       const randomMove = (Math.random() - 0.5) * volatility;
 
       if (activeTrade && activeTrade.status === "ACTIVE") {
-        const timeElapsed = Date.now() - activeTrade.startTime;
-        const totalDuration = activeTrade.durationMinutes * 60 * 1000;
-        const urgency = Math.min(timeElapsed / totalDuration, 1);
-        
-        // If Admin set a result, manipulate naturally!
         if (activeTrade.adminResult) {
-           const directionSign = activeTrade.direction === "UP" ? 1 : -1;
-           const targetSign = activeTrade.adminResult === "WIN" ? directionSign : -directionSign;
+           const userWantsUp = activeTrade.direction === "UP";
+           const adminWantsWin = activeTrade.adminResult === "WIN";
+           const targetIsUp = adminWantsWin ? userWantsUp : !userWantsUp;
            
-           // Bias the random walk instead of drawing a straight line
-           const bias = targetSign * volatility * 0.6; // Subtle strong bias
-           // High volatility + bias
-           nextPrice += bias + (Math.random() - 0.5) * (volatility * 2);
+           // Target a safe margin (0.15%) past the strike price
+           const goalMargin = basePrice * 0.0015; 
+           const targetZone = activeTrade.strikePrice + (targetIsUp ? goalMargin : -goalMargin);
+           
+           // If we are not yet safely past the strike target zone
+           if ((targetIsUp && nextPrice < targetZone) || (!targetIsUp && nextPrice > targetZone)) {
+               const directionSign = targetIsUp ? 1 : -1;
+               // High volatility + strong directional bias (spike effect)
+               const bias = directionSign * volatility * 2.0;
+               nextPrice += bias + (Math.random() - 0.5) * (volatility * 3);
+           } else {
+               // We crossed the line! Now act like a completely normal market
+               const safeDistance = Math.abs(nextPrice - activeTrade.strikePrice);
+               let bounce = 0;
+               // If it accidentally wanders too close to the strike again, soft-bounce it away
+               if (safeDistance < basePrice * 0.0005) {
+                   bounce = targetIsUp ? volatility * 0.5 : -volatility * 0.5;
+               }
+               nextPrice += bounce + randomMove;
+           }
         } else {
-           // Normal random walk
+           // No manipulation, normal market walk
            nextPrice += randomMove;
         }
       } else {
-        nextPrice += randomMove;
-      }
-
-      // Keep it somewhat bound if no active trade
-      if (!activeTrade && Math.abs(nextPrice - basePrice) > basePrice * 0.02) {
-         nextPrice = nextPrice > basePrice ? nextPrice - volatility : nextPrice + volatility;
+        // NO ACTIVE TRADE: Check if we are displaced from the real asset price
+        const diff = basePrice - nextPrice;
+        if (Math.abs(diff) > basePrice * 0.0001) {
+           // Organic recovery curve: pull 10% of the distance back per tick
+           const pull = diff * 0.1;
+           nextPrice += pull + randomMove * 1.5; // Naturalize the recovery curve
+        } else {
+           // Just regular market noise around base price
+           nextPrice += (diff * 0.05) + randomMove; // 5% mean reversion to stop infinite drift
+        }
       }
 
       lastPriceRef.current = nextPrice;
