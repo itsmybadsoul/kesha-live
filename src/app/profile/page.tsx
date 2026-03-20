@@ -31,7 +31,7 @@ export default function ProfilePage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">Yield<span className="text-indigo-400">Sphere</span></span>
+            <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Blockchain</a>
           </a>
           <div className="flex items-center gap-4 text-sm font-medium text-gray-400">
             <a href="/" className="hover:text-white transition-colors">Dashboard</a>
