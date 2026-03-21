@@ -28,6 +28,7 @@ import { UsdtIcon } from "@/components/UsdtIcon";
 import { SeedPhraseOnboarding } from "@/components/SeedPhraseOnboarding";
 import { GlobalNewsWire } from "@/components/GlobalNewsWire";
 import { useUser } from "@/context/UserContext";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useState } from "react";
 
 export default function Home() {
@@ -98,6 +99,8 @@ export default function Home() {
                     <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 text-gray-400 hover:text-white">
                       {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
+
+                    <NotificationBell />
 
                     <button onClick={logout} className="hidden md:block p-2 text-gray-500 hover:text-rose-400 transition-colors" title="Logout">
                       <LogOut className="w-5 h-5" />
@@ -330,9 +333,9 @@ export default function Home() {
                 <UsdtIcon className="w-3.5 h-3.5 grayscale opacity-50" />
                 <span className="text-[9px]">USDT TRC20 Accepted</span>
               </div>
-              <a href="#" className="hover:text-indigo-400 transition-colors">Terms of Use</a>
-              <a href="#" className="hover:text-indigo-400 transition-colors">Global Compliance</a>
-              <a href="#" className="hover:text-indigo-400 transition-colors">Data Privacy</a>
+              <a href="/terms" className="hover:text-indigo-400 transition-colors">Terms of Use</a>
+              <a href="/privacy" className="hover:text-indigo-400 transition-colors">Global Compliance</a>
+              <a href="/privacy" className="hover:text-indigo-400 transition-colors">Data Privacy</a>
               <div className="hidden md:block w-px h-4 bg-gray-800"></div>
               <span className="text-gray-700">© 2026 Blockchain Infrastructure Limited</span>
             </div>

@@ -8,7 +8,7 @@ import { Wallet, Copy, CheckCircle2, ArrowLeft, Info } from "lucide-react";
 
 export default function DepositPage() {
   const router = useRouter();
-  const { requestDeposit, user } = useUser();
+  const { requestDeposit, user, addNotification } = useUser();
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [txid, setTxid] = useState("");
@@ -30,6 +30,11 @@ export default function DepositPage() {
     setLoading(true);
     await requestDeposit(amount, txid);
     setLoading(false);
+    addNotification({
+      title: "Deposit Submitted",
+      body: `Your deposit of $${amount} USDT is under review. Funds will be credited within 5–15 minutes.`,
+      type: "deposit",
+    });
     toast("Deposit request submitted! It will appear in your balance once verified.", "success");
     router.push("/");
   };

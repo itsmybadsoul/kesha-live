@@ -80,6 +80,15 @@ export interface Transaction {
   timestamp: number;
 }
 
+export interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  type: "deposit" | "withdraw" | "trade" | "kyc" | "reward" | "system";
+  read: boolean;
+  timestamp: number;
+}
+
 interface UserContextType {
   user: User | null;
   balance: number;
@@ -104,6 +113,10 @@ interface UserContextType {
   updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => Promise<void>;
   setSeedPhrase: (phrase: string[]) => Promise<void>;
   claimMysteryBox: () => Promise<void>;
+  notifications: Notification[];
+  addNotification: (n: Omit<Notification, 'id' | 'read' | 'timestamp'>) => void;
+  markAllRead: () => void;
+  clearNotification: (id: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -122,6 +135,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [manualTradeCount, setManualTradeCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const refreshUser = async () => {
     if (!user?.email) return;
@@ -396,10 +410,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const claimMysteryBox = async () => {
     if (!user || user.hasOpenedMysteryBox) return;
+    addNotification({ title: "Mystery Box Claimed!", body: "$50 USDT has been credited to your balance.", type: "reward" });
     setUser({ ...user, hasOpenedMysteryBox: true });
     await syncUpdates({ hasOpenedMysteryBox: true });
     await updateBalance(50, "Mystery Box Reward");
   };
+
+  const addNotification = (n: Omit<Notification, 'id' | 'read' | 'timestamp'>) => {
+    setNotifications(prev => [{ ...n, id: Math.random().toString(36).substr(2, 9), read: false, timestamp: Date.now() }, ...prev].slice(0, 50));
+  };
+
+  const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+
+  const clearNotification = (id: string) => setNotifications(prev => prev.filter(n => n.id !== id));
 
   return (
     <UserContext.Provider
@@ -427,6 +450,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateKYCStatus,
         setSeedPhrase,
         claimMysteryBox,
+        notifications,
+        addNotification,
+        markAllRead,
+        clearNotification,
       }}
     >
       {children}
