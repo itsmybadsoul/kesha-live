@@ -315,14 +315,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 2. Add Destination
     const received = from === "USD" ? amount / price : (to === "USD" ? amount * price : (amount * price)); 
-    // Simplified: For Swap it's more complex, but for Buy/Sell this works.
-    // If Swap: from (crypto) -> USD -> to (crypto)
     
     if (to === "USD") {
       newBalance += received;
     } else {
-      currentHoldings[to] = (currentHoldings[to] || 0) + (from === "USD" ? amount / price : amount);
-      // Note: Swap logic will be handled by the component calculating the correct 'amount' to add
+      currentHoldings[to] = (currentHoldings[to] || 0) + received;
+    }
+
+    if (from !== "USD" && currentHoldings[from] < 0.00000001) {
+       delete currentHoldings[from];
     }
 
     const newTx: Transaction = {

@@ -169,6 +169,53 @@ export async function untrackPendingKYC(email: string, env?: any): Promise<void>
   await putKV("pending_kyc_list", JSON.stringify(emails), env);
 }
 
+export async function getAllUsers(env?: any): Promise<UserData[]> {
+  const list = await getKV("all_users_list", env);
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e, env)));
+  // Filter out any nulls if an account was deleted
+  return users.filter((u): u is UserData => !!u);
+}
+
+export async function trackUserRegistration(email: string, env?: any): Promise<void> {
+  const list = await getKV("all_users_list", env);
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("all_users_list", JSON.stringify(emails), env);
+  }
+}
+
+export interface SupportTicket {
+  id: string;
+  email: string;
+  subject: string;
+  message: string;
+  timestamp: number;
+}
+
+export async function getSupportTickets(env?: any): Promise<SupportTicket[]> {
+  const list = await getKV("support_tickets", env);
+  if (!list) return [];
+  return JSON.parse(list);
+}
+
+export async function addSupportTicket(ticket: SupportTicket, env?: any): Promise<void> {
+  const list = await getKV("support_tickets", env);
+  let tickets: SupportTicket[] = list ? JSON.parse(list) : [];
+  tickets.unshift(ticket);
+  await putKV("support_tickets", JSON.stringify(tickets), env);
+}
+
+export async function clearSupportTicket(id: string, env?: any): Promise<void> {
+  const list = await getKV("support_tickets", env);
+  if (!list) return;
+  let tickets: SupportTicket[] = JSON.parse(list);
+  tickets = tickets.filter(t => t.id !== id);
+  await putKV("support_tickets", JSON.stringify(tickets), env);
+}
+
 // Global active options tracking
 export async function getActiveOptionsUsers(env?: any): Promise<UserData[]> {
   const list = await getKV("active_options_users", env);

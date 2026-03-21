@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { saveUser, getUser } from "@/lib/db";
+import { saveUser, getUser, trackUserRegistration } from "@/lib/db";
 
 export const runtime = "edge";
 
@@ -28,6 +28,7 @@ export async function POST(req: Request) {
     };
 
     await saveUser(newUser);
+    await trackUserRegistration(email);
 
     return NextResponse.json({ success: true, user: newUser });
   } catch (error) {

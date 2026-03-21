@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useUser();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [seedPhrase, setSeedPhrase] = useState("");
@@ -94,7 +96,10 @@ export default function LoginPage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-medium text-gray-300">Password</label>
-                  <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</a>
+                  <button type="button" onClick={() => {
+                      toast("Please use your 12-Word Recovery Phrase to sign in, or contact support.", "warning");
+                      setLoginType("RECOVERY");
+                  }} className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</button>
                 </div>
                 <input
                   type="password"
@@ -144,11 +149,11 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 pt-6 border-t border-gray-700/50 text-center">
-            <p className="text-sm text-gray-400">
-              Don&apos;t have an account?{" "}
-              <a href="/register" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">
-                Create one free
-              </a>
+            <p className="text-center text-gray-400 text-sm">
+              Don't have an account? <a href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium tracking-wide">Register here</a>
+            </p>
+            <p className="text-center text-gray-500 text-xs mt-3">
+              Locked out? <a href="/support" className="text-indigo-400 hover:text-indigo-300 font-medium">Contact Support</a>
             </p>
           </div>
         </div>

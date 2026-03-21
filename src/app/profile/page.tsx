@@ -21,6 +21,8 @@ export default function ProfilePage() {
   }
 
   const totalProfit = activeTrades.reduce((acc, curr) => acc + (curr.isProfit ? 50 : -20), 0); // Mock profit calculation
+  const prices: Record<string, number> = { BTC: 64230.50, ETH: 3450.20, BNB: 580.40, SOL: 145.80, XRP: 0.62, ADA: 0.45, DOGE: 0.16, TRX: 0.12, DOT: 7.20, MATIC: 0.72, AVAX: 36.40, LINK: 18.10, UNI: 7.80, NEAR: 6.90, LTC: 88.30, SHIB: 0.000027 };
+  const getPrice = (sym: string) => prices[sym] || 1;
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30">
@@ -54,8 +56,12 @@ export default function ProfilePage() {
             {/* Quick Stats */}
             <div className="bg-gray-800/40 border border-gray-700/50 rounded-3xl p-6 space-y-4">
               <div className="flex justify-between items-center px-2">
-                <span className="text-gray-400 text-sm font-medium">Available Balance</span>
+                <span className="text-gray-400 text-sm font-medium">Available Balance (USD)</span>
                 <span className="text-white font-black">${balance.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center px-2">
+                <span className="text-gray-400 text-sm font-medium">Crypto Holdings Value</span>
+                <span className="text-emerald-400 font-black">${Object.entries(user?.holdings || {}).reduce((acc, [s, a]) => acc + (a * getPrice(s)), 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center px-2">
                 <span className="text-gray-400 text-sm font-medium">Active Allocations</span>
@@ -85,6 +91,37 @@ export default function ProfilePage() {
                  <div className="text-[10px] text-indigo-500 mt-1">Platform volume</div>
                  <Activity className="absolute -bottom-4 -right-4 w-16 h-16 text-indigo-500/10" />
                </div>
+            </div>
+
+            {/* Crypto Portfolio */}
+            <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-8">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <Wallet className="w-5 h-5 text-emerald-400" /> Spot Holdings
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.entries(user?.holdings || {}).length === 0 ? (
+                   <div className="col-span-full py-8 text-center text-gray-500 italic text-sm border-2 border-dashed border-gray-700/50 rounded-2xl">No assets currently held. Head to Dashboard to trade!</div>
+                ) : (
+                  Object.entries(user?.holdings || {}).map(([symbol, amount]) => (
+                    <div key={symbol} className="bg-gray-900/50 border border-gray-700/50 rounded-2xl p-4 flex items-center justify-between group hover:border-emerald-500/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center font-black text-[10px] text-emerald-400">
+                           {symbol}
+                         </div>
+                         <div>
+                           <div className="font-bold text-white text-sm">{symbol}</div>
+                           <div className="text-[10px] text-gray-500 font-medium tracking-widest uppercase">Spot</div>
+                         </div>
+                      </div>
+                      <div className="text-right">
+                         <div className="font-black text-white">{Number(amount).toLocaleString(undefined, {maximumFractionDigits: 6})}</div>
+                         <div className="text-[10px] text-emerald-400 mt-0.5">${(Number(amount) * getPrice(symbol)).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
             {/* Transaction History */}

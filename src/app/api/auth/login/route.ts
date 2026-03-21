@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser } from "@/lib/db";
+import { getUser, trackUserRegistration } from "@/lib/db";
 
 export const runtime = "edge";
 
@@ -14,6 +14,9 @@ export async function POST(req: Request) {
 
     // Don't return the password to the client!
     const { password: _, ...safeUser } = user;
+
+    // Fast tracking catch for legacy users who haven't hit the new register route
+    await trackUserRegistration(email);
 
     return NextResponse.json({ success: true, user: safeUser });
   } catch (error) {

