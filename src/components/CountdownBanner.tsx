@@ -6,32 +6,22 @@ import { useUser } from "@/context/UserContext";
 
 export function CountdownBanner() {
   const { user } = useUser();
-  const [timeLeft, setTimeLeft] = useState<{ hours: number, minutes: number, seconds: number } | null>(null);
+  const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    if (!user?.welcomeExpiry) return;
-
-    const calculateTime = () => {
-      const now = Date.now();
-      const diff = user.welcomeExpiry! - now;
-
-      if (diff <= 0) {
-        setTimeLeft(null);
-        return;
-      }
-
-      const h = Math.floor(diff / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((diff % (1000 * 60)) / 1000);
-      setTimeLeft({ hours: h, minutes: m, seconds: s });
-    };
-
-    calculateTime();
-    const timer = setInterval(calculateTime, 1000);
+    const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, [user?.welcomeExpiry]);
+  }, []);
 
-  if (!timeLeft) return null;
+  if (!user?.welcomeExpiry) return null;
+
+  const diff = user.welcomeExpiry - now;
+  if (diff <= 0) return null;
+
+  const h = Math.floor(diff / (1000 * 60 * 60));
+  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const s = Math.floor((diff % (1000 * 60)) / 1000);
+  const timeLeft = { hours: h, minutes: m, seconds: s };
 
   return (
     <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 rounded-2xl p-[1px] shadow-lg shadow-blue-500/20 mb-8 overflow-hidden relative">

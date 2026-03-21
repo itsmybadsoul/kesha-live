@@ -30,8 +30,17 @@ export function DigitalMembershipCard() {
     iconColor = "text-slate-300";
   }
 
-  // Format serial number
-  const serial = `BLOCK-${user?.email?.split('@')[0].toUpperCase().substring(0,4) || 'X'}-${new Date().getFullYear().toString().slice(-2)}00`;
+  // Format serial number - Generate a persistent 8-character hex ID based on email to look professional
+  const hashEmail = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+  };
+  const memberId = hashEmail(user?.email || 'unknown');
+  const serial = `ID-${memberId.slice(0,4)}-${memberId.slice(4,8)}`;
 
   return (
     <div className={`relative overflow-hidden w-full aspect-[1.6/1] rounded-3xl p-6 flex flex-col justify-between bg-gradient-to-br ${bgGradient} border border-opacity-50 ${borderGlow} transition-all duration-700 hover:scale-[1.02]`}>
