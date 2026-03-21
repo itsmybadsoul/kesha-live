@@ -1,30 +1,45 @@
 "use client";
 
-import { Gift, LockKeyhole, Sparkles, Unlock } from "lucide-react";
+import { Gift, LockKeyhole, Sparkles, Unlock, PackageOpen } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
+import { useState } from "react";
 
 export function MysteryBox() {
-  const { user, balance } = useUser();
+  const { user, balance, claimMysteryBox } = useUser();
   const { toast } = useToast();
+  const [opening, setOpening] = useState(false);
   
   if (!user) return null;
 
-  const isUnlocked = balance >= 500;
   const progress = Math.min((balance / 500) * 100, 100);
+  const isUnlocked = balance >= 500 && !user.hasOpenedMysteryBox;
 
-  const handleOpen = (e: React.MouseEvent) => {
+  const handleOpen = async (e: React.MouseEvent) => {
     e.preventDefault();
+    if (user.hasOpenedMysteryBox) {
+       return toast("You have already claimed your Epic Mystery Box!", "info");
+    }
+    if (opening) return;
+    
     if (isUnlocked) {
-       toast("Mystery Box opened! You won 50 USDT (Mocked)", "success");
+       setOpening(true);
+       try {
+         await claimMysteryBox();
+         toast("Mystery Box opened! 50 USDT has been credited to your balance.", "success");
+       } catch (err) {
+         toast("Error claiming Mystery Box. Please try again.", "error");
+       } finally {
+         setOpening(false);
+       }
     } else {
-       toast("Deposit $500 or more to unlock this Mystery Box", "error");
+       toast("Deposit $500 or more to unlock this Mystery Box.", "error");
     }
   };
 
   return (
-    <a href={isUnlocked ? "#" : "/deposit"} onClick={handleOpen} className="block group">
-      <div className={`bg-gradient-to-br from-[#1A1B1E] to-[#0D0E12] border ${isUnlocked ? 'border-fuchsia-500/50 shadow-[0_0_30px_rgba(217,70,239,0.2)]' : 'border-indigo-500/20'} rounded-3xl p-5 relative overflow-hidden transition-all hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)] active:scale-[0.98]`}>
+    <a href={(isUnlocked || user.hasOpenedMysteryBox) ? "#" : "/deposit"} onClick={handleOpen} className="block group">
+      <div className={`bg-gradient-to-br from-[#1A1B1E] to-[#0D0E12] border ${user.hasOpenedMysteryBox ? 'border-gray-800 opacity-70' : isUnlocked ? 'border-fuchsia-500/50 shadow-[0_0_30px_rgba(217,70,239,0.2)]' : 'border-indigo-500/20'} rounded-3xl p-5 relative overflow-hidden transition-all hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)] active:scale-[0.98]`}>
         {/* Animated Glow Overlay */}
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-fuchsia-500/5 rounded-full blur-3xl group-hover:bg-fuchsia-500/10 transition-all duration-700"></div>
@@ -53,15 +68,19 @@ export function MysteryBox() {
           </div>
 
           <div className="shrink-0 flex flex-col items-center gap-1">
-             <div className={`w-10 h-10 rounded-full bg-gray-900/80 border ${isUnlocked ? 'border-fuchsia-500' : 'border-gray-700'} flex items-center justify-center group-hover:border-indigo-500/50 transition-colors`}>
-                {isUnlocked ? (
+             <div className={`w-10 h-10 rounded-full bg-gray-900/80 border ${user.hasOpenedMysteryBox ? 'border-gray-800' : isUnlocked ? 'border-fuchsia-500' : 'border-gray-700'} flex items-center justify-center group-hover:border-indigo-500/50 transition-colors`}>
+                {opening ? (
+                   <Sparkles className="w-4 h-4 text-fuchsia-400 animate-spin" />
+                ) : user.hasOpenedMysteryBox ? (
+                   <PackageOpen className="w-4 h-4 text-emerald-500" />
+                ) : isUnlocked ? (
                   <Unlock className="w-4 h-4 text-fuchsia-400 group-hover:text-indigo-400 transition-colors" />
                 ) : (
                   <LockKeyhole className="w-4 h-4 text-gray-500 group-hover:text-indigo-400 transition-colors" />
                 )}
              </div>
-             <span className={`text-[8px] font-black uppercase tracking-widest ${isUnlocked ? 'text-fuchsia-400' : 'text-gray-500 group-hover:text-indigo-400'}`}>
-                {isUnlocked ? "Ready" : "Locked"}
+             <span className={`text-[8px] font-black uppercase tracking-widest ${user.hasOpenedMysteryBox ? 'text-emerald-500' : isUnlocked ? 'text-fuchsia-400' : 'text-gray-500 group-hover:text-indigo-400'}`}>
+                {user.hasOpenedMysteryBox ? "Claimed" : isUnlocked ? "Ready" : "Locked"}
              </span>
           </div>
         </div>

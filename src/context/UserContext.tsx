@@ -44,6 +44,7 @@ export interface User {
   hasDepositBonus?: boolean;
   kycStatus?: 'UNVERIFIED' | 'PENDING' | 'VERIFIED';
   seedPhrase?: string[];
+  hasOpenedMysteryBox?: boolean;
 }
 
 export interface Quest {
@@ -102,6 +103,7 @@ interface UserContextType {
   resolveOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ win: boolean; amount: number } | null>;
   updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => Promise<void>;
   setSeedPhrase: (phrase: string[]) => Promise<void>;
+  claimMysteryBox: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -392,6 +394,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await syncUpdates({ seedPhrase: phrase });
   };
 
+  const claimMysteryBox = async () => {
+    if (!user || user.hasOpenedMysteryBox) return;
+    setUser({ ...user, hasOpenedMysteryBox: true });
+    await syncUpdates({ hasOpenedMysteryBox: true });
+    await updateBalance(50, "Mystery Box Reward");
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -417,6 +426,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resolveOptionsTrade,
         updateKYCStatus,
         setSeedPhrase,
+        claimMysteryBox,
       }}
     >
       {children}
