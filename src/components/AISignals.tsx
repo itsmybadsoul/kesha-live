@@ -1,6 +1,7 @@
 "use client";
 
 import { BrainCircuit, TrendingUp, TrendingDown, Clock, ArrowRight } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 interface Signal {
   id: string;
@@ -19,6 +20,7 @@ const MOCK_SIGNALS: Signal[] = [
 ];
 
 export function AISignals() {
+  const { toast } = useToast();
   return (
     <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 relative overflow-hidden group">
       <div className="flex justify-between items-center mb-6">
@@ -32,7 +34,7 @@ export function AISignals() {
 
       <div className="space-y-4">
         {MOCK_SIGNALS.map((signal) => (
-          <div key={signal.id} className="bg-black/40 p-4 rounded-2xl border border-gray-700/30 hover:border-indigo-500/30 transition-all cursor-pointer group">
+          <div key={signal.id} onClick={() => toast("Detailed AI metrics are reserved for VIP Tier 2.", "error")} className="bg-black/40 p-4 rounded-2xl border border-gray-700/30 hover:border-indigo-500/30 transition-all cursor-pointer group">
              <div className="flex justify-between items-start mb-2">
                 <div className="flex flex-col">
                    <span className="text-xs font-black text-white">{signal.asset}</span>
@@ -68,7 +70,7 @@ export function AISignals() {
         ))}
       </div>
 
-      <button className="w-full mt-6 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 font-black py-4 rounded-2xl transition-all text-xs border border-indigo-500/20 active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest">
+      <button onClick={() => toast("Advanced AI Intelligence requires PRO subscription.", "info")} className="w-full mt-6 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 font-black py-4 rounded-2xl transition-all text-xs border border-indigo-500/20 active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest">
          View All Intelligence <ArrowRight className="w-4 h-4" />
       </button>
     </div>

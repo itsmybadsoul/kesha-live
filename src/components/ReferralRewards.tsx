@@ -1,11 +1,13 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { Users, Gift, ChevronRight, Share2, Award } from "lucide-react";
 import { UsdtIcon } from "./UsdtIcon";
 
 export function ReferralRewards() {
   const { user } = useUser();
+  const { toast } = useToast();
 
   const milestones = [
     { count: 5, reward: "25 USDT", id: 1 },
@@ -14,7 +16,14 @@ export function ReferralRewards() {
     { count: 100, reward: "1,500 USDT", id: 4 },
   ];
 
-  const currentInvites = user?.referralStats?.totalInvites || 2; // Default mock for new users
+  const handleInvite = () => {
+    if (!user) return toast("Please login to invite friends", "error");
+    const link = `https://blockchain.com/invite/${user.email?.split('@')[0] || 'crypto'}`;
+    navigator.clipboard.writeText(link);
+    toast("Referral link copied to clipboard!", "success");
+  };
+
+  const currentInvites = user?.referralStats?.totalInvites || 0; // Fixed default mock
   const nextMilestone = milestones.find(m => m.count > currentInvites) || milestones[milestones.length - 1];
   const progress = (currentInvites / nextMilestone.count) * 100;
 
@@ -56,7 +65,7 @@ export function ReferralRewards() {
       </div>
 
       <div className="flex gap-3 relative z-10">
-         <button className="flex-1 bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs flex items-center justify-center gap-2 active:scale-95 shadow-xl">
+         <button onClick={handleInvite} className="flex-1 bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs flex items-center justify-center gap-2 active:scale-95 shadow-xl">
             <Share2 className="w-4 h-4" /> Invite Friend
          </button>
          <button className="bg-gray-800/80 hover:bg-gray-700 text-white font-black px-6 rounded-2xl transition-all border border-gray-700 active:scale-95">

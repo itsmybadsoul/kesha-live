@@ -1,8 +1,10 @@
 "use client";
 
 import { Wallet, TrendingUp, ShieldCheck, Zap, ArrowRight, BarChart } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 export function StakingWidget() {
+  const { toast } = useToast();
   return (
     <div className="bg-gradient-to-br from-indigo-600/20 to-gray-800/40 backdrop-blur-xl border border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
       {/* Decorative background element */}
@@ -43,10 +45,10 @@ export function StakingWidget() {
       </div>
 
       <div className="mt-6 flex flex-col gap-3 relative z-10">
-         <a href="/deposit" className="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest shadow-xl active:scale-95 flex items-center justify-center gap-2 group">
+         <button onClick={() => toast("Staking Protocol v2 is launching next week. Stay tuned!", "info")} className="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest shadow-xl active:scale-95 flex items-center justify-center gap-2 group">
             Stake USDT <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-         </a>
-         <button className="w-full bg-gray-900/50 hover:bg-gray-800 text-gray-400 font-bold py-3 rounded-2xl transition-all text-[10px] border border-gray-700/50 uppercase tracking-widest">
+         </button>
+         <button onClick={() => toast("No active staking history found.", "error")} className="w-full bg-gray-900/50 hover:bg-gray-800 text-gray-400 font-bold py-3 rounded-2xl transition-all text-[10px] border border-gray-700/50 uppercase tracking-widest">
             Stake History
          </button>
       </div>

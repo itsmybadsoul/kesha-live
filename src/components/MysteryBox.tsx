@@ -1,11 +1,30 @@
 "use client";
 
-import { Gift, LockKeyhole, Sparkles } from "lucide-react";
+import { Gift, LockKeyhole, Sparkles, Unlock } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 
 export function MysteryBox() {
+  const { user, balance } = useUser();
+  const { toast } = useToast();
+  
+  if (!user) return null;
+
+  const isUnlocked = balance >= 500;
+  const progress = Math.min((balance / 500) * 100, 100);
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isUnlocked) {
+       toast("Mystery Box opened! You won 50 USDT (Mocked)", "success");
+    } else {
+       toast("Deposit $500 or more to unlock this Mystery Box", "error");
+    }
+  };
+
   return (
-    <a href="/deposit" className="block group">
-      <div className="bg-gradient-to-br from-[#1A1B1E] to-[#0D0E12] border border-indigo-500/20 rounded-3xl p-5 relative overflow-hidden transition-all hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)] active:scale-[0.98]">
+    <a href={isUnlocked ? "#" : "/deposit"} onClick={handleOpen} className="block group">
+      <div className={`bg-gradient-to-br from-[#1A1B1E] to-[#0D0E12] border ${isUnlocked ? 'border-fuchsia-500/50 shadow-[0_0_30px_rgba(217,70,239,0.2)]' : 'border-indigo-500/20'} rounded-3xl p-5 relative overflow-hidden transition-all hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)] active:scale-[0.98]`}>
         {/* Animated Glow Overlay */}
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-fuchsia-500/5 rounded-full blur-3xl group-hover:bg-fuchsia-500/10 transition-all duration-700"></div>
@@ -34,19 +53,25 @@ export function MysteryBox() {
           </div>
 
           <div className="shrink-0 flex flex-col items-center gap-1">
-             <div className="w-10 h-10 rounded-full bg-gray-900/80 border border-gray-700 flex items-center justify-center group-hover:border-indigo-500/50 transition-colors">
-                <LockKeyhole className="w-4 h-4 text-gray-500 group-hover:text-indigo-400 transition-colors" />
+             <div className={`w-10 h-10 rounded-full bg-gray-900/80 border ${isUnlocked ? 'border-fuchsia-500' : 'border-gray-700'} flex items-center justify-center group-hover:border-indigo-500/50 transition-colors`}>
+                {isUnlocked ? (
+                  <Unlock className="w-4 h-4 text-fuchsia-400 group-hover:text-indigo-400 transition-colors" />
+                ) : (
+                  <LockKeyhole className="w-4 h-4 text-gray-500 group-hover:text-indigo-400 transition-colors" />
+                )}
              </div>
-             <span className="text-[8px] font-black text-gray-500 group-hover:text-indigo-400 uppercase tracking-widest">Locked</span>
+             <span className={`text-[8px] font-black uppercase tracking-widest ${isUnlocked ? 'text-fuchsia-400' : 'text-gray-500 group-hover:text-indigo-400'}`}>
+                {isUnlocked ? "Ready" : "Locked"}
+             </span>
           </div>
         </div>
 
-        {/* Progress Bar (Simulated requirement) */}
+        {/* Progress Bar (Actual requirement) */}
         <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-3">
            <div className="flex-1 h-1.5 bg-gray-900 rounded-full overflow-hidden">
-              <div className="h-full w-0 bg-gradient-to-r from-indigo-500 to-fuchsia-500 group-hover:w-[15%] transition-all duration-1000"></div>
+              <div className="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 group-hover:opacity-80 transition-all duration-1000" style={{ width: `${progress}%` }}></div>
            </div>
-           <span className="text-[9px] font-bold text-gray-500">0 / $500</span>
+           <span className="text-[9px] font-bold text-gray-500">${balance.toLocaleString()} / $500</span>
         </div>
       </div>
     </a>
