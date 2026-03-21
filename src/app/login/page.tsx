@@ -160,8 +160,8 @@ export default function LoginPage() {
 
         <p className="text-center text-xs text-gray-600 mt-6">
           By signing in, you agree to our{" "}
-          <a href="#" className="underline">Terms of Service</a> and{" "}
-          <a href="#" className="underline">Privacy Policy</a>.
+          <a href="/terms" className="underline hover:text-indigo-400 transition-colors">Terms of Service</a> and{" "}
+          <a href="/privacy" className="underline hover:text-indigo-400 transition-colors">Privacy Policy</a>.
         </p>
       </div>
     </div>

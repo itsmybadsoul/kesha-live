@@ -124,6 +124,12 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+
+      <p className="text-center text-xs text-gray-600 mt-6 pb-8">
+        By creating an account, you agree to our{" "}
+        <a href="/terms" className="underline hover:text-indigo-400 transition-colors">Terms of Service</a> and{" "}
+        <a href="/privacy" className="underline hover:text-indigo-400 transition-colors">Privacy Policy</a>.
+      </p>
     </div>
   );
 }
