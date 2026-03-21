@@ -144,6 +144,8 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-[1440px] mx-auto px-4 md:px-10 py-8">
         
+        <PendingDeposit />
+
         {user && !user.hasDepositBonus && (
           <div className="mb-8 p-6 md:p-8 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-emerald-500/20 border border-indigo-500/30 rounded-3xl relative overflow-hidden group shadow-2xl">
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors"></div>
@@ -268,8 +270,6 @@ export default function Home() {
         </div>
 
         <CountdownBanner />
-        
-        <PendingDeposit />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
