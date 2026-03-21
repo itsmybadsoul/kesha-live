@@ -45,11 +45,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30 flex flex-col">
       <SeedPhraseOnboarding />
-      <GlobalNewsWire />
-      <LivePriceTicker />
-      <TradeActivityToasts />
-      {/* Navbar */}
-      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-10 z-[60]">
+      <div className="sticky top-0 z-[60] w-full flex flex-col">
+        <GlobalNewsWire />
+        <LivePriceTicker />
+        <TradeActivityToasts />
+        {/* Navbar */}
+        <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
@@ -138,6 +139,7 @@ export default function Home() {
           </div>
         )}
       </nav>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-[1440px] mx-auto px-4 md:px-10 py-8">
