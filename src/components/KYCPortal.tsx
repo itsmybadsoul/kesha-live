@@ -1,12 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useUser } from "@/context/UserContext";
 import { ShieldAlert, ShieldCheck, Upload, CheckCircle2 } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 export function KYCPortal() {
   const { user, updateKYCStatus } = useUser();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [idFront, setIdFront] = useState<string | null>(null);
+  const [idBack, setIdBack] = useState<string | null>(null);
+
+  const idInputRef = useRef<HTMLInputElement>(null);
+  const selfieInputRef = useRef<HTMLInputElement>(null);
 
   if (!user) return null;
   
@@ -30,12 +37,63 @@ export function KYCPortal() {
     );
   }
 
+  const processImage = (file: File, callback: (base64: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_SIZE = 800; // Compress image down
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > MAX_SIZE) {
+          height *= MAX_SIZE / width;
+          width = MAX_SIZE;
+        } else if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height;
+          height = MAX_SIZE;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // JPEG format with 0.6 quality saves huge amounts of space (perfect for KV)
+        callback(canvas.toDataURL("image/jpeg", 0.6));
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleIdUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    toast("Processing Document...", "info");
+    processImage(file, (base64) => {
+      setIdFront(base64);
+      setStep(2);
+    });
+  };
+
+  const handleSelfieUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    toast("Processing Face Match...", "info");
+    processImage(file, (base64) => {
+      setIdBack(base64);
+      setStep(3);
+    });
+  };
+
   const handleSubmit = async () => {
+    if (!idFront || !idBack) return;
     setLoading(true);
-    setTimeout(async () => {
-      await updateKYCStatus("PENDING");
-      setLoading(false);
-    }, 1500);
+    await updateKYCStatus("PENDING", { idFront, idBack, timestamp: Date.now() });
+    setLoading(false);
+    toast("Documents securely embedded to Cloud API.", "success");
   };
 
   return (
@@ -47,8 +105,9 @@ export function KYCPortal() {
       
       {step === 1 && (
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer" onClick={() => setStep(2)}>
-            <Upload className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+          <input type="file" ref={idInputRef} onChange={handleIdUpload} accept="image/*" className="hidden" />
+          <div className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer group" onClick={() => idInputRef.current?.click()}>
+            <Upload className="w-8 h-8 text-gray-500 mx-auto mb-2 group-hover:text-indigo-400 transition-colors" />
             <p className="text-sm font-bold text-white">Upload Government ID</p>
             <p className="text-xs text-gray-500 mt-1">Passport, Driver's License, or National ID</p>
           </div>
@@ -57,10 +116,15 @@ export function KYCPortal() {
 
       {step === 2 && (
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer" onClick={() => setStep(3)}>
-            <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-500 mx-auto mb-2 flex items-center justify-center">
-               <div className="w-8 h-8 rounded-full border border-gray-600"></div>
-            </div>
+          <input type="file" ref={selfieInputRef} onChange={handleSelfieUpload} accept="image/*" capture="user" className="hidden" />
+          <div className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer group" onClick={() => selfieInputRef.current?.click()}>
+            {idFront ? (
+              <img src={idFront} alt="ID Preview" className="h-16 w-auto mx-auto mb-3 rounded-lg border border-gray-600 shadow-xl opacity-50" />
+            ) : (
+              <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-500 mx-auto mb-2 flex items-center justify-center">
+                 <div className="w-8 h-8 rounded-full border border-gray-600"></div>
+              </div>
+            )}
             <p className="text-sm font-bold text-white">Face Match Verification</p>
             <p className="text-xs text-gray-500 mt-1">Take a selfie to match your uploaded document</p>
           </div>
@@ -71,6 +135,10 @@ export function KYCPortal() {
         <div className="space-y-4 text-center py-4">
           <CheckCircle2 className="w-12 h-12 text-indigo-400 mx-auto mb-3" />
           <p className="text-white font-bold mb-4">Documents Ready for Submission</p>
+          <div className="flex gap-4 justify-center mb-6">
+            {idFront && <img src={idFront} className="h-16 w-auto rounded border border-gray-700 opacity-60" />}
+            {idBack && <img src={idBack} className="h-16 w-auto rounded border border-gray-700 opacity-60" />}
+          </div>
           <button 
              onClick={handleSubmit}
              disabled={loading}

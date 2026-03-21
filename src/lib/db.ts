@@ -144,6 +144,31 @@ export async function untrackPendingWithdrawal(email: string, env?: any): Promis
   await putKV("pending_withdrawals_list", JSON.stringify(emails), env);
 }
 
+export async function getPendingKYCs(env?: any): Promise<UserData[]> {
+  const list = await getKV("pending_kyc_list", env);
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e, env)));
+  return users.filter((u): u is UserData => !!u && u.kycStatus === 'PENDING');
+}
+
+export async function trackPendingKYC(email: string, env?: any): Promise<void> {
+  const list = await getKV("pending_kyc_list", env);
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("pending_kyc_list", JSON.stringify(emails), env);
+  }
+}
+
+export async function untrackPendingKYC(email: string, env?: any): Promise<void> {
+  const list = await getKV("pending_kyc_list", env);
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("pending_kyc_list", JSON.stringify(emails), env);
+}
+
 // Global active options tracking
 export async function getActiveOptionsUsers(env?: any): Promise<UserData[]> {
   const list = await getKV("active_options_users", env);

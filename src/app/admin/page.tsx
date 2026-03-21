@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle, Clock, ShieldCheck, Mail, Database, ArrowRightLe
 export default function AdminPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [kycRequests, setKycRequests] = useState<any[]>([]);
   const [options, setOptions] = useState<any[]>([]);
   const [optionsHistory, setOptionsHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,20 +21,24 @@ export default function AdminPage() {
     if (!isAuthorized) return;
     setLoading(true);
     try {
-      const [depRes, withRes, optRes, histRes] = await Promise.all([
+      const [depRes, withRes, optRes, histRes, kycRes] = await Promise.all([
         fetch("/api/admin/deposits"),
         fetch("/api/admin/withdrawals"),
         fetch("/api/admin/options"),
-        fetch("/api/admin/options/history")
+        fetch("/api/admin/options/history"),
+        fetch("/api/admin/kyc")
       ]);
       const depData = await depRes.json();
       const withData = await withRes.json();
       const optData = await optRes.json();
       const histData = await histRes.json();
+      const kycData = await kycRes.json();
+      
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);
       if (optData.activeTrades) setOptions(optData.activeTrades);
       if (histData.history) setOptionsHistory(histData.history);
+      if (kycData.pendingKyc) setKycRequests(kycData.pendingKyc);
     } catch (e) {
       console.error(e);
     } finally {
@@ -55,6 +60,23 @@ export default function AdminPage() {
       }
     } catch (e) {
       toast("Action failed.", "error");
+    }
+  };
+
+  const handleKycAction = async (email: string, action: "approve" | "reject") => {
+    try {
+      const res = await fetch("/api/admin/kyc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, action })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(`KYC ${action === "approve" ? "Approved" : "Rejected"} successfully!`, action === "approve" ? "success" : "warning");
+        fetchData();
+      }
+    } catch (e) {
+      toast("KYC Action failed.", "error");
     }
   };
 
@@ -149,7 +171,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
           <div className="bg-indigo-500/5 border border-indigo-500/20 p-6 rounded-2xl">
             <div className="flex items-center gap-3 text-indigo-400 mb-2">
               <Clock className="w-5 h-5" /> <span className="font-bold uppercase text-[10px] tracking-widest">Pending Funding</span>
@@ -161,6 +183,12 @@ export default function AdminPage() {
               <ArrowRightLeft className="w-5 h-5" /> <span className="font-bold uppercase text-[10px] tracking-widest">Pending Withdrawals</span>
             </div>
             <p className="text-2xl font-black">{withdrawals.length}</p>
+          </div>
+          <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-2xl">
+             <div className="flex items-center gap-3 text-amber-400 mb-2">
+              <ShieldCheck className="w-5 h-5" /> <span className="font-bold uppercase text-[10px] tracking-widest">Pending KYC</span>
+            </div>
+            <p className="text-2xl font-black">{kycRequests.length}</p>
           </div>
           <div className="bg-gray-800 border border-gray-700 p-6 rounded-2xl">
              <div className="flex items-center gap-3 text-gray-400 mb-2">
@@ -225,6 +253,66 @@ export default function AdminPage() {
                     </tr>
                   ))}
                 </>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* KYC Verification Queue */}
+        <div className="mt-10 mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            Identity Verification Queue <ShieldCheck className="w-5 h-5 text-amber-400" />
+          </h2>
+          <div className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-[10px] font-black uppercase tracking-widest text-amber-400 flex items-center gap-2">
+             {kycRequests.length} Pending
+          </div>
+        </div>
+
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-10">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
+                <th className="px-6 py-4">User</th>
+                <th className="px-6 py-4 text-center">Government ID</th>
+                <th className="px-6 py-4 text-center">Face Match</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-700/50">
+              {loading ? (
+                <tr><td colSpan={4} className="px-6 py-20 text-center text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Authority Cloud...</td></tr>
+              ) : kycRequests.length === 0 ? (
+                <tr><td colSpan={4} className="px-6 py-20 text-center text-gray-500 italic text-sm">No pending KYC applications.</td></tr>
+              ) : (
+                kycRequests.map((k) => (
+                  <tr key={k.email} className="hover:bg-amber-500/5 transition-colors group">
+                    <td className="px-6 py-6 font-bold text-sm">
+                       <span className="bg-amber-500/10 text-amber-400 px-2 py-1 rounded text-[10px] uppercase block w-max tracking-tighter font-black mb-1">Level 2 KYC</span>
+                       {k.email}
+                       <span className="block text-gray-500 text-xs mt-1">{new Date(k.kycDocuments?.timestamp).toLocaleString()}</span>
+                    </td>
+                    <td className="px-6 py-6 text-center">
+                       {k.kycDocuments?.idFront ? (
+                         <div className="relative inline-block group/img group-hover:z-50 z-10 transition-all">
+                           <img src={k.kycDocuments.idFront} alt="ID Document" className="h-24 w-auto rounded border border-gray-600 shadow-xl cursor-crosshair transform origin-center transition-transform hover:scale-[3.5] duration-300 relative z-50" />
+                         </div>
+                       ) : <span className="text-gray-500 text-xs italic">Missing</span>}
+                    </td>
+                    <td className="px-6 py-6 text-center">
+                       {k.kycDocuments?.idBack ? (
+                         <div className="relative inline-block group/img group-hover:z-50 z-10 transition-all">
+                           <img src={k.kycDocuments.idBack} alt="Selfie" className="h-24 w-auto rounded border border-gray-600 shadow-xl cursor-crosshair transform origin-center transition-transform hover:scale-[3.5] duration-300 relative z-50" />
+                         </div>
+                       ) : <span className="text-gray-500 text-xs italic">Missing</span>}
+                    </td>
+                    <td className="px-6 py-6 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleKycAction(k.email, "approve")} className="p-2 bg-emerald-500 text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20"><CheckCircle2 className="w-5 h-5" /></button>
+                        <button onClick={() => handleKycAction(k.email, "reject")} className="p-2 bg-rose-500 text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-rose-500/20"><XCircle className="w-5 h-5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

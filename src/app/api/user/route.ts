@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser } from "@/lib/db";
+import { getUser, saveUser, trackPendingKYC } from "@/lib/db";
 
 export const runtime = "edge";
 
@@ -25,6 +25,10 @@ export async function PATCH(req: Request) {
 
     const updatedUser = { ...user, ...updates };
     await saveUser(updatedUser);
+
+    if (updates.kycStatus === 'PENDING') {
+      await trackPendingKYC(email);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

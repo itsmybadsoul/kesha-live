@@ -100,7 +100,7 @@ interface UserContextType {
   tradeAsset: (from: string, to: string, amount: number, price: number) => Promise<void>;
   placeOptionsTrade: (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => Promise<void>;
   resolveOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ win: boolean; amount: number } | null>;
-  updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED') => Promise<void>;
+  updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => Promise<void>;
   setSeedPhrase: (phrase: string[]) => Promise<void>;
 }
 
@@ -375,10 +375,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
-  const updateKYCStatus = async (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED') => {
+  const updateKYCStatus = async (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => {
     if (!user) return;
-    setUser({ ...user, kycStatus: status });
-    await syncUpdates({ kycStatus: status });
+    const updates: any = { kycStatus: status };
+    if (docs) {
+      updates.kycDocuments = docs;
+    }
+    setUser({ ...user, ...updates });
+    await syncUpdates(updates);
   };
 
   const setSeedPhrase = async (phrase: string[]) => {
