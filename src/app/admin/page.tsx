@@ -12,6 +12,7 @@ export default function AdminPage() {
   const [optionsHistory, setOptionsHistory] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [supportTickets, setSupportTickets] = useState<any[]>([]);
+  const [notifModal, setNotifModal] = useState<{ open: boolean; email: string; title: string; body: string }>({ open: false, email: "", title: "", body: "" });
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -138,6 +139,32 @@ export default function AdminPage() {
       }
     } catch (e) {
       toast("Failed to purge ticket.", "error");
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (!notifModal.title || !notifModal.body) return;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email: notifModal.email, 
+          notification: { 
+            title: notifModal.title, 
+            body: notifModal.body, 
+            type: "system" 
+          } 
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast("Notification broadcasted to user device.", "success");
+        setNotifModal({ open: false, email: "", title: "", body: "" });
+        fetchData();
+      }
+    } catch (e) {
+      toast("Failed to transmit alert.", "error");
     }
   };
 
@@ -560,9 +587,14 @@ export default function AdminPage() {
                        </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <button onClick={() => handleEditBalance(u.email)} className="bg-indigo-600 hover:bg-indigo-500 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg text-white shadow-lg transition-colors">
-                         Edit Balance
-                       </button>
+                       <div className="flex justify-end gap-2">
+                         <button onClick={() => setNotifModal({ open: true, email: u.email, title: "", body: "" })} className="p-2 bg-gray-800 text-gray-400 hover:text-indigo-400 rounded-lg hover:bg-indigo-500/10 transition-all" title="Send Notification">
+                            <MessageSquare className="w-4 h-4" />
+                         </button>
+                         <button onClick={() => handleEditBalance(u.email)} className="bg-indigo-600 hover:bg-indigo-500 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg text-white shadow-lg transition-colors">
+                           Edit Balance
+                         </button>
+                       </div>
                     </td>
                   </tr>
                 ))
@@ -606,6 +638,55 @@ export default function AdminPage() {
         </div>
 
       </div>
+
+      {/* Notification Modal */}
+      {notifModal.open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setNotifModal({ ...notifModal, open: false })}></div>
+          <div className="relative bg-gray-900 border border-gray-700 w-full max-w-lg rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
+            <h3 className="text-xl font-black mb-2 italic">Broadcast Alert</h3>
+            <p className="text-gray-400 text-sm mb-6 font-medium">Transmitting system notification to: <span className="text-indigo-400 font-bold">{notifModal.email}</span></p>
+            
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Alert Title</label>
+                <input 
+                  type="text" 
+                  value={notifModal.title} 
+                  onChange={(e) => setNotifModal({ ...notifModal, title: e.target.value })}
+                  placeholder="e.g. Account Verification Required"
+                  className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-500 outline-none transition-colors"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Message Body</label>
+                <textarea 
+                  value={notifModal.body} 
+                  onChange={(e) => setNotifModal({ ...notifModal, body: e.target.value })}
+                  placeholder="Enter the detailed instructions or update for the user..."
+                  className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-500 outline-none transition-colors min-h-[120px] resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-8">
+              <button 
+                onClick={() => setNotifModal({ ...notifModal, open: false })}
+                className="flex-1 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSendNotification}
+                disabled={!notifModal.title || !notifModal.body}
+                className="flex-[2] bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+              >
+                Push Notification
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

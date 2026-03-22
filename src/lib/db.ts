@@ -14,6 +14,15 @@ export interface OptionsTrade {
   payout: number;
 }
 
+export interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  type: "deposit" | "withdraw" | "trade" | "kyc" | "reward" | "system";
+  read: boolean;
+  timestamp: number;
+}
+
 export interface UserData {
   firstName: string;
   lastName: string;
@@ -44,6 +53,7 @@ export interface UserData {
     idBack: string;
     timestamp: number;
   };
+  notifications?: Notification[];
 }
 
 // Global variable for local simulation (cleared on server restart)

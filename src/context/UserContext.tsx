@@ -45,6 +45,7 @@ export interface User {
   kycStatus?: 'UNVERIFIED' | 'PENDING' | 'VERIFIED';
   seedPhrase?: string[];
   hasOpenedMysteryBox?: boolean;
+  notifications?: Notification[];
 }
 
 export interface Quest {
@@ -135,7 +136,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [manualTradeCount, setManualTradeCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  
+  const notifications = user?.notifications || [];
 
   const refreshUser = async () => {
     if (!user?.email) return;
@@ -416,13 +418,32 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await updateBalance(50, "Mystery Box Reward");
   };
 
-  const addNotification = (n: Omit<Notification, 'id' | 'read' | 'timestamp'>) => {
-    setNotifications(prev => [{ ...n, id: Math.random().toString(36).substr(2, 9), read: false, timestamp: Date.now() }, ...prev].slice(0, 50));
+  const addNotification = async (n: Omit<Notification, 'id' | 'read' | 'timestamp'>) => {
+    if (!user) return;
+    const newNotif: Notification = { 
+      ...n, 
+      id: Math.random().toString(36).substr(2, 9), 
+      read: false, 
+      timestamp: Date.now() 
+    };
+    const updatedNotifs = [newNotif, ...(user.notifications || [])].slice(0, 50);
+    setUser({ ...user, notifications: updatedNotifs });
+    await syncUpdates({ notifications: updatedNotifs });
   };
 
-  const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const markAllRead = async () => {
+    if (!user) return;
+    const updatedNotifs = (user.notifications || []).map(n => ({ ...n, read: true }));
+    setUser({ ...user, notifications: updatedNotifs });
+    await syncUpdates({ notifications: updatedNotifs });
+  };
 
-  const clearNotification = (id: string) => setNotifications(prev => prev.filter(n => n.id !== id));
+  const clearNotification = async (id: string) => {
+    if (!user) return;
+    const updatedNotifs = (user.notifications || []).filter(n => n.id !== id);
+    setUser({ ...user, notifications: updatedNotifs });
+    await syncUpdates({ notifications: updatedNotifs });
+  };
 
   return (
     <UserContext.Provider
