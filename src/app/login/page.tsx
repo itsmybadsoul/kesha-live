@@ -158,7 +158,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-600 mt-6">
+        <p className="text-center text-xs text-gray-600 mt-6 pb-8">
           By signing in, you agree to our{" "}
           <a href="/terms" className="underline hover:text-indigo-400 transition-colors">Terms of Service</a> and{" "}
           <a href="/privacy" className="underline hover:text-indigo-400 transition-colors">Privacy Policy</a>.
