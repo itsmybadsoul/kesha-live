@@ -5,6 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { TrendingUp, TrendingDown, Clock, Activity, AlertTriangle, ShieldCheck } from "lucide-react";
 import { OptionsChart } from "@/components/OptionsChart";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const ASSETS: Record<string, number> = {
   BTC: 64230.50,
@@ -20,7 +21,10 @@ const ASSETS: Record<string, number> = {
 };
 
 export default function FuturesOptions() {
-  const { user, balance, placeOptionsTrade, resolveOptionsTrade, refreshUser } = useUser();
+  const { user, balance, placeOptionsTrade, resolveOptionsTrade, refreshUser, isLoading } = useUser();
+
+  if (isLoading) return <LoadingScreen />;
+
   const { toast } = useToast();
   const [selectedAsset, setSelectedAsset] = useState("BTC");
   const [amount, setAmount] = useState("");
@@ -87,7 +91,7 @@ export default function FuturesOptions() {
       <div className="bg-[#12141d] border-b border-gray-800/50 sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
            <div className="flex items-center gap-4">
-              <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Blockchain</a>
+              <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
               <span className="text-gray-700">|</span>
               <span className="text-sm font-black text-indigo-400 tracking-widest uppercase flex items-center gap-2">
                 <Activity className="w-4 h-4" /> Pro Options

@@ -23,7 +23,7 @@ export function PendingDeposit() {
               <span className="text-yellow-400">${user.pendingDeposit.amount.toLocaleString()} USDT</span> Pending
             </h3>
             <p className="text-sm text-gray-400 max-w-md leading-relaxed">
-              We have received your request. Our system is verifying the transaction on the blockchain. Your funds are safe and will be credited within 5-15 minutes.
+              We have received your request. Our system is verifying the transaction. Your funds are safe and will be credited within 5-15 minutes.
             </p>
           </div>
         </div>

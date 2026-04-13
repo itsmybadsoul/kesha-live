@@ -150,14 +150,14 @@ export function SwapTrade() {
            disabled={loading || !amount}
            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-2 group active:scale-[0.98] uppercase tracking-widest text-xs"
          >
-           {loading ? "Syncing Blockchain..." : "Execute Instant Trade"}
+           {loading ? "Syncing Transaction..." : "Execute Instant Trade"}
            <TrendingUp className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
          </button>
-
+ 
          <div className="flex gap-2 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-xl">
             <Info className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
             <p className="text-[9px] text-gray-500 font-medium leading-relaxed uppercase">
-              Liquidity provided by global institutional nodes. Trades are final and permanently recorded on the blockchain.
+              Liquidity provided by global institutional nodes. Trades are final and permanently recorded.
             </p>
          </div>
       </div>

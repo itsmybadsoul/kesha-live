@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Blockchain - Crypto Investment Platform",
-  description: "Secure, high-yield crypto investment and exchange platform.",
+  title: "Stocks Indicators - Smart Trading Platform",
+  description: "Advanced indicators and predictive analytics for smart stock trading.",
 };
 
 import { UserProvider } from "@/context/UserContext";

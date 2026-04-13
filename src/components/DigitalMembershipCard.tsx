@@ -52,7 +52,7 @@ export function DigitalMembershipCard() {
 
       <div className="relative z-10 flex justify-between items-start">
         <h3 className={`text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r ${tier === 'Standard' ? 'from-white to-gray-400' : 'from-white to-white'}`}>
-          Blockchain
+          Stocks Indicators
         </h3>
         <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${borderGlow} ${iconColor} bg-black/20 backdrop-blur-md`}>
           {tier} VIP

@@ -57,7 +57,7 @@ export default function Home() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
                 <BlocksIcon className="w-5 h-5 text-white" />
               </div>
-              <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform">Blockchain</a>
+              <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform">Stocks Indicators</a>
             </div>
 
             <div className="flex items-center gap-2 md:gap-6">
@@ -337,7 +337,7 @@ export default function Home() {
               <a href="/privacy" className="hover:text-indigo-400 transition-colors">Global Compliance</a>
               <a href="/privacy" className="hover:text-indigo-400 transition-colors">Data Privacy</a>
               <div className="hidden md:block w-px h-4 bg-gray-800"></div>
-              <span className="text-gray-700">© 2026 Blockchain Infrastructure Limited</span>
+              <span className="text-gray-700">© 2026 Stocks Indicators Infrastructure Limited</span>
             </div>
           </div>
         </div>

@@ -6,10 +6,11 @@ import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle, ShieldAlert } from "lucide-react";
 import { UsdtIcon } from "@/components/UsdtIcon";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function WithdrawPage() {
   const router = useRouter();
-  const { user, balance, requestWithdraw } = useUser();
+  const { user, balance, requestWithdraw, isLoading } = useUser();
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<"CRYPTO" | "BANK">("CRYPTO");
@@ -44,7 +45,24 @@ export default function WithdrawPage() {
     router.push("/");
   };
 
-  if (!user) return <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center text-white">Please login first.</div>;
+  if (isLoading) return <LoadingScreen />;
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-6">
+        <div className="text-center bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 p-10 rounded-3xl shadow-2xl max-w-sm w-full">
+           <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Landmark className="w-8 h-8 text-amber-400" />
+           </div>
+           <h1 className="text-xl font-bold text-white mb-2">Access Restricted</h1>
+           <p className="text-gray-400 text-sm mb-8">Authentication is required to settle accounts and withdraw funds.</p>
+           <a href="/login" className="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
+             Sign In
+           </a>
+        </div>
+      </div>
+    );
+  }
 
   if (user.kycStatus !== "VERIFIED") {
     return (

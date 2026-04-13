@@ -11,24 +11,24 @@ export default function TermsPage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Blockchain</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</span>
           </a>
           <a href="/" className="text-sm text-indigo-400 hover:text-white font-bold transition-colors">← Back to Dashboard</a>
         </div>
       </nav>
-
+ 
       <main className="max-w-3xl mx-auto px-4 py-16">
         <div className="mb-10">
           <p className="text-[10px] text-indigo-400 font-black uppercase tracking-[0.3em] mb-3">Legal</p>
           <h1 className="text-4xl font-black text-white mb-3">Terms of Use</h1>
           <p className="text-gray-500 text-sm">Last updated: March 21, 2026</p>
         </div>
-
+ 
         <div className="prose prose-invert max-w-none space-y-8 text-gray-300 text-sm leading-relaxed">
-
+ 
           <section>
             <h2 className="text-lg font-black text-white mb-3">1. Acceptance of Terms</h2>
-            <p>By accessing or using the Blockchain Investment Platform ("Platform"), you agree to be bound by these Terms of Use. If you do not agree, you may not access the Platform.</p>
+            <p>By accessing or using the Stocks Indicators Platform ("Platform"), you agree to be bound by these Terms of Use. If you do not agree, you may not access the Platform.</p>
           </section>
 
           <section>
@@ -69,24 +69,24 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-black text-white mb-3">8. Limitation of Liability</h2>
-            <p>To the maximum extent permitted by law, Blockchain Infrastructure Limited shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform, including lost profits or data.</p>
+            <p>To the maximum extent permitted by law, Stocks Indicators Infrastructure Limited shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform, including lost profits or data.</p>
           </section>
-
+ 
           <section>
             <h2 className="text-lg font-black text-white mb-3">9. Modifications</h2>
             <p>We reserve the right to modify these Terms at any time. Continued use of the Platform after changes constitutes your acceptance of the revised Terms.</p>
           </section>
-
+ 
           <section>
             <h2 className="text-lg font-black text-white mb-3">10. Contact</h2>
             <p>For any questions regarding these Terms, please contact us via our <a href="/support" className="text-indigo-400 hover:text-white transition-colors font-semibold">Support Portal</a>.</p>
           </section>
         </div>
       </main>
-
+ 
       <footer className="border-t border-gray-800 py-6 mt-8">
         <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-gray-600 font-bold uppercase tracking-widest">
-          <span>© 2026 Blockchain Infrastructure Limited</span>
+          <span>© 2026 Stocks Indicators Infrastructure Limited</span>
           <div className="flex items-center gap-6">
             <a href="/privacy" className="hover:text-indigo-400 transition-colors">Privacy Policy</a>
             <a href="/support" className="hover:text-indigo-400 transition-colors">Contact Support</a>

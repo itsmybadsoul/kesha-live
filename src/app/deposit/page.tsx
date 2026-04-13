@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { Wallet, Copy, CheckCircle2, ArrowLeft, Info } from "lucide-react";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function DepositPage() {
   const router = useRouter();
-  const { requestDeposit, user, addNotification } = useUser();
+  const { requestDeposit, user, addNotification, isLoading } = useUser();
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [txid, setTxid] = useState("");
@@ -39,8 +40,23 @@ export default function DepositPage() {
     router.push("/");
   };
 
+  if (isLoading) return <LoadingScreen />;
+
   if (!user) {
-    return <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center font-bold text-white">Please login first.</div>;
+    return (
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-6">
+        <div className="text-center bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 p-10 rounded-3xl shadow-2xl max-w-sm w-full">
+           <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Wallet className="w-8 h-8 text-indigo-400" />
+           </div>
+           <h1 className="text-xl font-bold text-white mb-2">Session Required</h1>
+           <p className="text-gray-400 text-sm mb-8">Please login to your secure trading account to manage funds and deposits.</p>
+           <a href="/login" className="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
+             Go to Login
+           </a>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -5,16 +5,25 @@ import { LivePriceTicker } from "@/components/LivePriceTicker";
 import { User, Wallet, TrendingUp, History, ArrowUpRight, ArrowDownRight, Award, ShieldCheck } from "lucide-react";
 import { KYCPortal } from "@/components/KYCPortal";
 import { DigitalMembershipCard } from "@/components/DigitalMembershipCard";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function ProfilePage() {
-  const { user, balance, transactions, activeTrades } = useUser();
+  const { user, balance, transactions, activeTrades, isLoading } = useUser();
+
+  if (isLoading) return <LoadingScreen />;
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Please login to view your profile</h1>
-          <a href="/login" className="bg-indigo-600 px-6 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all">Login</a>
+      <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center p-6">
+        <div className="text-center bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 p-10 rounded-3xl shadow-2xl max-w-sm w-full">
+           <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <User className="w-8 h-8 text-indigo-400" />
+           </div>
+           <h1 className="text-xl font-bold text-white mb-2">Login Required</h1>
+           <p className="text-gray-400 text-sm mb-8">Accessing your profile and trading history requires a secure session.</p>
+           <a href="/login" className="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
+             Go to Login
+           </a>
         </div>
       </div>
     );
@@ -35,7 +44,7 @@ export default function ProfilePage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Blockchain</a>
+            <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
           </a>
           <div className="flex items-center gap-4 text-sm font-medium text-gray-400">
             <a href="/" className="hover:text-white transition-colors">Dashboard</a>

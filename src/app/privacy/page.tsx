@@ -11,7 +11,7 @@ export default function PrivacyPage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Blockchain</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</span>
           </a>
           <a href="/" className="text-sm text-indigo-400 hover:text-white font-bold transition-colors">← Back to Dashboard</a>
         </div>
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
 
       <footer className="border-t border-gray-800 py-6 mt-8">
         <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-gray-600 font-bold uppercase tracking-widest">
-          <span>© 2026 Blockchain Infrastructure Limited</span>
+          <span>© 2026 Stocks Indicators Infrastructure Limited</span>
           <div className="flex items-center gap-6">
             <a href="/terms" className="hover:text-indigo-400 transition-colors">Terms of Use</a>
             <a href="/support" className="hover:text-indigo-400 transition-colors">Contact Support</a>

@@ -18,7 +18,7 @@ export function ReferralRewards() {
 
   const handleInvite = () => {
     if (!user) return toast("Please login to invite friends", "error");
-    const link = `https://blockchain.com/invite/${user.email?.split('@')[0] || 'crypto'}`;
+    const link = `https://stocksindicators.com/invite/${user.email?.split('@')[0] || 'crypto'}`;
     navigator.clipboard.writeText(link);
     toast("Referral link copied to clipboard!", "success");
   };
