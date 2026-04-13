@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:pages": "next build && npx @cloudflare/next-on-pages && node generate-routes.mjs",
+    "build:pages": "next build && npx @cloudflare/next-on-pages --skip-build && node generate-routes.mjs",
     "start": "next start",
     "lint": "eslint",
     "pages:build": "npm run build:pages",
