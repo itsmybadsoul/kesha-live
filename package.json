@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:pages": "npx opennextjs-cloudflare build && cp -r .open-next/assets/* .open-next/ && cp -r .open-next/assets/.* .open-next/ 2>/dev/null || true && mv .open-next/worker.js .open-next/_worker.js",
+    "build:pages": "npx opennextjs-cloudflare build && cp -r .open-next/assets/* .open-next/ && cp -r .open-next/assets/.* .open-next/ 2>/dev/null || true && echo '{\"version\":1,\"include\":[\"/*\"],\"exclude\":[\"/_next/*\",\"/favicon.ico\",\"/trader*.png\",\"/*.svg\",\"/*.ico\"]}' > .open-next/_routes.json && mv .open-next/worker.js .open-next/_worker.js",
     "pages:build": "npm run build:pages",
     "deploy": "npm run build:pages && wrangler pages deploy .open-next"
   },
