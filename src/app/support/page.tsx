@@ -40,7 +40,7 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] flex flex-col items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+    <div className="min-h-screen bg-[#0A0A0B] flex flex-col items-center justify-center p-6 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)]">
       <a href="/login" className="absolute top-8 left-8 flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-sm font-bold">
          <ChevronLeft className="w-4 h-4" /> Back to Login
       </a>

@@ -48,7 +48,7 @@ export function DigitalMembershipCard() {
       <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-50 pointer-events-none"></div>
       
       {/* Pattern background */}
-      <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
+      <div className="absolute inset-0 opacity-[0.03] bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] pointer-events-none"></div>
 
       <div className="relative z-10 flex justify-between items-start">
         <h3 className={`text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r ${tier === 'Standard' ? 'from-white to-gray-400' : 'from-white to-white'}`}>

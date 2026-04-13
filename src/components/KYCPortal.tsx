@@ -20,7 +20,7 @@ export function KYCPortal() {
   if (user.kycStatus === "VERIFIED") {
     return (
       <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-[2rem] p-12 text-center shadow-lg relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]"></div>
+        <div className="absolute inset-0 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] opacity-[0.03]"></div>
         <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
            <ShieldCheck className="w-12 h-12 text-emerald-400" />
         </div>
@@ -33,7 +33,7 @@ export function KYCPortal() {
   if (user.kycStatus === "PENDING") {
     return (
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-[2rem] p-12 text-center shadow-lg relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]"></div>
+        <div className="absolute inset-0 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)] opacity-[0.03]"></div>
         <div className="w-24 h-24 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(245,158,11,0.2)] animate-pulse">
            <ShieldAlert className="w-12 h-12 text-amber-400" />
         </div>
