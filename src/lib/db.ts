@@ -61,13 +61,15 @@ const mockDB: Record<string, string> = {};
 
 export async function getKV(key: string, env?: any): Promise<string | null> {
   try {
-    // 1. Try passed env (Standard Cloudflare)
+    // 1. Try passed env (most reliable)
     if (env?.DATABASE) return await env.DATABASE.get(key);
-    // 2. Try global/process.env (OpenNext / Node-compat)
+    // 2. Try nested context (Cloudflare Pages / OpenNext pattern)
+    if (env?.context?.env?.DATABASE) return await env.context.env.DATABASE.get(key);
+    // 3. Try global/process.env
     const db = (process.env as any).DATABASE || (globalThis as any).DATABASE;
     if (db && typeof db.get === 'function') return await db.get(key);
     
-    console.warn(`KV Binding 'DATABASE' not found for key: ${key}. Using mockDB.`);
+    console.warn(`KV Binding 'DATABASE' not found for key: ${key}. Check dashboard bindings.`);
   } catch (err) {
     console.error(`KV Get Error for ${key}:`, err);
   }
@@ -83,14 +85,19 @@ export async function putKV(key: string, value: string, env?: any): Promise<void
       await env.DATABASE.put(key, value);
       return;
     }
-    // 2. Try global/process.env
+    // 2. Try nested context
+    if (env?.context?.env?.DATABASE) {
+      await env.context.env.DATABASE.put(key, value);
+      return;
+    }
+    // 3. Try global/process.env
     const db = (process.env as any).DATABASE || (globalThis as any).DATABASE;
     if (db && typeof db.put === 'function') {
       await db.put(key, value);
       return;
     }
 
-    console.warn(`KV Binding 'DATABASE' not found for put. Using mockDB.`);
+    console.warn(`KV Binding 'DATABASE' not found for put. Check dashboard bindings.`);
   } catch (err) {
     console.error(`KV Put Error for ${key}:`, err);
   }
