@@ -60,32 +60,39 @@ export interface UserData {
 const mockDB: Record<string, string> = {};
 
 export async function getKV(key: string, env?: any): Promise<string | null> {
-  // 1. Try passed env
-  if (env?.DATABASE) return await env.DATABASE.get(key);
-  // 2. Try process.env (Next.js polyfill)
-  if ((process.env as any).DATABASE) return await (process.env as any).DATABASE.get(key);
-  // 3. Try global (Cloudflare native)
-  if ((globalThis as any).DATABASE) return await (globalThis as any).DATABASE.get(key);
+  try {
+    // 1. Try passed env (Standard Cloudflare)
+    if (env?.DATABASE) return await env.DATABASE.get(key);
+    // 2. Try global/process.env (OpenNext / Node-compat)
+    const db = (process.env as any).DATABASE || (globalThis as any).DATABASE;
+    if (db && typeof db.get === 'function') return await db.get(key);
+    
+    console.warn(`KV Binding 'DATABASE' not found for key: ${key}. Using mockDB.`);
+  } catch (err) {
+    console.error(`KV Get Error for ${key}:`, err);
+  }
   
   // Local fallback
   return mockDB[key] || null;
 }
 
 export async function putKV(key: string, value: string, env?: any): Promise<void> {
-  // 1. Try passed env
-  if (env?.DATABASE) {
-    await env.DATABASE.put(key, value);
-    return;
-  }
-  // 2. Try process.env (Next.js polyfill)
-  if ((process.env as any).DATABASE) {
-    await (process.env as any).DATABASE.put(key, value);
-    return;
-  }
-  // 3. Try global (Cloudflare native)
-  if ((globalThis as any).DATABASE) {
-    await (globalThis as any).DATABASE.put(key, value);
-    return;
+  try {
+    // 1. Try passed env
+    if (env?.DATABASE) {
+      await env.DATABASE.put(key, value);
+      return;
+    }
+    // 2. Try global/process.env
+    const db = (process.env as any).DATABASE || (globalThis as any).DATABASE;
+    if (db && typeof db.put === 'function') {
+      await db.put(key, value);
+      return;
+    }
+
+    console.warn(`KV Binding 'DATABASE' not found for put. Using mockDB.`);
+  } catch (err) {
+    console.error(`KV Put Error for ${key}:`, err);
   }
   
   // Local fallback
