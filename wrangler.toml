@@ -6,4 +6,4 @@ pages_build_output_dir = ".vercel/output/static"
 
 [[kv_namespaces]]
 binding = "DATABASE"
-id = "464d17980b6f45c6b8c7f681ccac603f" # Replace with your actual KV namespace ID
+id = "68e82b8a623e43d08e8fef5d62de5e85" # Replace with your actual KV namespace ID
