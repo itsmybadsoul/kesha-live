@@ -1,9 +1,0 @@
-#:schema node_modules/wrangler/config-schema.json
-name = "kesha-live"
-compatibility_date = "2024-11-18"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output"
-
-[[kv_namespaces]]
-binding = "DATABASE"
-id = "68e82b8a623e43d08e8fef5d62de5e85" # Replace with your actual KV namespace ID
