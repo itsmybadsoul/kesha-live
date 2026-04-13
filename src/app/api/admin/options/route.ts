@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getActiveOptionsUsers, OptionsTrade } from "@/lib/db";
 
-export const runtime = "edge";
+
 
 export async function GET(req: Request) {
   try {

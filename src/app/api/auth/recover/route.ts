@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/db";
 
-export const runtime = "edge";
+
 
 export async function POST(req: Request) {
   try {
