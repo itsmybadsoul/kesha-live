@@ -1,3 +1,4 @@
+// Triggering deployment for Stocks Indicators
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
