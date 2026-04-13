@@ -1,7 +1,9 @@
-import { writeFileSync, existsSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
-// Cloudflare Pages _routes.json spec:
-// https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file
+// This script ensures that static assets (CSS, JS, Images, Fonts) 
+// bypass the Cloudflare Edge Worker to prevent 500 errors.
+
 const routes = {
   version: 1,
   include: ["/*"],
@@ -9,6 +11,12 @@ const routes = {
     "/_next/static/*",
     "/_next/image*",
     "/favicon.ico",
+    "/trader*.png",
+    "/file.svg",
+    "/globe.svg",
+    "/next.svg",
+    "/vercel.svg",
+    "/window.svg",
     "/*.png",
     "/*.jpg",
     "/*.jpeg",
@@ -21,18 +29,25 @@ const routes = {
     "/*.ttf",
     "/*.otf",
     "/*.eot",
-    "/*.css",
-    "/*.js.map"
+    "/*.css"
   ]
 };
 
-const outputPath = '.vercel/output/static/_routes.json';
+// We target .vercel/output/static as the root of the deployment
+const outputDir = join(process.cwd(), '.vercel', 'output', 'static');
 
-if (!existsSync('.vercel/output/static')) {
-  console.error('❌ .vercel/output/static does not exist – skipping _routes.json generation');
-  process.exit(1);
+if (!existsSync(outputDir)) {
+    console.log('⚠️ Directory .vercel/output/static not found, creating it...');
+    mkdirSync(outputDir, { recursive: true });
 }
 
-writeFileSync(outputPath, JSON.stringify(routes, null, 2));
-console.log('✓ _routes.json written to', outputPath);
-console.log(JSON.stringify(routes, null, 2));
+const outputPath = join(outputDir, '_routes.json');
+
+try {
+    writeFileSync(outputPath, JSON.stringify(routes, null, 2));
+    console.log('✅ Successfully generated _routes.json at ' + outputPath);
+    console.log('Configuration summary: Excluding ' + routes.exclude.length + ' static patterns from the Worker.');
+} catch (error) {
+    console.error('❌ Failed to write _routes.json:', error);
+    process.exit(1);
+}

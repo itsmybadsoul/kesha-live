@@ -8,8 +8,8 @@
     "build:pages": "next build && npx @cloudflare/next-on-pages && node generate-routes.mjs",
     "start": "next start",
     "lint": "eslint",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "deploy": "npm run pages:build && wrangler pages deploy .vercel/output"
+    "pages:build": "npm run build:pages",
+    "deploy": "npm run build:pages && wrangler pages deploy .vercel/output/static"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",
