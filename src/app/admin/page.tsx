@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2 } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2 } from "lucide-react";
 
 export default function AdminPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
@@ -12,6 +12,7 @@ export default function AdminPage() {
   const [optionsHistory, setOptionsHistory] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [supportTickets, setSupportTickets] = useState<any[]>([]);
+  const [customMarkets, setCustomMarkets] = useState<any[]>([]);
   const [notifModal, setNotifModal] = useState<{ open: boolean; email: string; title: string; body: string }>({ open: false, email: "", title: "", body: "" });
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
@@ -31,7 +32,8 @@ export default function AdminPage() {
         fetch("/api/admin/options/history"),
         fetch("/api/admin/kyc"),
         fetch("/api/admin/users"),
-        fetch("/api/support")
+        fetch("/api/support"),
+        fetch("/api/admin/market")
       ]);
       const depData = await depRes.json();
       const withData = await withRes.json();
@@ -40,6 +42,7 @@ export default function AdminPage() {
       const kycData = await kycRes.json();
       const userData = await userRes.json();
       const supportData = await supRes.json();
+      const marketData = await marketRes.json();
       
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);
@@ -48,6 +51,7 @@ export default function AdminPage() {
       if (kycData.pendingKyc) setKycRequests(kycData.pendingKyc);
       if (userData.users) setAllUsers(userData.users);
       if (supportData.tickets) setSupportTickets(supportData.tickets);
+      if (marketData.markets) setCustomMarkets(marketData.markets);
     } catch (e) {
       console.error(e);
     } finally {
@@ -165,6 +169,42 @@ export default function AdminPage() {
       }
     } catch (e) {
       toast("Failed to transmit alert.", "error");
+    }
+  };
+
+  const handleMarketAction = async (action: "jump" | "target" | "clear", sym: string) => {
+    let price;
+    let durationMinutes;
+    if (action === "jump") {
+       const pr = prompt(`Enter new exact Base Price for ${sym}:`);
+       if (!pr || isNaN(Number(pr))) return;
+       price = Number(pr);
+    } else if (action === "target") {
+       const pr = prompt(`Enter Target Price for ${sym} to reach:`);
+       if (!pr || isNaN(Number(pr))) return;
+       const dur = prompt(`Enter Duration in minutes for ${sym} to reach the target:`);
+       if (!dur || isNaN(Number(dur))) return;
+       price = Number(pr);
+       durationMinutes = Number(dur);
+    } else if (action === "clear") {
+       price = 0;
+    }
+    
+    try {
+      const res = await fetch("/api/admin/market", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, sym, price, durationMinutes })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(`Deployed ${action} to ${sym} successfully!`, "success");
+        fetchData();
+      } else {
+        toast(data.error || "Action failed", "error");
+      }
+    } catch (e) {
+      toast("Action failed.", "error");
     }
   };
 
@@ -463,6 +503,85 @@ export default function AdminPage() {
                 })
               )}
             </tbody>
+          </table>
+        </div>
+
+        {/* Unique Market Control */}
+        <div className="mt-10 mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            Unique Market Control <Activity className="w-5 h-5 text-indigo-400" />
+          </h2>
+          <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-widest text-indigo-400">
+             {customMarkets.length} Custom Stocks
+          </div>
+        </div>
+
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-10">
+          <table className="w-full text-left border-collapse">
+             <thead>
+               <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
+                 <th className="px-6 py-4">Symbol / Name</th>
+                 <th className="px-6 py-4">Live State</th>
+                 <th className="px-6 py-4">Active Target Path</th>
+                 <th className="px-6 py-4 text-right">Market Manipulations</th>
+               </tr>
+             </thead>
+             <tbody className="divide-y divide-gray-700/50">
+               {loading ? (
+                 <tr><td colSpan={4} className="px-6 py-20 text-center text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing KV Store...</td></tr>
+               ) : customMarkets.map(m => {
+                  const hasTarget = m.targetPrice && m.targetEndTime && m.targetStartTime;
+                  const isFinished = hasTarget && Date.now() > m.targetEndTime;
+                  const timeLeftMs = hasTarget && !isFinished ? m.targetEndTime - Date.now() : 0;
+                  const mins = Math.ceil(timeLeftMs / 60000);
+                  return (
+                    <tr key={m.sym} className="hover:bg-indigo-500/5 transition-colors group">
+                       <td className="px-6 py-4">
+                         <div className="font-black text-lg text-white flex items-center gap-2">
+                           {m.sym}
+                           {hasTarget && !isFinished && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>}
+                         </div>
+                         <div className="text-xs text-gray-500 font-mono mt-0.5">{m.name}</div>
+                       </td>
+                       <td className="px-6 py-4">
+                         <div className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Base Price / Vol</div>
+                         <div className="font-mono font-bold text-indigo-300">
+                           ${m.basePrice.toFixed(2)} <span className="text-gray-600 font-normal">v{m.volatility}</span>
+                         </div>
+                       </td>
+                       <td className="px-6 py-4">
+                         {hasTarget ? (
+                           isFinished ? (
+                             <span className="text-[10px] px-2 py-1 bg-gray-800 text-gray-500 rounded uppercase font-black tracking-widest">Target Reached</span>
+                           ) : (
+                             <div>
+                               <div className="text-sm font-black text-emerald-400">Target: ${m.targetPrice.toFixed(2)}</div>
+                               <div className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">Hitting in ~{mins}m</div>
+                             </div>
+                           )
+                         ) : (
+                           <span className="text-[10px] px-2 py-1 bg-gray-800/50 text-gray-600 rounded uppercase font-black tracking-widest">Base Trajectory</span>
+                         )}
+                       </td>
+                       <td className="px-6 py-4 text-right">
+                         <div className="flex justify-end gap-2">
+                           {hasTarget && !isFinished && (
+                              <button onClick={() => handleMarketAction('clear', m.sym)} className="p-2 bg-gray-800 text-gray-400 rounded-lg hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Clear Target">
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                           )}
+                           <button onClick={() => handleMarketAction('target', m.sym)} className="bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/20 shadow-lg">
+                             <Target className="w-3.5 h-3.5" /> Deploy Target
+                           </button>
+                           <button onClick={() => handleMarketAction('jump', m.sym)} className="bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-500/20 shadow-lg">
+                             <TrendingUp className="w-3.5 h-3.5" /> Instant Shift
+                           </button>
+                         </div>
+                       </td>
+                    </tr>
+                  )
+               })}
+             </tbody>
           </table>
         </div>
 

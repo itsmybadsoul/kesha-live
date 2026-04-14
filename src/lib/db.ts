@@ -286,3 +286,44 @@ export async function addGlobalOptionsHistory(trade: OptionsTrade, email: string
   if (history.length > 300) history = history.slice(0, 300);
   await putKV("global_options_history", JSON.stringify(history));
 }
+
+// ── Custom Managed Markets ──────────────────────────────────────────────────
+
+export interface CustomStock {
+  sym: string;
+  name: string;
+  sector: string;
+  basePrice: number;
+  volatility: number;
+  targetPrice?: number;
+  targetStartTime?: number;
+  targetEndTime?: number;
+  targetStartPrice?: number;
+}
+
+const DEFAULT_CUSTOM_STOCKS: CustomStock[] = [
+  { sym: "NXT", name: "NextGen Tech", sector: "Tech", basePrice: 150.00, volatility: 2.5 },
+  { sym: "QNTM", name: "Quantum Computing Solutions", sector: "Tech", basePrice: 45.20, volatility: 4.0 },
+  { sym: "EVM", name: "EcoVehicle Motors", sector: "Automotive", basePrice: 210.50, volatility: 3.5 },
+  { sym: "AIG", name: "AI Global Systems", sector: "Tech", basePrice: 89.30, volatility: 2.8 },
+  { sym: "SLR", name: "Solaris Energy", sector: "Energy", basePrice: 34.10, volatility: 1.5 },
+  { sym: "BIOX", name: "BioX Pharma", sector: "Pharma", basePrice: 120.40, volatility: 2.1 },
+  { sym: "CRPT", name: "Cryptographic Holdings", sector: "Finance", basePrice: 500.00, volatility: 5.0 },
+  { sym: "AERO", name: "AeroDynamics Inc", sector: "Industrial", basePrice: 245.80, volatility: 1.2 },
+  { sym: "VRTX", name: "Vertex Meta Platforms", sector: "Media", basePrice: 65.00, volatility: 3.2 },
+  { sym: "AUR", name: "Aura Gold Mining", sector: "Industrial", basePrice: 18.50, volatility: 1.8 }
+];
+
+export async function getCustomMarkets(_env?: any): Promise<CustomStock[]> {
+  const list = await getKV("custom_markets");
+  if (!list) {
+    // If none exist, save and return default ones
+    await saveCustomMarkets(DEFAULT_CUSTOM_STOCKS);
+    return DEFAULT_CUSTOM_STOCKS;
+  }
+  return JSON.parse(list);
+}
+
+export async function saveCustomMarkets(stocks: CustomStock[], _env?: any): Promise<void> {
+  await putKV("custom_markets", JSON.stringify(stocks));
+}

@@ -13,119 +13,7 @@ import {
 
 const SECTORS = ["Tech", "Finance", "Energy", "Healthcare", "Retail", "Automotive", "Telecom", "Media", "Pharma", "Industrial"];
 
-const BASE_COMPANIES = [
-  // Tech
-  { sym: "AAPL",  name: "Apple Inc.",                  sector: "Tech",         price: 189.84, vol: 58_400_000,  cap: 2_920_000 },
-  { sym: "MSFT",  name: "Microsoft Corp.",              sector: "Tech",         price: 415.32, vol: 22_100_000,  cap: 3_090_000 },
-  { sym: "NVDA",  name: "NVIDIA Corp.",                 sector: "Tech",         price: 874.15, vol: 41_700_000,  cap: 2_150_000 },
-  { sym: "GOOGL", name: "Alphabet Inc.",                sector: "Tech",         price: 175.98, vol: 24_800_000,  cap: 2_190_000 },
-  { sym: "META",  name: "Meta Platforms",               sector: "Tech",         price: 527.84, vol: 19_300_000,  cap: 1_350_000 },
-  { sym: "AMZN",  name: "Amazon.com Inc.",              sector: "Tech",         price: 198.35, vol: 38_500_000,  cap: 2_080_000 },
-  { sym: "TSLA",  name: "Tesla Inc.",                   sector: "Automotive",   price: 177.67, vol: 94_200_000,  cap: 566_000 },
-  { sym: "AMD",   name: "Advanced Micro Devices",       sector: "Tech",         price: 158.44, vol: 48_900_000,  cap: 257_000 },
-  { sym: "INTC",  name: "Intel Corporation",            sector: "Tech",         price: 31.18,  vol: 54_300_000,  cap: 133_000 },
-  { sym: "CRM",   name: "Salesforce Inc.",              sector: "Tech",         price: 294.12, vol: 6_800_000,   cap: 283_000 },
-  { sym: "ORCL",  name: "Oracle Corporation",           sector: "Tech",         price: 134.89, vol: 14_500_000,  cap: 371_000 },
-  { sym: "ADBE",  name: "Adobe Inc.",                   sector: "Tech",         price: 476.52, vol: 3_200_000,   cap: 209_000 },
-  { sym: "CSCO",  name: "Cisco Systems",                sector: "Tech",         price: 55.31,  vol: 19_800_000,  cap: 224_000 },
-  { sym: "QCOM",  name: "Qualcomm Inc.",                sector: "Tech",         price: 174.87, vol: 12_100_000,  cap: 196_000 },
-  { sym: "NOW",   name: "ServiceNow Inc.",              sector: "Tech",         price: 812.44, vol: 1_900_000,   cap: 168_000 },
-  { sym: "SNOW",  name: "Snowflake Inc.",               sector: "Tech",         price: 148.32, vol: 7_400_000,   cap: 49_000 },
-  { sym: "PLTR",  name: "Palantir Technologies",        sector: "Tech",         price: 24.18,  vol: 71_300_000,  cap: 51_000 },
-  { sym: "UBER",  name: "Uber Technologies",            sector: "Tech",         price: 78.54,  vol: 22_700_000,  cap: 161_000 },
-  { sym: "SQ",    name: "Block Inc.",                   sector: "Finance",      price: 68.47,  vol: 9_800_000,   cap: 42_000 },
-  { sym: "SHOP",  name: "Shopify Inc.",                 sector: "Tech",         price: 74.83,  vol: 12_300_000,  cap: 95_000 },
-  // Finance
-  { sym: "JPM",   name: "JPMorgan Chase & Co.",         sector: "Finance",      price: 209.84, vol: 9_100_000,   cap: 607_000 },
-  { sym: "BAC",   name: "Bank of America Corp.",        sector: "Finance",      price: 39.47,  vol: 41_200_000,  cap: 310_000 },
-  { sym: "GS",    name: "Goldman Sachs Group",          sector: "Finance",      price: 482.38, vol: 2_600_000,   cap: 160_000 },
-  { sym: "MS",    name: "Morgan Stanley",               sector: "Finance",      price: 101.54, vol: 8_400_000,   cap: 164_000 },
-  { sym: "WFC",   name: "Wells Fargo & Co.",            sector: "Finance",      price: 60.21,  vol: 18_700_000,  cap: 214_000 },
-  { sym: "V",     name: "Visa Inc.",                    sector: "Finance",      price: 278.14, vol: 7_200_000,   cap: 568_000 },
-  { sym: "MA",    name: "Mastercard Inc.",              sector: "Finance",      price: 476.82, vol: 3_800_000,   cap: 444_000 },
-  { sym: "AXP",   name: "American Express Co.",         sector: "Finance",      price: 234.67, vol: 4_100_000,   cap: 170_000 },
-  { sym: "BLK",   name: "BlackRock Inc.",               sector: "Finance",      price: 891.34, vol: 688_000,     cap: 136_000 },
-  { sym: "C",     name: "Citigroup Inc.",               sector: "Finance",      price: 67.83,  vol: 16_500_000,  cap: 130_000 },
-  // Energy
-  { sym: "XOM",   name: "Exxon Mobil Corp.",            sector: "Energy",       price: 114.32, vol: 17_300_000,  cap: 460_000 },
-  { sym: "CVX",   name: "Chevron Corporation",          sector: "Energy",       price: 161.84, vol: 8_700_000,   cap: 305_000 },
-  { sym: "COP",   name: "ConocoPhillips",               sector: "Energy",       price: 112.47, vol: 6_200_000,   cap: 139_000 },
-  { sym: "SLB",   name: "SLB (Schlumberger)",           sector: "Energy",       price: 46.18,  vol: 14_800_000,  cap: 66_000 },
-  { sym: "MPC",   name: "Marathon Petroleum Corp.",     sector: "Energy",       price: 168.92, vol: 4_500_000,   cap: 59_000 },
-  { sym: "OXY",   name: "Occidental Petroleum",         sector: "Energy",       price: 59.47,  vol: 12_100_000,  cap: 55_000 },
-  { sym: "PSX",   name: "Phillips 66",                  sector: "Energy",       price: 138.73, vol: 3_900_000,   cap: 52_000 },
-  { sym: "VLO",   name: "Valero Energy Corp.",          sector: "Energy",       price: 149.84, vol: 4_200_000,   cap: 49_000 },
-  // Healthcare
-  { sym: "JNJ",   name: "Johnson & Johnson",            sector: "Healthcare",   price: 156.42, vol: 7_300_000,   cap: 378_000 },
-  { sym: "UNH",   name: "UnitedHealth Group",           sector: "Healthcare",   price: 514.87, vol: 3_400_000,   cap: 474_000 },
-  { sym: "PFE",   name: "Pfizer Inc.",                  sector: "Pharma",       price: 27.34,  vol: 42_800_000,  cap: 155_000 },
-  { sym: "ABBV",  name: "AbbVie Inc.",                  sector: "Pharma",       price: 184.72, vol: 8_100_000,   cap: 327_000 },
-  { sym: "MRK",   name: "Merck & Co. Inc.",             sector: "Pharma",       price: 128.54, vol: 9_900_000,   cap: 327_000 },
-  { sym: "BMY",   name: "Bristol-Myers Squibb",         sector: "Pharma",       price: 51.23,  vol: 14_200_000,  cap: 103_000 },
-  { sym: "AMGN",  name: "Amgen Inc.",                   sector: "Pharma",       price: 308.41, vol: 2_700_000,   cap: 163_000 },
-  { sym: "LLY",   name: "Eli Lilly and Co.",            sector: "Pharma",       price: 787.34, vol: 3_100_000,   cap: 749_000 },
-  { sym: "CVS",   name: "CVS Health Corp.",             sector: "Healthcare",   price: 55.67,  vol: 11_300_000,  cap: 71_000 },
-  { sym: "MDT",   name: "Medtronic plc",                sector: "Healthcare",   price: 82.14,  vol: 7_800_000,   cap: 109_000 },
-  // Retail
-  { sym: "WMT",   name: "Walmart Inc.",                 sector: "Retail",       price: 67.84,  vol: 14_200_000,  cap: 546_000 },
-  { sym: "HD",    name: "Home Depot Inc.",              sector: "Retail",       price: 358.47, vol: 3_800_000,   cap: 356_000 },
-  { sym: "COST",  name: "Costco Wholesale Corp.",       sector: "Retail",       price: 874.32, vol: 2_100_000,   cap: 387_000 },
-  { sym: "TGT",   name: "Target Corporation",           sector: "Retail",       price: 148.73, vol: 4_900_000,   cap: 68_000 },
-  { sym: "LOW",   name: "Lowe's Companies Inc.",        sector: "Retail",       price: 228.54, vol: 3_700_000,   cap: 135_000 },
-  { sym: "MCD",   name: "McDonald's Corporation",       sector: "Retail",       price: 284.37, vol: 3_200_000,   cap: 204_000 },
-  { sym: "SBUX",  name: "Starbucks Corporation",        sector: "Retail",       price: 79.84,  vol: 9_700_000,   cap: 89_000 },
-  { sym: "NKE",   name: "Nike Inc.",                    sector: "Retail",       price: 93.47,  vol: 12_400_000,  cap: 126_000 },
-  { sym: "AMZN2", name: "Amazon Retail Div. Trust",     sector: "Retail",       price: 185.22, vol: 8_100_000,   cap: 190_000 },
-  // Telecom
-  { sym: "T",     name: "AT&T Inc.",                    sector: "Telecom",      price: 17.84,  vol: 52_300_000,  cap: 127_000 },
-  { sym: "VZ",    name: "Verizon Communications",       sector: "Telecom",      price: 41.23,  vol: 27_100_000,  cap: 173_000 },
-  { sym: "TMUS",  name: "T-Mobile US Inc.",             sector: "Telecom",      price: 177.34, vol: 4_800_000,   cap: 206_000 },
-  { sym: "CMCSA", name: "Comcast Corporation",          sector: "Telecom",      price: 39.54,  vol: 22_700_000,  cap: 162_000 },
-  // Media
-  { sym: "DIS",   name: "Walt Disney Company",          sector: "Media",        price: 113.84, vol: 14_300_000,  cap: 207_000 },
-  { sym: "NFLX",  name: "Netflix Inc.",                 sector: "Media",        price: 634.21, vol: 6_200_000,   cap: 277_000 },
-  { sym: "SPOT",  name: "Spotify Technology",           sector: "Media",        price: 314.87, vol: 2_400_000,   cap: 62_000 },
-  { sym: "WBD",   name: "Warner Bros. Discovery",       sector: "Media",        price: 8.47,   vol: 31_200_000,  cap: 21_000 },
-  { sym: "PARA",  name: "Paramount Global",             sector: "Media",        price: 12.34,  vol: 18_700_000,  cap: 8_000 },
-  // Automotive
-  { sym: "F",     name: "Ford Motor Company",           sector: "Automotive",   price: 12.47,  vol: 68_400_000,  cap: 49_000 },
-  { sym: "GM",    name: "General Motors Co.",           sector: "Automotive",   price: 48.84,  vol: 23_100_000,  cap: 47_000 },
-  { sym: "TM",    name: "Toyota Motor Corp.",           sector: "Automotive",   price: 189.34, vol: 4_100_000,   cap: 270_000 },
-  { sym: "RIVN",  name: "Rivian Automotive",            sector: "Automotive",   price: 10.84,  vol: 42_300_000,  cap: 10_000 },
-  { sym: "LCID",  name: "Lucid Group Inc.",             sector: "Automotive",   price: 3.12,   vol: 38_700_000,  cap: 7_100 },
-  // Industrial
-  { sym: "CAT",   name: "Caterpillar Inc.",             sector: "Industrial",   price: 364.84, vol: 2_700_000,   cap: 179_000 },
-  { sym: "HON",   name: "Honeywell International",      sector: "Industrial",   price: 202.47, vol: 2_900_000,   cap: 132_000 },
-  { sym: "GE",    name: "GE Aerospace",                  sector: "Industrial",   price: 174.32, vol: 5_800_000,   cap: 189_000 },
-  { sym: "MMM",   name: "3M Company",                   sector: "Industrial",   price: 135.47, vol: 4_100_000,   cap: 74_000 },
-  { sym: "BA",    name: "Boeing Company",               sector: "Industrial",   price: 178.34, vol: 8_700_000,   cap: 108_000 },
-  { sym: "LMT",   name: "Lockheed Martin Corp.",        sector: "Industrial",   price: 472.84, vol: 1_100_000,   cap: 116_000 },
-  { sym: "RTX",   name: "RTX Corporation",              sector: "Industrial",   price: 123.47, vol: 5_600_000,   cap: 163_000 },
-  { sym: "DE",    name: "Deere & Company",              sector: "Industrial",   price: 418.32, vol: 1_500_000,   cap: 127_000 },
-  { sym: "UPS",   name: "United Parcel Service",        sector: "Industrial",   price: 138.84, vol: 5_900_000,   cap: 119_000 },
-  { sym: "FDX",   name: "FedEx Corporation",            sector: "Industrial",   price: 284.47, vol: 2_300_000,   cap: 71_000 },
-  // Extra Tech / Crypto Adjacent
-  { sym: "COIN",  name: "Coinbase Global Inc.",         sector: "Finance",      price: 218.47, vol: 11_400_000,  cap: 53_000 },
-  { sym: "MSTR",  name: "MicroStrategy Inc.",           sector: "Finance",      price: 1284.32,vol: 4_200_000,   cap: 22_000 },
-  { sym: "HOOD",  name: "Robinhood Markets",            sector: "Finance",      price: 22.47,  vol: 16_800_000,  cap: 20_000 },
-  { sym: "PYPL",  name: "PayPal Holdings Inc.",         sector: "Finance",      price: 68.84,  vol: 18_300_000,  cap: 74_000 },
-  { sym: "ABNB",  name: "Airbnb Inc.",                  sector: "Tech",         price: 148.32, vol: 5_700_000,   cap: 95_000 },
-  { sym: "LYFT",  name: "Lyft Inc.",                    sector: "Tech",         price: 13.47,  vol: 21_400_000,  cap: 5_600 },
-  { sym: "SNAP",  name: "Snap Inc.",                    sector: "Media",        price: 10.84,  vol: 34_200_000,  cap: 18_000 },
-  { sym: "PINS",  name: "Pinterest Inc.",               sector: "Media",        price: 33.47,  vol: 12_600_000,  cap: 22_000 },
-  { sym: "TWTR2", name: "X Holdings Corp.",             sector: "Media",        price: 54.84,  vol: 8_400_000,   cap: 11_000 },
-  { sym: "RBLX",  name: "Roblox Corporation",           sector: "Media",        price: 42.84,  vol: 9_100_000,   cap: 25_000 },
-  { sym: "U",     name: "Unity Software Inc.",          sector: "Tech",         price: 22.34,  vol: 8_700_000,   cap: 7_900 },
-  { sym: "DDOG",  name: "Datadog Inc.",                 sector: "Tech",         price: 124.47, vol: 4_800_000,   cap: 40_000 },
-  { sym: "ZS",    name: "Zscaler Inc.",                 sector: "Tech",         price: 198.32, vol: 2_100_000,   cap: 29_000 },
-  { sym: "CRWD",  name: "CrowdStrike Holdings",         sector: "Tech",         price: 312.84, vol: 5_400_000,   cap: 79_000 },
-  { sym: "PANW",  name: "Palo Alto Networks",           sector: "Tech",         price: 328.47, vol: 4_200_000,   cap: 108_000 },
-  { sym: "MDB",   name: "MongoDB Inc.",                 sector: "Tech",         price: 248.32, vol: 2_900_000,   cap: 18_000 },
-  { sym: "NET",   name: "Cloudflare Inc.",              sector: "Tech",         price: 112.84, vol: 7_300_000,   cap: 38_000 },
-  { sym: "OKTA",  name: "Okta Inc.",                    sector: "Tech",         price: 98.47,  vol: 4_100_000,   cap: 16_000 },
-  { sym: "GTLB",  name: "GitLab Inc.",                  sector: "Tech",         price: 52.34,  vol: 3_200_000,   cap: 9_000 },
-  { sym: "AI",    name: "C3.ai Inc.",                   sector: "Tech",         price: 32.84,  vol: 11_700_000,  cap: 4_100 },
-];
+
 
 interface Stock {
   sym: string; name: string; sector: string;
@@ -134,23 +22,14 @@ interface Stock {
   vol: number; cap: number;
   volatility: number; direction: "up" | "down" | "flat";
   flash?: "green" | "red";
+  isControlled?: boolean;
+  params?: any;
 }
 
 type SortKey = "sym" | "name" | "price" | "changePct" | "vol" | "cap" | "volatility";
 type SortDir = "asc" | "desc";
 
-function initStocks(): Stock[] {
-  return BASE_COMPANIES.map(c => {
-    const changePct = (Math.random() - 0.48) * 6;
-    const change = +(c.price * changePct / 100).toFixed(2);
-    return {
-      ...c,
-      prevPrice: c.price,
-      change,
-      changePct: +changePct.toFixed(2),
-      volatility: +(Math.random() * 4 + 0.2).toFixed(2),
-      direction: changePct > 0 ? "up" : changePct < 0 ? "down" : "flat",
-    };
+;
   });
 }
 
@@ -171,7 +50,7 @@ function fmtVol(n: number) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function MarketsPage() {
   const { user, balance } = useUser();
-  const [stocks, setStocks] = useState<Stock[]>(initStocks);
+  const [stocks, setStocks] = useState<Stock[]>([]);
   const [search, setSearch] = useState("");
   const [sector, setSector] = useState("All");
   const [filter, setFilter] = useState<"all" | "gainers" | "losers" | "hot">("all");
@@ -187,38 +66,136 @@ export default function MarketsPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const tickRef = useRef(0);
 
-  // Live price simulation
+  // Central synchronized loading
   useEffect(() => {
-    const interval = setInterval(() => {
-      tickRef.current++;
+    let mounted = true;
+
+    async function loadData() {
+      try {
+        const [realRes, ctrlRes] = await Promise.all([
+          fetch("/api/market/real"),
+          fetch("/api/market/controlled")
+        ]);
+        const realData = await realRes.json();
+        const ctrlData = await ctrlRes.json();
+
+        if (!mounted) return;
+
+        let newStocks: Stock[] = [];
+
+        if (realData.success && realData.data) {
+           newStocks = [...newStocks, ...realData.data.map((r: any) => ({
+             ...r,
+             prevPrice: r.price,
+             isControlled: false
+           }))];
+        }
+
+        if (ctrlData.success && ctrlData.data) {
+           const mappedCtrl = ctrlData.data.map((c: any) => ({
+             sym: c.sym,
+             name: c.name,
+             sector: c.sector,
+             price: c.basePrice,
+             prevPrice: c.basePrice,
+             change: 0,
+             changePct: 0,
+             vol: Math.floor(Math.random() * 5000000 + 1000000),
+             cap: Math.floor(Math.random() * 50000),
+             volatility: c.volatility,
+             direction: "flat",
+             isControlled: true,
+             params: c
+           }));
+           newStocks = [...newStocks, ...mappedCtrl];
+        }
+
+        // Just blindly overlay real/controlled without losing their current prices if possible
+        setStocks(prev => {
+          // preserve volatile changes for controlled? actually just reset they'll snap to math
+           if (prev.length === 0) return newStocks;
+           
+           return newStocks.map(ns => {
+              const existing = prev.find(p => p.sym === ns.sym);
+              if (existing) {
+                 return { ...ns, price: existing.price, prevPrice: existing.prevPrice, change: existing.change, changePct: existing.changePct };
+              }
+              return ns;
+           });
+        });
+      } catch (e) {}
+    }
+    
+    loadData();
+    const pollInterval = setInterval(loadData, 15000);
+    return () => { mounted = false; clearInterval(pollInterval); };
+  }, []);
+
+  // Live localized tick renderer (Detroit syncing)
+  useEffect(() => {
+    const tickInterval = setInterval(() => {
+      const now = Date.now();
       setStocks(prev => prev.map(s => {
-        // ~30% of stocks move each tick for realism
-        if (Math.random() > 0.3) return { ...s, flash: undefined };
-        const drift = (Math.random() - 0.49) * s.volatility * 0.08;
-        const newPrice = +(s.price * (1 + drift / 100)).toFixed(2);
-        const changePct = +((newPrice - s.price) / s.price * 100).toFixed(2);
-        const totalChangePct = +((newPrice - BASE_COMPANIES.find(b => b.sym === s.sym)!.price) / BASE_COMPANIES.find(b => b.sym === s.sym)!.price * 100).toFixed(2);
-        const totalChange = +(newPrice - BASE_COMPANIES.find(b => b.sym === s.sym)!.price).toFixed(2);
-        return {
-          ...s,
-          prevPrice: s.price,
-          price: newPrice,
-          change: totalChange,
-          changePct: totalChangePct,
-          direction: changePct > 0 ? "up" : changePct < 0 ? "down" : "flat",
-          flash: changePct > 0 ? "green" : "red",
-          volatility: +(s.volatility * 0.98 + Math.random() * 0.1).toFixed(2),
-        };
+        if (!s.isControlled) {
+           // Real stock subtle jitter
+           if (Math.random() > 0.3) return { ...s, flash: undefined };
+           const drift = (Math.random() - 0.5) * s.volatility * 0.02;
+           const newPrice = +(s.price + drift).toFixed(2);
+           const change = newPrice - s.prevPrice;
+           if (Math.abs(change) < 0.01) return { ...s, flash: undefined };
+           
+           return {
+             ...s, 
+             price: newPrice,
+             flash: change > 0 ? "green" : change < 0 ? "red" : undefined,
+             direction: change > 0 ? "up" : change < 0 ? "down" : "flat",
+             prevPrice: s.price
+           };
+        } else {
+           // Controlled deterministic logic
+           const p = s.params;
+           let truePrice = p.basePrice;
+
+           if (p.targetPrice !== undefined && p.targetEndTime && p.targetStartTime && p.targetStartPrice !== undefined) {
+             if (now < p.targetEndTime) {
+               const progress = (now - p.targetStartTime) / (p.targetEndTime - p.targetStartTime);
+               truePrice = p.targetStartPrice + (p.targetPrice - p.targetStartPrice) * progress;
+             } else {
+               truePrice = p.targetPrice;
+             }
+           }
+           
+           const t = now / (3000 / p.volatility);
+           const noise = (Math.sin(t) + Math.cos(t * 1.5)) * p.volatility * 0.2;
+           truePrice += noise;
+
+           truePrice = +(truePrice.toFixed(2));
+           const change = truePrice - s.prevPrice;
+           
+           if (Math.abs(change) < 0.01) return { ...s, flash: undefined };
+           
+           const changePct = +((change) / (s.prevPrice || 1) * 100).toFixed(2);
+           
+           return {
+             ...s,
+             price: truePrice,
+             change: +(s.change + change).toFixed(2),
+             changePct: +(s.changePct + changePct).toFixed(2),
+             flash: change > 0.02 ? "green" : change < -0.02 ? "red" : undefined,
+             direction: change > 0 ? "up" : change < 0 ? "down" : "flat",
+             prevPrice: truePrice
+           };
+        }
       }));
-    }, 2500);
-    return () => clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(tickInterval);
   }, []);
 
   // Derived stats
   const gainers = stocks.filter(s => s.changePct > 0).length;
   const losers = stocks.filter(s => s.changePct < 0).length;
   const totalMarketCap = stocks.reduce((a, s) => a + s.cap, 0);
-  const fearGreed = Math.round(50 + (gainers - losers) / stocks.length * 50);
+  const fearGreed = stocks.length > 0 ? Math.round(50 + (gainers - losers) / stocks.length * 50) : 50;
 
   // Filtering & sorting
   const visible = stocks
