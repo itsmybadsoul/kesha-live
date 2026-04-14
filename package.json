@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:pages": "npx opennextjs-cloudflare build && node generate-routes.mjs",
+    "build:pages": "npx opennextjs-cloudflare build && node flatten-assets.mjs",
     "pages:build": "npm run build:pages",
     "deploy": "npm run build:pages && wrangler pages deploy .open-next"
   },
