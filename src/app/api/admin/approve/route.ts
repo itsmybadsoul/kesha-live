@@ -5,9 +5,10 @@ import { getUser, saveUser, untrackPendingDeposit, untrackPendingWithdrawal } fr
 
 export async function POST(req: Request) {
   try {
+    const env = (req as any).context?.env || process.env;
     const { email, action } = await req.json(); // action: "approve" or "reject"
     
-    const user = await getUser(email);
+    const user = await getUser(email, env);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const addNotif = (title: string, body: string, type: "deposit" | "withdraw" | "system") => {
@@ -37,12 +38,12 @@ export async function POST(req: Request) {
         user.balance += depositAmount;
         addNotif("Deposit Approved", `Your deposit of $${depositAmount.toFixed(2)} USDT has been credited to your balance${bonusBody}.`, "deposit");
         user.pendingDeposit = null;
-        await untrackPendingDeposit(email);
+        await untrackPendingDeposit(email, env);
       } else if (user.pendingWithdrawal) {
         user.balance -= user.pendingWithdrawal.amount;
         addNotif("Withdrawal Successful", `Your withdrawal of $${user.pendingWithdrawal.amount.toFixed(2)} USDT has been processed.`, "withdraw");
         user.pendingWithdrawal = null;
-        await untrackPendingWithdrawal(email);
+        await untrackPendingWithdrawal(email, env);
       }
     } else {
       // Reject
@@ -51,11 +52,11 @@ export async function POST(req: Request) {
       
       user.pendingDeposit = null;
       user.pendingWithdrawal = null;
-      await untrackPendingDeposit(email);
-      await untrackPendingWithdrawal(email);
+      await untrackPendingDeposit(email, env);
+      await untrackPendingWithdrawal(email, env);
     }
 
-    await saveUser(user);
+    await saveUser(user, env);
     return NextResponse.json({ success: true, newBalance: user.balance });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

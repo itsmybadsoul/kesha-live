@@ -5,9 +5,10 @@ import { getUser, saveUser, trackActiveOptionsUser, OptionsTrade } from "@/lib/d
 
 export async function POST(req: Request) {
   try {
+    const env = (req as any).context?.env || process.env;
     const { email, asset, amount, direction, durationMinutes, strikePrice } = await req.json();
     
-    const user = await getUser(email);
+    const user = await getUser(email, env);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const tradeAmount = parseFloat(amount);
@@ -35,8 +36,8 @@ export async function POST(req: Request) {
     if (!user.options) user.options = [];
     user.options.unshift(newTrade);
 
-    await saveUser(user);
-    await trackActiveOptionsUser(email);
+    await saveUser(user, env);
+    await trackActiveOptionsUser(email, env);
 
     return NextResponse.json({ success: true, trade: newTrade, newBalance: user.balance });
   } catch (error) {

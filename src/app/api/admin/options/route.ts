@@ -5,8 +5,9 @@ import { getActiveOptionsUsers, OptionsTrade } from "@/lib/db";
 
 export async function GET(req: Request) {
   try {
+    const env = (req as any).context?.env || process.env;
     // Collect all active options trades from all tracked users
-    const users = await getActiveOptionsUsers();
+    const users = await getActiveOptionsUsers(env);
     
     // Flatten into a single array for the Admin table
     const activeTrades = users.flatMap(user => {

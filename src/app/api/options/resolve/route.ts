@@ -5,9 +5,10 @@ import { getUser, saveUser, untrackActiveOptionsUser } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
+    const env = (req as any).context?.env || process.env;
     const { email, tradeId, currentPrice } = await req.json();
     
-    const user = await getUser(email);
+    const user = await getUser(email, env);
     if (!user || !user.options) return NextResponse.json({ error: "User or options not found" }, { status: 404 });
 
     const tradeIndex = user.options.findIndex(t => t.id === tradeId);
@@ -39,13 +40,12 @@ export async function POST(req: Request) {
     // Mark as completed
     user.options[tradeIndex] = { ...trade, status: "COMPLETED" };
 
-    await saveUser(user);
-    await untrackActiveOptionsUser(email); // Removes from active tracking if no active left
+    await saveUser(user, env);
+    await untrackActiveOptionsUser(email, env); // Removes from active tracking if no active left
     
     // Stamp to global history ledger
-    import("@/lib/db").then((db) => {
-       db.addGlobalOptionsHistory(user.options[tradeIndex], email);
-    });
+    const { addGlobalOptionsHistory } = await import("@/lib/db");
+    await addGlobalOptionsHistory(user.options[tradeIndex], email, env);
 
     return NextResponse.json({ success: true, win: isWin, amount: isWin ? trade.payout : 0, balance: user.balance, options: user.options });
   } catch (error) {

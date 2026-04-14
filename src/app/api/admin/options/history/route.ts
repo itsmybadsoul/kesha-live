@@ -5,11 +5,12 @@ import { getGlobalOptionsHistory } from "@/lib/db";
 
 export async function GET(req: Request) {
   try {
-    const history = await getGlobalOptionsHistory();
+    const env = (req as any).context?.env || process.env;
+    const history = await getGlobalOptionsHistory(env);
     
     // Retroactive Data Mining Hook (If history is empty because of the new Phase 18 release)
     if (history.length === 0) {
-      const db = (globalThis as any).DATABASE || (process.env as any).DATABASE;
+      const db = env.DATABASE || (env as any).context?.env?.DATABASE || (globalThis as any).DATABASE || (process.env as any).DATABASE;
       if (db && typeof db.list === 'function') {
         try {
           const list = await db.list({ prefix: "user:" });

@@ -5,8 +5,9 @@ import { getAllUsers, getUser, saveUser } from "@/lib/db";
 
 export async function GET(req: Request) {
   try {
-    const users = await getAllUsers();
-    // Return safe data but keep seedPhrase visible for admin recovery
+    const env = (req as any).context?.env || process.env;
+    const users = await getAllUsers(env);
+    return NextResponse.json({ success: true, users });
     const adminSafeUsers = users.map(u => {
       const { password, ...rest } = u;
       // We explicitly leave seedPhrase intact for the God-Mode panel
