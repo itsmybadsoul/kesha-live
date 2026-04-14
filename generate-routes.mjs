@@ -23,6 +23,12 @@ try {
   const assetsDir = path.join(baseDir, 'assets');
   let staticFiles = [];
 
+  // 0. Rename _next to next to bypass Cloudflare ignoring it
+  const nextDir = path.join(assetsDir, '_next');
+  const safeNextDir = path.join(assetsDir, 'next');
+  if (fs.existsSync(nextDir)) {
+      fs.renameSync(nextDir, safeNextDir);
+  }
   if (fs.existsSync(assetsDir)) {
     staticFiles = getStaticFiles(assetsDir);
   }
@@ -42,7 +48,12 @@ try {
             // --- INJECTED BY CLOUDFLARE PAGES ROUTER FIX ---
             const staticAssets = ${staticFilesJson};
             if (url.pathname.startsWith("/_next/") || staticAssets.includes(url.pathname)) {
-                const assetUrl = new URL("/assets" + url.pathname, request.url);
+                let proxyPath = url.pathname;
+                if (proxyPath.startsWith("/_next/")) {
+                    // Map the requested /_next/ to the safe uploaded /next/ folder
+                    proxyPath = "/next/" + proxyPath.substring(7);
+                }
+                const assetUrl = new URL("/assets" + proxyPath, request.url);
                 const assetReq = new Request(assetUrl, request);
                 const assetRes = await env.ASSETS.fetch(assetReq);
                 if (assetRes.ok) return assetRes;
