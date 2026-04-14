@@ -25,7 +25,7 @@ export default function AdminPage() {
     if (!isAuthorized) return;
     setLoading(true);
     try {
-      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes] = await Promise.all([
+      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes, marketRes] = await Promise.all([
         fetch("/api/admin/deposits"),
         fetch("/api/admin/withdrawals"),
         fetch("/api/admin/options"),
