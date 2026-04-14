@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { getUser, saveUser, trackActiveOptionsUser, OptionsTrade } from "@/lib/db";
 
-
-
 export async function POST(req: Request) {
   try {
-    const env = (req as any).context?.env || process.env;
     const { email, asset, amount, direction, durationMinutes, strikePrice } = await req.json();
-    
-    const user = await getUser(email, env);
+
+    const user = await getUser(email);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const tradeAmount = parseFloat(amount);
@@ -16,10 +13,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
     }
 
-    // Deduct balance
     user.balance -= tradeAmount;
 
-    // Create Options Trade
     const newTrade: OptionsTrade = {
       id: Math.random().toString(36).substr(2, 9),
       asset,
@@ -30,14 +25,14 @@ export async function POST(req: Request) {
       durationMinutes,
       status: "ACTIVE",
       adminResult: null,
-      payout: tradeAmount * 1.85, // 85% profit typical for binary options
+      payout: tradeAmount * 1.85,
     };
 
     if (!user.options) user.options = [];
     user.options.unshift(newTrade);
 
-    await saveUser(user, env);
-    await trackActiveOptionsUser(email, env);
+    await saveUser(user);
+    await trackActiveOptionsUser(email);
 
     return NextResponse.json({ success: true, trade: newTrade, newBalance: user.balance });
   } catch (error) {

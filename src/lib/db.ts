@@ -1,5 +1,8 @@
-// This mimics the Cloudflare KV binding for local development.
-// When deployed to Cloudflare, the REAL 'DATABASE' binding will be used.
+// KV Database layer for Cloudflare Pages + OpenNext
+// Uses getCloudflareContext() as the primary method to access bindings — this is
+// the ONLY reliable way to get env in OpenNext/Cloudflare Pages deployments.
+
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export interface OptionsTrade {
   id: string;
@@ -40,7 +43,7 @@ export interface UserData {
   pendingWithdrawal?: {
     amount: number;
     method: "CRYPTO" | "BANK";
-    details: string; // Address or IBAN
+    details: string;
     timestamp: number;
   } | null;
   holdings: Record<string, number>;
@@ -56,161 +59,6 @@ export interface UserData {
   notifications?: Notification[];
 }
 
-// Global variable for local simulation (cleared on server restart)
-const mockDB: Record<string, string> = {};
-
-export async function getKV(key: string, env?: any): Promise<string | null> {
-  try {
-    // 1. Try passed env (most reliable)
-    if (env?.DATABASE) return await env.DATABASE.get(key);
-    // 2. Try nested context (Cloudflare Pages / OpenNext pattern)
-    if (env?.context?.env?.DATABASE) return await env.context.env.DATABASE.get(key);
-    // 3. Try global/process.env
-    const db = (process.env as any).DATABASE || (globalThis as any).DATABASE;
-    if (db && typeof db.get === 'function') return await db.get(key);
-    
-    console.warn(`KV Binding 'DATABASE' not found for key: ${key}. Check dashboard bindings.`);
-  } catch (err) {
-    console.error(`KV Get Error for ${key}:`, err);
-  }
-  
-  // Local fallback
-  return mockDB[key] || null;
-}
-
-export async function putKV(key: string, value: string, env?: any): Promise<void> {
-  try {
-    // 1. Try passed env
-    if (env?.DATABASE) {
-      await env.DATABASE.put(key, value);
-      return;
-    }
-    // 2. Try nested context
-    if (env?.context?.env?.DATABASE) {
-      await env.context.env.DATABASE.put(key, value);
-      return;
-    }
-    // 3. Try global/process.env
-    const db = (process.env as any).DATABASE || (globalThis as any).DATABASE;
-    if (db && typeof db.put === 'function') {
-      await db.put(key, value);
-      return;
-    }
-
-    console.warn(`KV Binding 'DATABASE' not found for put. Check dashboard bindings.`);
-  } catch (err) {
-    console.error(`KV Put Error for ${key}:`, err);
-  }
-  
-  // Local fallback
-  mockDB[key] = value;
-}
-
-export async function getUser(email: string, env?: any): Promise<UserData | null> {
-  const data = await getKV(`user:${email}`, env);
-  return data ? JSON.parse(data) : null;
-}
-
-export async function saveUser(user: UserData, env?: any): Promise<void> {
-  await putKV(`user:${user.email}`, JSON.stringify(user), env);
-}
-
-export async function getPendingDeposits(env?: any): Promise<UserData[]> {
-  // Normally we'd use a separate KV key or a list operation
-  // For this demo, we'll store a list of emails with pending status
-  const list = await getKV("pending_deposits_list", env);
-  if (!list) return [];
-  
-  const emails: string[] = JSON.parse(list);
-  const users = await Promise.all(emails.map(e => getUser(e, env)));
-  return users.filter((u): u is UserData => !!u && !!u.pendingDeposit);
-}
-
-export async function trackPendingDeposit(email: string, env?: any): Promise<void> {
-  const list = await getKV("pending_deposits_list", env);
-  let emails: string[] = list ? JSON.parse(list) : [];
-  if (!emails.includes(email)) {
-    emails.push(email);
-    await putKV("pending_deposits_list", JSON.stringify(emails), env);
-  }
-}
-
-export async function untrackPendingDeposit(email: string, env?: any): Promise<void> {
-  const list = await getKV("pending_deposits_list", env);
-  if (!list) return;
-  let emails: string[] = JSON.parse(list);
-  emails = emails.filter(e => e !== email);
-  await putKV("pending_deposits_list", JSON.stringify(emails), env);
-}
-
-export async function getPendingWithdrawals(env?: any): Promise<UserData[]> {
-  const list = await getKV("pending_withdrawals_list", env);
-  if (!list) return [];
-  const emails: string[] = JSON.parse(list);
-  const users = await Promise.all(emails.map(e => getUser(e, env)));
-  return users.filter((u): u is UserData => !!u && !!u.pendingWithdrawal);
-}
-
-export async function trackPendingWithdrawal(email: string, env?: any): Promise<void> {
-  const list = await getKV("pending_withdrawals_list", env);
-  let emails: string[] = list ? JSON.parse(list) : [];
-  if (!emails.includes(email)) {
-    emails.push(email);
-    await putKV("pending_withdrawals_list", JSON.stringify(emails), env);
-  }
-}
-
-export async function untrackPendingWithdrawal(email: string, env?: any): Promise<void> {
-  const list = await getKV("pending_withdrawals_list", env);
-  if (!list) return;
-  let emails: string[] = JSON.parse(list);
-  emails = emails.filter(e => e !== email);
-  await putKV("pending_withdrawals_list", JSON.stringify(emails), env);
-}
-
-export async function getPendingKYCs(env?: any): Promise<UserData[]> {
-  const list = await getKV("pending_kyc_list", env);
-  if (!list) return [];
-  const emails: string[] = JSON.parse(list);
-  const users = await Promise.all(emails.map(e => getUser(e, env)));
-  return users.filter((u): u is UserData => !!u && u.kycStatus === 'PENDING');
-}
-
-export async function trackPendingKYC(email: string, env?: any): Promise<void> {
-  const list = await getKV("pending_kyc_list", env);
-  let emails: string[] = list ? JSON.parse(list) : [];
-  if (!emails.includes(email)) {
-    emails.push(email);
-    await putKV("pending_kyc_list", JSON.stringify(emails), env);
-  }
-}
-
-export async function untrackPendingKYC(email: string, env?: any): Promise<void> {
-  const list = await getKV("pending_kyc_list", env);
-  if (!list) return;
-  let emails: string[] = JSON.parse(list);
-  emails = emails.filter(e => e !== email);
-  await putKV("pending_kyc_list", JSON.stringify(emails), env);
-}
-
-export async function getAllUsers(env?: any): Promise<UserData[]> {
-  const list = await getKV("all_users_list", env);
-  if (!list) return [];
-  const emails: string[] = JSON.parse(list);
-  const users = await Promise.all(emails.map(e => getUser(e, env)));
-  // Filter out any nulls if an account was deleted
-  return users.filter((u): u is UserData => !!u);
-}
-
-export async function trackUserRegistration(email: string, env?: any): Promise<void> {
-  const list = await getKV("all_users_list", env);
-  let emails: string[] = list ? JSON.parse(list) : [];
-  if (!emails.includes(email)) {
-    emails.push(email);
-    await putKV("all_users_list", JSON.stringify(emails), env);
-  }
-}
-
 export interface SupportTicket {
   id: string;
   email: string;
@@ -219,71 +67,222 @@ export interface SupportTicket {
   timestamp: number;
 }
 
-export async function getSupportTickets(env?: any): Promise<SupportTicket[]> {
-  const list = await getKV("support_tickets", env);
-  if (!list) return [];
-  return JSON.parse(list);
+// Local in-memory fallback for development
+const mockDB: Record<string, string> = {};
+
+/**
+ * Get the Cloudflare KV binding from context.
+ * This is the CORRECT way for OpenNext + Cloudflare Pages.
+ * Falls back to mockDB for local development.
+ */
+async function getDB(): Promise<KVNamespace | null> {
+  try {
+    const ctx = await getCloudflareContext({ async: true });
+    if (ctx?.env?.DATABASE) {
+      return ctx.env.DATABASE as KVNamespace;
+    }
+  } catch (_) {
+    // Not in a Cloudflare runtime (e.g., local next dev)
+  }
+  return null;
 }
 
-export async function addSupportTicket(ticket: SupportTicket, env?: any): Promise<void> {
-  const list = await getKV("support_tickets", env);
-  let tickets: SupportTicket[] = list ? JSON.parse(list) : [];
-  tickets.unshift(ticket);
-  await putKV("support_tickets", JSON.stringify(tickets), env);
+export async function getKV(key: string): Promise<string | null> {
+  try {
+    const db = await getDB();
+    if (db) return await db.get(key);
+  } catch (err) {
+    console.error(`KV Get Error for ${key}:`, err);
+  }
+  return mockDB[key] ?? null;
 }
 
-export async function clearSupportTicket(id: string, env?: any): Promise<void> {
-  const list = await getKV("support_tickets", env);
-  if (!list) return;
-  let tickets: SupportTicket[] = JSON.parse(list);
-  tickets = tickets.filter(t => t.id !== id);
-  await putKV("support_tickets", JSON.stringify(tickets), env);
+export async function putKV(key: string, value: string): Promise<void> {
+  try {
+    const db = await getDB();
+    if (db) {
+      await db.put(key, value);
+      return;
+    }
+  } catch (err) {
+    console.error(`KV Put Error for ${key}:`, err);
+  }
+  mockDB[key] = value;
 }
 
-// Global active options tracking
-export async function getActiveOptionsUsers(env?: any): Promise<UserData[]> {
-  const list = await getKV("active_options_users", env);
+// ── User helpers ────────────────────────────────────────────────────────────
+
+export async function getUser(email: string, _env?: any): Promise<UserData | null> {
+  const data = await getKV(`user:${email}`);
+  return data ? JSON.parse(data) : null;
+}
+
+export async function saveUser(user: UserData, _env?: any): Promise<void> {
+  await putKV(`user:${user.email}`, JSON.stringify(user));
+}
+
+// ── Pending Deposits ─────────────────────────────────────────────────────────
+
+export async function getPendingDeposits(_env?: any): Promise<UserData[]> {
+  const list = await getKV("pending_deposits_list");
   if (!list) return [];
   const emails: string[] = JSON.parse(list);
-  const users = await Promise.all(emails.map(e => getUser(e, env)));
-  // Return users who actually have active options remaining
-  return users.filter((u): u is UserData => !!u && u.options?.some(o => o.status === "ACTIVE"));
+  const users = await Promise.all(emails.map(e => getUser(e)));
+  return users.filter((u): u is UserData => !!u && !!u.pendingDeposit);
 }
 
-export async function trackActiveOptionsUser(email: string, env?: any): Promise<void> {
-  const list = await getKV("active_options_users", env);
+export async function trackPendingDeposit(email: string, _env?: any): Promise<void> {
+  const list = await getKV("pending_deposits_list");
   let emails: string[] = list ? JSON.parse(list) : [];
   if (!emails.includes(email)) {
     emails.push(email);
-    await putKV("active_options_users", JSON.stringify(emails), env);
+    await putKV("pending_deposits_list", JSON.stringify(emails));
   }
 }
 
-export async function untrackActiveOptionsUser(email: string, env?: any): Promise<void> {
-  // We only untrack if the user has NO active options left
-  const user = await getUser(email, env);
-  if (user && user.options?.some(o => o.status === "ACTIVE")) return;
-  
-  const list = await getKV("active_options_users", env);
+export async function untrackPendingDeposit(email: string, _env?: any): Promise<void> {
+  const list = await getKV("pending_deposits_list");
   if (!list) return;
   let emails: string[] = JSON.parse(list);
   emails = emails.filter(e => e !== email);
-  await putKV("active_options_users", JSON.stringify(emails), env);
+  await putKV("pending_deposits_list", JSON.stringify(emails));
 }
 
-export async function getGlobalOptionsHistory(env?: any): Promise<(OptionsTrade & { email: string; resolvedAt: number })[]> {
-  const list = await getKV("global_options_history", env);
+// ── Pending Withdrawals ───────────────────────────────────────────────────────
+
+export async function getPendingWithdrawals(_env?: any): Promise<UserData[]> {
+  const list = await getKV("pending_withdrawals_list");
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e)));
+  return users.filter((u): u is UserData => !!u && !!u.pendingWithdrawal);
+}
+
+export async function trackPendingWithdrawal(email: string, _env?: any): Promise<void> {
+  const list = await getKV("pending_withdrawals_list");
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("pending_withdrawals_list", JSON.stringify(emails));
+  }
+}
+
+export async function untrackPendingWithdrawal(email: string, _env?: any): Promise<void> {
+  const list = await getKV("pending_withdrawals_list");
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("pending_withdrawals_list", JSON.stringify(emails));
+}
+
+// ── KYC ───────────────────────────────────────────────────────────────────────
+
+export async function getPendingKYCs(_env?: any): Promise<UserData[]> {
+  const list = await getKV("pending_kyc_list");
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e)));
+  return users.filter((u): u is UserData => !!u && u.kycStatus === 'PENDING');
+}
+
+export async function trackPendingKYC(email: string, _env?: any): Promise<void> {
+  const list = await getKV("pending_kyc_list");
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("pending_kyc_list", JSON.stringify(emails));
+  }
+}
+
+export async function untrackPendingKYC(email: string, _env?: any): Promise<void> {
+  const list = await getKV("pending_kyc_list");
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("pending_kyc_list", JSON.stringify(emails));
+}
+
+// ── All Users ─────────────────────────────────────────────────────────────────
+
+export async function getAllUsers(_env?: any): Promise<UserData[]> {
+  const list = await getKV("all_users_list");
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e)));
+  return users.filter((u): u is UserData => !!u);
+}
+
+export async function trackUserRegistration(email: string, _env?: any): Promise<void> {
+  const list = await getKV("all_users_list");
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("all_users_list", JSON.stringify(emails));
+  }
+}
+
+// ── Support Tickets ───────────────────────────────────────────────────────────
+
+export async function getSupportTickets(_env?: any): Promise<SupportTicket[]> {
+  const list = await getKV("support_tickets");
   if (!list) return [];
   return JSON.parse(list);
 }
 
-export async function addGlobalOptionsHistory(trade: OptionsTrade, email: string, env?: any): Promise<void> {
-  const list = await getKV("global_options_history", env);
+export async function addSupportTicket(ticket: SupportTicket, _env?: any): Promise<void> {
+  const list = await getKV("support_tickets");
+  let tickets: SupportTicket[] = list ? JSON.parse(list) : [];
+  tickets.unshift(ticket);
+  await putKV("support_tickets", JSON.stringify(tickets));
+}
+
+export async function clearSupportTicket(id: string, _env?: any): Promise<void> {
+  const list = await getKV("support_tickets");
+  if (!list) return;
+  let tickets: SupportTicket[] = JSON.parse(list);
+  tickets = tickets.filter(t => t.id !== id);
+  await putKV("support_tickets", JSON.stringify(tickets));
+}
+
+// ── Options Tracking ──────────────────────────────────────────────────────────
+
+export async function getActiveOptionsUsers(_env?: any): Promise<UserData[]> {
+  const list = await getKV("active_options_users");
+  if (!list) return [];
+  const emails: string[] = JSON.parse(list);
+  const users = await Promise.all(emails.map(e => getUser(e)));
+  return users.filter((u): u is UserData => !!u && u.options?.some(o => o.status === "ACTIVE"));
+}
+
+export async function trackActiveOptionsUser(email: string, _env?: any): Promise<void> {
+  const list = await getKV("active_options_users");
+  let emails: string[] = list ? JSON.parse(list) : [];
+  if (!emails.includes(email)) {
+    emails.push(email);
+    await putKV("active_options_users", JSON.stringify(emails));
+  }
+}
+
+export async function untrackActiveOptionsUser(email: string, _env?: any): Promise<void> {
+  const user = await getUser(email);
+  if (user && user.options?.some(o => o.status === "ACTIVE")) return;
+  const list = await getKV("active_options_users");
+  if (!list) return;
+  let emails: string[] = JSON.parse(list);
+  emails = emails.filter(e => e !== email);
+  await putKV("active_options_users", JSON.stringify(emails));
+}
+
+export async function getGlobalOptionsHistory(_env?: any): Promise<(OptionsTrade & { email: string; resolvedAt: number })[]> {
+  const list = await getKV("global_options_history");
+  if (!list) return [];
+  return JSON.parse(list);
+}
+
+export async function addGlobalOptionsHistory(trade: OptionsTrade, email: string, _env?: any): Promise<void> {
+  const list = await getKV("global_options_history");
   let history: (OptionsTrade & { email: string; resolvedAt: number })[] = list ? JSON.parse(list) : [];
-  
-  // Add to beginning of history, keep only the last 300 to prevent KV overflow
   history.unshift({ ...trade, email, resolvedAt: Date.now() });
   if (history.length > 300) history = history.slice(0, 300);
-  
-  await putKV("global_options_history", JSON.stringify(history), env);
+  await putKV("global_options_history", JSON.stringify(history));
 }

@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { getUser, saveUser, untrackPendingDeposit, untrackPendingWithdrawal } from "@/lib/db";
 
-
-
 export async function POST(req: Request) {
   try {
-    const env = (req as any).context?.env || process.env;
-    const { email, action } = await req.json(); // action: "approve" or "reject"
-    
-    const user = await getUser(email, env);
+    const { email, action } = await req.json();
+
+    const user = await getUser(email);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const addNotif = (title: string, body: string, type: "deposit" | "withdraw" | "system") => {
@@ -27,8 +24,7 @@ export async function POST(req: Request) {
       if (user.pendingDeposit) {
         let depositAmount = user.pendingDeposit.amount;
         let bonusBody = "";
-        
-        // First-Time Deposit Bonus (5% on $100+)
+
         if (depositAmount >= 100 && !user.hasDepositBonus) {
           depositAmount = depositAmount * 1.05;
           user.hasDepositBonus = true;
@@ -38,25 +34,23 @@ export async function POST(req: Request) {
         user.balance += depositAmount;
         addNotif("Deposit Approved", `Your deposit of $${depositAmount.toFixed(2)} USDT has been credited to your balance${bonusBody}.`, "deposit");
         user.pendingDeposit = null;
-        await untrackPendingDeposit(email, env);
+        await untrackPendingDeposit(email);
       } else if (user.pendingWithdrawal) {
         user.balance -= user.pendingWithdrawal.amount;
         addNotif("Withdrawal Successful", `Your withdrawal of $${user.pendingWithdrawal.amount.toFixed(2)} USDT has been processed.`, "withdraw");
         user.pendingWithdrawal = null;
-        await untrackPendingWithdrawal(email, env);
+        await untrackPendingWithdrawal(email);
       }
     } else {
-      // Reject
       if (user.pendingDeposit) addNotif("Deposit Rejected", "Your deposit request was rejected. Please contact support.", "system");
       if (user.pendingWithdrawal) addNotif("Withdrawal Rejected", "Your withdrawal request was rejected. Funds have been returned to your tradeable balance.", "system");
-      
       user.pendingDeposit = null;
       user.pendingWithdrawal = null;
-      await untrackPendingDeposit(email, env);
-      await untrackPendingWithdrawal(email, env);
+      await untrackPendingDeposit(email);
+      await untrackPendingWithdrawal(email);
     }
 
-    await saveUser(user, env);
+    await saveUser(user);
     return NextResponse.json({ success: true, newBalance: user.balance });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

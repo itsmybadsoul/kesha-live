@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
 import { getAllUsers, getUser, saveUser } from "@/lib/db";
 
-
-
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const env = (req as any).context?.env || process.env;
-    const users = await getAllUsers(env);
+    const users = await getAllUsers();
     const adminSafeUsers = users.map(u => {
       const { password, ...rest } = u;
-      // We explicitly leave seedPhrase intact for the God-Mode panel
       return rest;
     });
     return NextResponse.json({ success: true, users: adminSafeUsers });
@@ -20,10 +16,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const env = (req as any).context?.env || process.env;
     const { email, newBalance, notification } = await req.json();
-    const user = await getUser(email, env);
-    
+    const user = await getUser(email);
+
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     if (typeof newBalance === 'number') {
@@ -42,8 +37,7 @@ export async function POST(req: Request) {
       user.notifications = [newNotif, ...(user.notifications || [])].slice(0, 50);
     }
 
-    await saveUser(user, env);
-
+    await saveUser(user);
     return NextResponse.json({ success: true, user });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

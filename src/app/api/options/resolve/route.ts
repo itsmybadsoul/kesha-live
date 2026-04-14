@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, untrackActiveOptionsUser } from "@/lib/db";
-
-
+import { getUser, saveUser, untrackActiveOptionsUser, addGlobalOptionsHistory } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
-    const env = (req as any).context?.env || process.env;
     const { email, tradeId, currentPrice } = await req.json();
-    
-    const user = await getUser(email, env);
+
+    const user = await getUser(email);
     if (!user || !user.options) return NextResponse.json({ error: "User or options not found" }, { status: 404 });
 
     const tradeIndex = user.options.findIndex(t => t.id === tradeId);
@@ -17,14 +14,10 @@ export async function POST(req: Request) {
     const trade = user.options[tradeIndex];
     if (trade.status === "COMPLETED") return NextResponse.json({ success: true, user });
 
-    // Determine Result
     let isWin = false;
-    
-    // If admin intercepted, honor the admin result completely
     if (trade.adminResult) {
       isWin = trade.adminResult === "WIN";
     } else {
-      // Natural resolution if no admin intervention
       if (trade.direction === "UP") {
         isWin = currentPrice > trade.strikePrice;
       } else {
@@ -32,20 +25,15 @@ export async function POST(req: Request) {
       }
     }
 
-    // Apply PnL
     if (isWin) {
       user.balance += trade.payout;
     }
 
-    // Mark as completed
     user.options[tradeIndex] = { ...trade, status: "COMPLETED" };
 
-    await saveUser(user, env);
-    await untrackActiveOptionsUser(email, env); // Removes from active tracking if no active left
-    
-    // Stamp to global history ledger
-    const { addGlobalOptionsHistory } = await import("@/lib/db");
-    await addGlobalOptionsHistory(user.options[tradeIndex], email, env);
+    await saveUser(user);
+    await untrackActiveOptionsUser(email);
+    await addGlobalOptionsHistory(user.options[tradeIndex], email);
 
     return NextResponse.json({ success: true, win: isWin, amount: isWin ? trade.payout : 0, balance: user.balance, options: user.options });
   } catch (error) {

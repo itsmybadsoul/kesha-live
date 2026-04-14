@@ -63,6 +63,7 @@ export default function Home() {
             <div className="flex items-center gap-2 md:gap-6">
               <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-400">
                 <a href="/" className="flex items-center gap-2 text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
+                <a href="/markets" className="flex items-center gap-2 hover:text-white transition-colors"><BarChart3 className="w-4 h-4 text-cyan-400" /> Markets</a>
                 <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
                 <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
                 <a href="/withdraw" className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors font-bold"><ArrowRightLeft className="w-4 h-4" /> Withdraw</a>
