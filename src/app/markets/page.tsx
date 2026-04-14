@@ -82,11 +82,22 @@ export default function MarketsPage() {
         let newStocks: Stock[] = [];
 
         if (realData.success && realData.data) {
-           newStocks = [...newStocks, ...realData.data.map((r: any) => ({
-             ...r,
-             prevPrice: r.price,
-             isControlled: false
-           }))];
+           const mappedReal = realData.data.map((c: any) => ({
+             sym: c.sym,
+             name: c.name,
+             sector: c.sector,
+             price: c.basePrice,
+             prevPrice: c.basePrice,
+             change: c.change,
+             changePct: c.changePct,
+             vol: c.vol,
+             cap: c.cap,
+             volatility: c.volatility,
+             direction: c.direction,
+             isControlled: true, // Synced deterministic math
+             params: c
+           }));
+           newStocks = [...newStocks, ...mappedReal];
         }
 
         if (ctrlData.success && ctrlData.data) {

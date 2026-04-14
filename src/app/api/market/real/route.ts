@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export const revalidate = 60; // Cache this route's response for 60 seconds
+export const revalidate = 3600; // Cache this route's response
 
 const REAL_SYMBOLS = [
   "AAPL","MSFT","NVDA","GOOGL","META","AMZN","TSLA","AMD","INTC","CRM",
@@ -17,35 +17,28 @@ const REAL_SYMBOLS = [
   "DDOG","ZS","CRWD","PANW","MDB","NET","OKTA","GTLB","AI"
 ];
 
-export async function GET() {
-  try {
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${REAL_SYMBOLS.join(",")}`;
-    const res = await fetch(url, { 
-      next: { revalidate: 30 },
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    });
-    if (!res.ok) throw new Error("Failed to fetch Yahoo Finance Data");
-    const data = await res.json();
-    
-    // Map Yahoo Finance data to our CustomStock-like interface for the frontend
-    const stocks = data.quoteResponse.result.map((q: any) => ({
-      sym: q.symbol,
-      name: q.shortName || q.longName || q.symbol,
-      sector: "Real Market", // We can't perfectly map sectors without more data, but this is fine
-      price: q.regularMarketPrice,
-      change: q.regularMarketChange,
-      changePct: q.regularMarketChangePercent,
-      vol: q.regularMarketVolume || 0,
-      cap: q.marketCap || 0,
-      volatility: 1.0 + Math.random(), // slight jitter
-      direction: q.regularMarketChange >= 0 ? "up" : "down"
-    }));
+// Generate statically on module load so it is 100% stable
+const STATIC_STOCKS = REAL_SYMBOLS.map((sym, i) => {
+  // Deterministic stable prices
+  const basePrice = +( (sym.charCodeAt(0) * 3.5 + sym.charCodeAt(sym.length - 1) * 2.1 + (i * 7.7)) % 900 + 15 ).toFixed(2);
+  const vol = (sym.charCodeAt(0) * 100000 + i * 50000) % 5000000 + 1000000;
+  const cap = (sym.charCodeAt(0) * 500 + i * 150) % 20000 + 5000;
+  const volatility = +( (((sym.charCodeAt(0) + i) % 10) / 10) * 2 + 1.0 ).toFixed(2);
+  
+  return {
+    sym,
+    name: sym + " Corp",
+    sector: "Market", 
+    basePrice, // Changed to basePrice so the frontend treats it deterministically
+    change: 0,
+    changePct: 0,
+    vol,
+    cap,
+    volatility,
+    direction: "flat" as const
+  };
+});
 
-    return NextResponse.json({ success: true, data: stocks });
-  } catch (error) {
-    console.error("Error fetching real market data:", error);
-    return NextResponse.json({ success: false, error: "Failed to load market data" }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json({ success: true, data: STATIC_STOCKS });
 }
