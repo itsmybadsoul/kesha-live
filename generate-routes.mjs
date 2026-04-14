@@ -1,91 +1,80 @@
 import fs from 'fs';
 import path from 'path';
 
-function copyDirRecursive(src, dest) {
-  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      copyDirRecursive(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
-}
-
-function getStaticExcludes(dir, basePath = '/') {
-  let excludes = [];
+function getStaticFiles(dir, basePath = '/') {
+  let files = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (entry.name === '_next') {
-         excludes.push('/_next/*');
-      } else {
-         excludes = excludes.concat(getStaticExcludes(path.join(dir, entry.name), `${basePath}${entry.name}/`));
+      if (entry.name !== '_next') {
+         files = files.concat(getStaticFiles(path.join(dir, entry.name), `${basePath}${entry.name}/`));
       }
     } else {
-      excludes.push(`${basePath}${entry.name}`);
+      files.push(`${basePath}${entry.name}`);
     }
   }
-  return excludes;
+  return files;
 }
 
 try {
-  console.log("Starting static asset flattening...");
+  console.log("Starting OpenNext Cloudflare Pages patching...");
   const baseDir = '.open-next';
   const assetsDir = path.join(baseDir, 'assets');
+  let staticFiles = [];
 
-  // 1. Copy assets to root
   if (fs.existsSync(assetsDir)) {
-    copyDirRecursive(assetsDir, baseDir);
-    console.log("Flattened assets successfully.");
-  } else {
-    console.log("No assets directory to flatten.");
+    staticFiles = getStaticFiles(assetsDir);
   }
 
-  // 2. Generate _routes.json
-  const excludes = ['/_next/*']; // Always explicitly exclude _next
-  
-  // Find all top-level public files
-  if (fs.existsSync(assetsDir)) {
-    const entries = fs.readdirSync(assetsDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) {
-        const routePath = `/${entry.name}`;
-        if (!excludes.includes(routePath)) {
-            excludes.push(routePath);
-        }
-      }
-    }
-  }
-
-  // Ensure no duplicates and under 100 limit
-  const uniqueExcludes = [...new Set(excludes)].slice(0, 99);
-
-  const routesObj = {
-    version: 1,
-    include: ["/*"],
-    exclude: uniqueExcludes
-  };
-
-  fs.writeFileSync(path.join(baseDir, '_routes.json'), JSON.stringify(routesObj, null, 2));
-  console.log(`Generated _routes.json with ${uniqueExcludes.length} exclusions.`);
-
-  // 3. Move worker execution file
+  // Rename worker.js to _worker.js
   const workerSrc = path.join(baseDir, 'worker.js');
   const workerDest = path.join(baseDir, '_worker.js');
+  
   if (fs.existsSync(workerSrc)) {
-    fs.renameSync(workerSrc, workerDest);
-    console.log("Renamed worker.js to _worker.js");
+    let workerContent = fs.readFileSync(workerSrc, 'utf8');
+    
+    // Convert array to string for code injection
+    const staticFilesJson = JSON.stringify(staticFiles);
+    
+    // Inject the CF Pages ASSETS interceptor right after URL extraction
+    const injection = `
+            // --- INJECTED BY CLOUDFLARE PAGES ROUTER FIX ---
+            const staticAssets = ${staticFilesJson};
+            if (url.pathname.startsWith("/_next/") || staticAssets.includes(url.pathname)) {
+                const assetUrl = new URL("/assets" + url.pathname, request.url);
+                const assetReq = new Request(assetUrl, request);
+                const assetRes = await env.ASSETS.fetch(assetReq);
+                if (assetRes.ok) return assetRes;
+                // If ASSETS router fails to find it (404), fall through to Next.js
+            }
+            // -----------------------------------------------
+    `;
+    
+    workerContent = workerContent.replace(
+      'const url = new URL(request.url);',
+      'const url = new URL(request.url);\n' + injection
+    );
+    
+    // In Cloudflare Pages, we don't use _routes.json because it's buggy with Next.js specific pathing and underscores.
+    // Instead we delete it if it exists so 100% of traffic routes through _worker.js which explicitly proxies to the /assets folder.
+    const routesFile = path.join(baseDir, '_routes.json');
+    if (fs.existsSync(routesFile)) {
+        fs.unlinkSync(routesFile);
+    }
+    
+    // Write out the modified worker
+    fs.writeFileSync(workerDest, workerContent);
+    // Delete the original worker.js just to be clean
+    fs.unlinkSync(workerSrc);
+    
+    console.log(`Successfully patched _worker.js to intelligently proxy ${staticFiles.length} top-level files and /_next/* to the env.ASSETS bucket.`);
+  } else {
+    console.error("worker.js not found in .open-next!");
   }
 
-  console.log("Build optimization complete.");
+  console.log("Pages optimization complete.");
 } catch (error) {
-  console.error("Failed to build Cloudflare Pages configuration:", error);
+  console.error("Failed to patch Cloudflare Pages configuration:", error);
   process.exit(1);
 }
