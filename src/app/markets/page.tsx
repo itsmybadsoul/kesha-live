@@ -29,9 +29,7 @@ interface Stock {
 type SortKey = "sym" | "name" | "price" | "changePct" | "vol" | "cap" | "volatility";
 type SortDir = "asc" | "desc";
 
-;
-  });
-}
+
 
 function fmt(n: number, decimals = 2) {
   return n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
