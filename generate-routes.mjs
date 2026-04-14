@@ -63,6 +63,10 @@ try {
         fs.unlinkSync(routesFile);
     }
     
+    // VERY IMPORTANT: Cloudflare Pages ignores folders starting with '_' during upload.
+    // Creating .nojekyll bypasses this hidden-folder behavior and ensures assets/_next gets uploaded!
+    fs.writeFileSync(path.join(baseDir, '.nojekyll'), '');
+    
     // Write out the modified worker
     fs.writeFileSync(workerDest, workerContent);
     // Delete the original worker.js just to be clean
