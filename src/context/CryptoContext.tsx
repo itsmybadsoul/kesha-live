@@ -142,13 +142,22 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const pData = await privateRes.json();
         if (pData.assets) {
           pData.assets.forEach((pa: any) => {
-            liveMap[pa.sym] = pa.price;
-            // Add to rawPrices if not already there (private assets are unique)
+            // Add automatic institutional volatility (random walk)
+            const vol = pa.volatility || 2.0;
+            const seed = Date.now() / 10000;
+            const drift = Math.sin(seed * 0.5) * 0.0002;
+            const noise = (Math.random() - 0.5) * (vol * 0.0005);
+            const livePrice = pa.price * (1 + drift + noise);
+
+            liveMap[pa.sym] = livePrice;
             rawArr.push({
               symbol: pa.sym,
-              rawPrice: pa.price,
-              price: pa.price.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-              change: pa.change
+              rawPrice: livePrice,
+              price: livePrice.toLocaleString(undefined, { 
+                minimumFractionDigits: livePrice < 1 ? 4 : 2,
+                maximumFractionDigits: livePrice < 1 ? 6 : 2
+              }),
+              change: pa.change + (drift * 100)
             });
           });
         }

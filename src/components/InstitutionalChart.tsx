@@ -55,23 +55,23 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   }, [asset, basePrice > 0]); // Only re-init if asset changes or we finally get a price
 
   // Live update with smoothing
+  const smoothedPriceRef = useRef(basePrice);
+  
   useEffect(() => {
-    let smoothedPrice = basePrice;
+    if (basePrice === 0) return;
     
     const interval = setInterval(() => {
-      if (basePrice === 0) return;
-      
-      // Glide the smoothedPrice towards basePrice (10% of the gap per tick)
-      const diff = basePrice - smoothedPrice;
+      // Glide the smoothedPrice towards the latest basePrice (15% of the gap per tick)
+      const diff = basePrice - smoothedPriceRef.current;
       if (Math.abs(diff) > 0.0001) {
-        smoothedPrice += diff * 0.15;
+        smoothedPriceRef.current += diff * 0.15;
       } else {
-        smoothedPrice = basePrice;
+        smoothedPriceRef.current = basePrice;
       }
 
       const nowSec = Math.floor(Date.now() / 1000);
       const noise = getNoise(nowSec);
-      const newPoint = smoothedPrice + (noise * smoothedPrice * 0.0005);
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0005);
       const newVol = Math.abs(noise) * 100 + Math.random() * 50;
 
       setDataPoints(prev => [...prev.slice(1), newPoint]);
@@ -80,7 +80,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [basePrice > 0]); // Only re-init if we go from no price to price
+  }, [basePrice]); // Re-sync interval whenever basePrice updates from context
 
   const { min, max, range, adjustedMin, adjustedMax, adjustedRange } = useMemo(() => {
     if (dataPoints.length === 0) return { min: 0, max: 0, range: 0, adjustedMin: 0, adjustedMax: 0, adjustedRange: 1 };
