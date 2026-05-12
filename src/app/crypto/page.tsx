@@ -6,6 +6,7 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { TrendingUp, TrendingDown, Search, ArrowUpRight, BarChart3, Activity, ChevronDown, X } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+import { InstitutionalChart } from "@/components/InstitutionalChart";
 
 const PAGE_SIZE = 50;
 
@@ -140,11 +141,8 @@ export default function CryptoOverviewPage() {
                      <X className="w-6 h-6 text-white" />
                    </button>
                 </div>
-                <div className="flex-1 bg-[#131722]">
-                   <iframe 
-                     src={`https://s.tradingview.com/widgetembed/?symbol=BINANCE:${selectedSymbol}USDT&theme=dark&interval=60&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en`}
-                     className="w-full h-full border-0"
-                   />
+                <div className="flex-1 bg-[#0B0E14] min-h-0">
+                   <InstitutionalChart asset={selectedSymbol} height={undefined} />
                 </div>
              </div>
           </div>

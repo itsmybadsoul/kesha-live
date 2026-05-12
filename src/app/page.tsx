@@ -33,6 +33,7 @@ import { useState } from "react";
 
 import { Navbar } from "@/components/Navbar";
 import { useCrypto } from "@/context/CryptoContext";
+import { InstitutionalChart } from "@/components/InstitutionalChart";
 
 export default function Home() {
   const { user, balance, logout, activeTrades } = useUser();
@@ -124,16 +125,9 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="w-full h-[650px] rounded-[2rem] overflow-hidden border border-slate-200 dark:border-gray-800 shadow-2xl bg-[#131722] relative z-10">
-            <div className="w-full h-full transform scale-[1.05] origin-center">
-              <iframe
-                key={selectedAsset}
-                src={`https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=BINANCE%3A${selectedAsset}USDT&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%2C%22widget_logo%22%2C%22header_resolutions%22%2C%22header_chart_type%22%5D&locale=en`}
-                style={{ width: '100%', height: '100%', border: 'none' }}
-              ></iframe>
-            </div>
-            {/* Precision Branding Mask (Bottom) */}
-            <div className="absolute bottom-0 left-0 right-0 h-[60px] bg-[#131722] z-20 border-t border-white/5"></div>
+          
+          <div className="relative z-10">
+            <InstitutionalChart asset={selectedAsset} height={600} />
           </div>
         </div>
 
