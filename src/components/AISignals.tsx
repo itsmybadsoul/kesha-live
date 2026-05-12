@@ -22,9 +22,9 @@ const MOCK_SIGNALS: Signal[] = [
 export function AISignals() {
   const { toast } = useToast();
   return (
-    <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 relative overflow-hidden group">
+    <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 relative overflow-hidden group">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           AI Intelligence <BrainCircuit className="w-5 h-5 text-indigo-400" />
         </h3>
         <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">
@@ -34,11 +34,11 @@ export function AISignals() {
 
       <div className="space-y-4">
         {MOCK_SIGNALS.map((signal) => (
-          <div key={signal.id} onClick={() => toast("Detailed AI metrics are reserved for VIP Tier 2.", "error")} className="bg-black/40 p-4 rounded-2xl border border-gray-700/30 hover:border-indigo-500/30 transition-all cursor-pointer group">
+          <div key={signal.id} onClick={() => toast("Detailed AI metrics are reserved for VIP Tier 2.", "error")} className="bg-black/40 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/30 hover:border-indigo-500/30 transition-all cursor-pointer group">
              <div className="flex justify-between items-start mb-2">
                 <div className="flex flex-col">
-                   <span className="text-xs font-black text-white">{signal.asset}</span>
-                   <span className="text-[10px] text-gray-500 font-bold flex items-center gap-1">
+                   <span className="text-xs font-black text-slate-900 dark:text-white">{signal.asset}</span>
+                   <span className="text-[10px] text-slate-400 dark:text-gray-500 font-bold flex items-center gap-1">
                       <Clock className="w-3 h-3" /> {signal.time}
                    </span>
                 </div>
@@ -51,8 +51,8 @@ export function AISignals() {
              
              <div className="flex items-end justify-between">
                 <div>
-                   <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Confidence</div>
-                   <div className="w-24 h-1.5 bg-gray-900 rounded-full overflow-hidden p-0.5">
+                   <div className="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-0.5">Confidence</div>
+                   <div className="w-24 h-1.5 bg-white dark:bg-gray-900 rounded-full overflow-hidden p-0.5">
                       <div 
                          className={`h-full rounded-full transition-all duration-1000 ${
                             signal.action === "BUY" ? "bg-emerald-500" : "bg-rose-500"
@@ -62,8 +62,8 @@ export function AISignals() {
                    </div>
                 </div>
                 <div className="text-right">
-                   <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Signal Price</div>
-                   <div className="text-sm font-black text-white tabular-nums">{signal.price}</div>
+                   <div className="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-0.5">Signal Price</div>
+                   <div className="text-sm font-black text-slate-900 dark:text-white tabular-nums">{signal.price}</div>
                 </div>
              </div>
           </div>

@@ -61,38 +61,38 @@ export function CopyTrading() {
   const filteredTraders = mockTraders.filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 lg:p-8">
+    <div className="bg-slate-100 dark:bg-gray-800/80 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             Social Copy Trading <Users className="w-5 h-5 text-indigo-400" />
           </h2>
-          <p className="text-sm text-gray-400 mt-1">Mirror the trades of elite performers automatically.</p>
+          <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Mirror the trades of elite performers automatically.</p>
         </div>
         <div className="relative w-full sm:w-auto">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500" />
           <input 
             type="text" 
             placeholder="Search traders..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-gray-900/50 border border-gray-700/50 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 text-white w-full sm:w-64 transition-colors"
+            className="bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 text-slate-900 dark:text-white w-full sm:w-64 transition-colors"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredTraders.map((trader) => (
-          <div key={trader.id} className="group bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 hover:border-gray-600 rounded-2xl p-5 transition-all duration-300 relative cursor-pointer">
+          <div key={trader.id} className="group bg-gradient-to-br from-gray-900 to-gray-800 border border-slate-300 dark:border-gray-700/50 hover:border-gray-600 rounded-2xl p-5 transition-all duration-300 relative cursor-pointer">
              <div className="flex justify-between items-start mb-4">
                <div className="flex items-center gap-3">
                  <div className="relative">
                     <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-br from-gray-700 to-gray-600 group-hover:from-indigo-500 group-hover:to-cyan-400 transition-colors">
-                      <img src={trader.avatar} alt={trader.name} className="w-full h-full rounded-full bg-gray-900" />
+                      <img src={trader.avatar} alt={trader.name} className="w-full h-full rounded-full bg-white dark:bg-gray-900" />
                     </div>
                  </div>
                  <div>
-                   <h3 className="font-bold text-white text-base">{trader.name}</h3>
+                   <h3 className="font-bold text-slate-900 dark:text-white text-base">{trader.name}</h3>
                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${trader.border} ${trader.color} font-medium tracking-wide uppercase mt-1 inline-block`}>
                      {trader.type}
                    </span>
@@ -100,19 +100,19 @@ export function CopyTrading() {
                </div>
                <div className="text-right">
                  <p className="text-lg font-black text-emerald-400">{trader.roi}</p>
-                 <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Total ROI</p>
+                 <p className="text-[10px] text-slate-400 dark:text-gray-500 font-medium uppercase tracking-wider">Total ROI</p>
                </div>
              </div>
 
-             <div className="flex items-center justify-between text-xs text-gray-400 mt-4 bg-gray-900/50 rounded-xl p-3 border border-gray-800">
+             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-gray-400 mt-4 bg-white/80 dark:bg-white dark:bg-gray-900/50 rounded-xl p-3 border border-slate-200 dark:border-gray-800">
                <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-indigo-400" /> {trader.copiers.toLocaleString()}</span>
-               <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-cyan-400" /> WR: <span className="text-white font-medium">{trader.winRate}</span></span>
+               <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-cyan-400" /> WR: <span className="text-slate-900 dark:text-white font-medium">{trader.winRate}</span></span>
              </div>
 
-             <div className="mt-4 pt-4 border-t border-gray-700/50">
+             <div className="mt-4 pt-4 border-t border-slate-300 dark:border-gray-700/50">
                <button 
                  onClick={() => handleCopy(trader)}
-                 className="w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(79,70,229,0.2)]"
+                 className="w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-slate-900 dark:text-white border border-indigo-500/30 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(79,70,229,0.2)]"
                >
                  <HeartHandshake className="w-4 h-4" /> Copy Trader
                </button>
@@ -125,27 +125,27 @@ export function CopyTrading() {
         <Portal>
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedTrader(null)}></div>
-            <div className="bg-gray-900 border border-gray-800 w-full max-w-md rounded-3xl p-8 relative z-20 shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 w-full max-w-md rounded-3xl p-8 relative z-20 shadow-2xl animate-in fade-in zoom-in duration-300">
               <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
                 Copy <span className="text-indigo-400">{selectedTrader.name}</span>
               </h2>
-              <p className="text-gray-400 text-sm mb-6 font-medium italic">Enter the amount of USDT you want to allocate to this trader.</p>
+              <p className="text-slate-500 dark:text-gray-400 text-sm mb-6 font-medium italic">Enter the amount of USDT you want to allocate to this trader.</p>
               
               <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Allocation Amount (USDT)</label>
+                  <label className="block text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2">Allocation Amount (USDT)</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-gray-400 font-bold">$</span>
                     <input 
                       type="number"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-2xl pl-8 pr-4 py-4 text-xl font-black text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-full bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-2xl pl-8 pr-4 py-4 text-xl font-black text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors"
                       placeholder="Min 50"
                     />
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-2 flex justify-between">
-                    <span>Available: <span className="text-white font-bold">${balance.toLocaleString()}</span></span>
+                  <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-2 flex justify-between">
+                    <span>Available: <span className="text-slate-900 dark:text-white font-bold">${balance.toLocaleString()}</span></span>
                     <span>Min: $50</span>
                   </p>
                 </div>
@@ -153,7 +153,7 @@ export function CopyTrading() {
                 <div className="flex gap-3">
                   <button 
                     onClick={() => setSelectedTrader(null)}
-                    className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95"
+                    className="flex-1 bg-slate-100 dark:bg-gray-800 hover:bg-gray-700 text-slate-900 dark:text-white font-bold py-4 rounded-2xl transition-all active:scale-95"
                   >
                     Cancel
                   </button>

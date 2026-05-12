@@ -26,6 +26,16 @@ export default function FuturesOptions() {
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [livePrice, setLivePrice] = useState(liveMarketPrices["BTC"] || 64230);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const assetParam = params.get("asset");
+      if (assetParam) {
+        setSelectedAsset(assetParam);
+      }
+    }
+  }, []);
+
   // Sync initial live price when asset changes
   useEffect(() => {
     if (liveMarketPrices[selectedAsset]) {
@@ -80,7 +90,7 @@ export default function FuturesOptions() {
   const historyTrades = user?.options?.filter(o => o.status === "COMPLETED") || [];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white selection:bg-indigo-500/30 font-sans pb-20">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-900 dark:text-white selection:bg-indigo-500/30 font-sans pb-20">
       
       <div className="sticky top-0 z-50 w-full flex flex-col">
         <Navbar />
@@ -93,7 +103,7 @@ export default function FuturesOptions() {
             <div className="lg:col-span-8 flex flex-col gap-6">
                
                {/* Asset Strip */}
-               <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-2 flex overflow-x-auto gap-2 scrollbar-none">
+               <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl p-2 flex overflow-x-auto gap-2 scrollbar-none">
                  {ASSET_SYMBOLS.map((sym) => {
                    const price = liveMarketPrices[sym] || 0;
                    return (
@@ -101,11 +111,11 @@ export default function FuturesOptions() {
                        key={sym}
                        onClick={() => setSelectedAsset(sym)}
                        className={`flex-shrink-0 px-4 py-3 rounded-xl min-w-[120px] transition-all ${
-                         selectedAsset === sym ? "bg-indigo-600 border border-indigo-500 shadow-xl" : "bg-black/40 border border-gray-800 hover:border-gray-600"
+                         selectedAsset === sym ? "bg-indigo-600 border border-indigo-500 shadow-xl" : "bg-black/40 border border-slate-200 dark:border-gray-800 hover:border-gray-600"
                        }`}
                      >
-                       <div className="text-xs font-black text-white mb-1">{sym}/USD</div>
-                       <div className={`text-sm font-bold ${selectedAsset === sym ? "text-indigo-100" : "text-gray-400"}`}>
+                       <div className="text-xs font-black text-slate-900 dark:text-white mb-1">{sym}/USD</div>
+                       <div className={`text-sm font-bold ${selectedAsset === sym ? "text-indigo-100" : "text-slate-500 dark:text-gray-400"}`}>
                          ${selectedAsset === sym ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) : price.toLocaleString()}
                        </div>
                      </button>
@@ -114,7 +124,7 @@ export default function FuturesOptions() {
                </div>
 
                {/* Chart Container */}
-               <div className="h-[500px] w-full bg-black/40 border border-gray-800 rounded-3xl p-1 relative shadow-2xl">
+               <div className="h-[500px] w-full bg-black/40 border border-slate-200 dark:border-gray-800 rounded-3xl p-1 relative shadow-2xl">
                   <OptionsChart 
                     asset={selectedAsset} 
                     basePrice={liveMarketPrices[selectedAsset] || livePrice} 
@@ -128,22 +138,22 @@ export default function FuturesOptions() {
             <div className="lg:col-span-4 flex flex-col gap-6">
                
                {/* Trade Panel */}
-               <div className="bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl">
-                 <h2 className="text-sm font-black text-white flex items-center gap-2 mb-6 uppercase tracking-widest">
+               <div className="bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl">
+                 <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mb-6 uppercase tracking-widest">
                    Order Entry <ShieldCheck className="w-4 h-4 text-emerald-400" />
                  </h2>
                  
                  {/* Amount */}
-                 <div className="bg-black/40 border border-gray-800 rounded-2xl p-4 mb-4 focus-within:border-indigo-500/50 transition-colors">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Investment Amount (USD)</label>
+                 <div className="bg-black/40 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 mb-4 focus-within:border-indigo-500/50 transition-colors">
+                    <label className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest block mb-2">Investment Amount (USD)</label>
                     <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold text-gray-400">$</span>
+                      <span className="text-xl font-bold text-slate-500 dark:text-gray-400">$</span>
                       <input 
                         type="number" 
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="100.00"
-                        className="bg-transparent text-2xl font-black text-white outline-none w-full"
+                        className="bg-transparent text-2xl font-black text-slate-900 dark:text-white outline-none w-full"
                       />
                       <button onClick={() => setAmount(balance.toString())} className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-md uppercase">Max</button>
                     </div>
@@ -151,14 +161,14 @@ export default function FuturesOptions() {
 
                  {/* Duration */}
                  <div className="mb-6">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 px-1">Timeframe & Expiry</label>
+                    <label className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest block mb-2 px-1">Timeframe & Expiry</label>
                     <div className="flex gap-2">
                        {[3, 5, 10].map(m => (
                           <button
                             key={m}
                             onClick={() => setDuration(m)}
                             className={`flex-1 py-3 rounded-xl text-xs font-black transition-all border ${
-                              duration === m ? "bg-white text-black border-transparent shadow-lg" : "bg-black/40 text-gray-400 border-gray-800 hover:border-gray-600"
+                              duration === m ? "bg-white text-black border-transparent shadow-lg" : "bg-black/40 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-800 hover:border-gray-600"
                             }`}
                           >
                             <Clock className="w-3 h-3 inline-block mr-1 -mt-0.5" /> {m} MIN
@@ -172,7 +182,7 @@ export default function FuturesOptions() {
                     <button 
                       onClick={() => handlePlaceTrade("UP")}
                       disabled={placing}
-                      className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex flex-col items-center justify-center gap-1 group"
+                      className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-900 dark:text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex flex-col items-center justify-center gap-1 group"
                     >
                       <TrendingUp className="w-6 h-6 group-hover:-translate-y-1 transition-transform" />
                       <span className="tracking-widest uppercase text-[10px]">Call (Up)</span>
@@ -181,7 +191,7 @@ export default function FuturesOptions() {
                     <button 
                       onClick={() => handlePlaceTrade("DOWN")}
                       disabled={placing}
-                      className="bg-rose-500 hover:bg-rose-400 disabled:opacity-50 text-white font-black py-4 rounded-2xl shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex flex-col items-center justify-center gap-1 group"
+                      className="bg-rose-500 hover:bg-rose-400 disabled:opacity-50 text-slate-900 dark:text-white font-black py-4 rounded-2xl shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex flex-col items-center justify-center gap-1 group"
                     >
                       <TrendingDown className="w-6 h-6 group-hover:translate-y-1 transition-transform" />
                       <span className="tracking-widest uppercase text-[10px]">Put (Down)</span>
@@ -198,15 +208,15 @@ export default function FuturesOptions() {
                </div>
 
              {/* Active Options Tracker */}
-               <div className="flex-1 bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
-                 <h2 className="text-sm font-black text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
+               <div className="flex-1 bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
+                 <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
                    Active Positions <span className="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded-full">{allActiveTrades.length}</span>
                  </h2>
                  <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-none max-h-[400px]">
                     {allActiveTrades.length === 0 ? (
                       <div className="text-center py-10 opacity-30">
-                        <Activity className="w-10 h-10 mx-auto text-gray-500 mb-3" />
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No Active Bets</p>
+                        <Activity className="w-10 h-10 mx-auto text-slate-400 dark:text-gray-500 mb-3" />
+                        <p className="text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-widest">No Active Bets</p>
                       </div>
                     ) : (
                       allActiveTrades.map(trade => {
@@ -216,26 +226,26 @@ export default function FuturesOptions() {
                         const isUp = trade.direction === "UP";
                         
                         return (
-                          <div key={trade.id} className="bg-black/40 border border-gray-800 rounded-xl p-4">
+                          <div key={trade.id} className="bg-black/40 border border-slate-200 dark:border-gray-800 rounded-xl p-4">
                              <div className="flex justify-between items-center mb-2">
                                <div className="flex items-center gap-2">
                                  <span className={`w-2 h-2 rounded-full animate-pulse ${isUp ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
-                                 <span className="text-xs font-black text-white">{trade.asset}</span>
+                                 <span className="text-xs font-black text-slate-900 dark:text-white">{trade.asset}</span>
                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${isUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
                                    {trade.direction}
                                  </span>
                                </div>
-                               <div className="text-xs font-mono text-gray-300">
+                               <div className="text-xs font-mono text-slate-600 dark:text-gray-300">
                                  {mins}:{secs.toString().padStart(2, '0')}
                                </div>
                              </div>
-                             <div className="flex justify-between items-end border-t border-gray-800 pt-2 mt-2">
+                             <div className="flex justify-between items-end border-t border-slate-200 dark:border-gray-800 pt-2 mt-2">
                                <div>
-                                 <div className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Stake</div>
-                                 <div className="text-sm font-black text-white">${trade.amount.toLocaleString()}</div>
+                                 <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-bold tracking-wider">Stake</div>
+                                 <div className="text-sm font-black text-slate-900 dark:text-white">${trade.amount.toLocaleString()}</div>
                                </div>
                                <div className="text-right">
-                                 <div className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1">Status</div>
+                                 <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-bold tracking-wider mb-1">Status</div>
                                  {trade.adminResult ? (
                                    <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest animate-pulse border-b border-indigo-400/50">Vols Spiking</div>
                                  ) : (
@@ -251,15 +261,15 @@ export default function FuturesOptions() {
                </div>
 
                {/* Recent History Tracker */}
-               <div className="flex-1 bg-gray-900/80 border border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
-                 <h2 className="text-sm font-black text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
-                   Recent History <span className="text-gray-500 font-mono text-[10px] bg-black/50 px-2 py-0.5 rounded-full">Last 24</span>
+               <div className="flex-1 bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
+                 <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
+                   Recent History <span className="text-slate-400 dark:text-gray-500 font-mono text-[10px] bg-black/50 px-2 py-0.5 rounded-full">Last 24</span>
                  </h2>
                  <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-none max-h-[300px]">
                     {historyTrades.length === 0 ? (
-                      <div className="text-center py-10 opacity-30 border border-dashed border-gray-700 rounded-2xl">
-                        <Clock className="w-10 h-10 mx-auto text-gray-500 mb-3" />
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No Recent Settled Trades</p>
+                      <div className="text-center py-10 opacity-30 border border-dashed border-slate-300 dark:border-gray-700 rounded-2xl">
+                        <Clock className="w-10 h-10 mx-auto text-slate-400 dark:text-gray-500 mb-3" />
+                        <p className="text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-widest">No Recent Settled Trades</p>
                       </div>
                     ) : (
                       // Reverse to show newest first, then slice
@@ -267,20 +277,20 @@ export default function FuturesOptions() {
                         const isUp = trade.direction === "UP";
                         const won = trade.payout && trade.payout > 0;
                         return (
-                          <div key={trade.id} className="bg-black/40 border border-gray-800 rounded-xl p-4 flex justify-between items-center hover:border-gray-600 transition-colors">
+                          <div key={trade.id} className="bg-black/40 border border-slate-200 dark:border-gray-800 rounded-xl p-4 flex justify-between items-center hover:border-gray-600 transition-colors">
                             <div className="flex flex-col gap-1">
                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-black text-gray-300">{trade.asset}</span>
+                                  <span className="text-xs font-black text-slate-600 dark:text-gray-300">{trade.asset}</span>
                                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${isUp ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
                                     {trade.direction}
                                   </span>
                                </div>
-                               <div className="text-[10px] text-gray-500 font-mono">
+                               <div className="text-[10px] text-slate-400 dark:text-gray-500 font-mono">
                                   Strike: ${trade.strikePrice.toLocaleString(undefined, { maximumFractionDigits: 2 })} 
                                </div>
                             </div>
                             <div className="text-right">
-                               <div className={`text-sm font-black ${won ? 'text-emerald-400' : 'text-gray-500'}`}>
+                               <div className={`text-sm font-black ${won ? 'text-emerald-400' : 'text-slate-400 dark:text-gray-500'}`}>
                                   {won ? `+$${trade.payout.toLocaleString()}` : 'Settled - $0'}
                                </div>
                             </div>

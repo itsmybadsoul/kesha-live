@@ -24,21 +24,21 @@ export function MarketEventsTicker() {
   return (
     <div className={`transition-all duration-500 border rounded-2xl p-4 flex items-center justify-between overflow-hidden relative ${event.color}`}>
       <div className="flex items-center gap-4">
-        <div className="bg-gray-900/50 p-2 rounded-xl backdrop-blur-md">
+        <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 p-2 rounded-xl backdrop-blur-md">
            {event.icon}
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-white text-sm">{event.type} Detected</span>
+            <span className="font-bold text-slate-900 dark:text-white text-sm">{event.type} Detected</span>
             <span className={`text-xs font-black px-1.5 py-0.5 rounded ${event.percentage.startsWith('+') ? 'bg-emerald-500/20 text-emerald-400' : event.percentage.startsWith('-') ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'}`}>
               {event.asset} {event.percentage}
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-1">{event.description}</p>
+          <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">{event.description}</p>
         </div>
       </div>
       
-      <button className="hidden sm:flex bg-gray-900/80 hover:bg-gray-800 text-white text-xs font-semibold px-4 py-2 rounded-lg border border-gray-700 transition-colors shrink-0">
+      <button className="hidden sm:flex bg-white dark:bg-white dark:bg-gray-900/80 hover:bg-slate-100 dark:bg-gray-800 text-slate-900 dark:text-white text-xs font-semibold px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 transition-colors shrink-0">
         Trade Now
       </button>
 

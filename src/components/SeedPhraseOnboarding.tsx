@@ -91,15 +91,15 @@ export function SeedPhraseOnboarding() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-950/80 backdrop-blur-xl">
-      <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative overflow-hidden">
         
         {/* Header */}
         <div className="text-center mb-8 relative z-10">
           <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-8 h-8 text-blue-500" />
           </div>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight">Institutional Security</h2>
-          <p className="text-gray-400 mt-2 text-sm leading-relaxed">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Institutional Security</h2>
+          <p className="text-slate-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
             As a decentralized platform, we do not store your recovery keys. You are the sole custodian of your funds.
           </p>
         </div>
@@ -115,9 +115,9 @@ export function SeedPhraseOnboarding() {
 
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {phrase.map((word, i) => (
-                  <div key={i} className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-2">
-                     <span className="text-gray-500 text-xs font-mono">{i + 1}.</span>
-                     <span className="text-white font-bold tracking-wide">{word}</span>
+                  <div key={i} className="bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2">
+                     <span className="text-slate-400 dark:text-gray-500 text-xs font-mono">{i + 1}.</span>
+                     <span className="text-slate-900 dark:text-white font-bold tracking-wide">{word}</span>
                   </div>
                 ))}
               </div>
@@ -125,14 +125,14 @@ export function SeedPhraseOnboarding() {
               <div className="flex flex-col sm:flex-row gap-3">
                  <button 
                   onClick={handleCopy}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gray-800 border border-gray-700 hover:border-blue-500/50 hover:bg-gray-700 text-white p-3 rounded-xl transition-all font-bold"
+                  className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 hover:border-blue-500/50 hover:bg-gray-700 text-slate-900 dark:text-white p-3 rounded-xl transition-all font-bold"
                  >
-                    {copied ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5 text-gray-400" />}
+                    {copied ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5 text-slate-500 dark:text-gray-400" />}
                     {copied ? "Copied" : "Copy to Clipboard"}
                  </button>
                  <button 
                   onClick={handleContinue}
-                  className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl transition-all font-bold ${copied ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-800 text-gray-500 cursor-not-allowed'}`}
+                  className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl transition-all font-bold ${copied ? 'bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white shadow-lg shadow-blue-500/20' : 'bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500 cursor-not-allowed'}`}
                  >
                     I Saved It <ArrowRight className="w-5 h-5" />
                  </button>
@@ -142,14 +142,14 @@ export function SeedPhraseOnboarding() {
 
         {phase === "VERIFY" && (
            <div className="relative z-10">
-              <h3 className="text-white font-bold mb-4">Verify your Backup</h3>
-              <p className="text-sm text-gray-400 mb-6">Please enter the corresponding words from your saved seed phrase to verify you have backed it up correctly.</p>
+              <h3 className="text-slate-900 dark:text-white font-bold mb-4">Verify your Backup</h3>
+              <p className="text-sm text-slate-500 dark:text-gray-400 mb-6">Please enter the corresponding words from your saved seed phrase to verify you have backed it up correctly.</p>
 
               <div className="space-y-4 mb-8">
                 {verifyIndices.map((index, i) => (
                   <div key={index} className="flex items-center gap-4">
                      <div className="w-16 text-right">
-                       <span className="text-gray-500 font-bold">Word #{index + 1}</span>
+                       <span className="text-slate-400 dark:text-gray-500 font-bold">Word #{index + 1}</span>
                      </div>
                      <input
                        type="text"
@@ -159,7 +159,7 @@ export function SeedPhraseOnboarding() {
                          newAnswers[i] = e.target.value;
                          setVerifyAnswers(newAnswers);
                        }}
-                       className="flex-1 bg-gray-950 border border-gray-800 focus:border-blue-500 rounded-xl p-3 text-white outline-none transition-colors"
+                       className="flex-1 bg-gray-950 border border-slate-200 dark:border-gray-800 focus:border-blue-500 rounded-xl p-3 text-slate-900 dark:text-white outline-none transition-colors"
                        placeholder="Enter word..."
                      />
                   </div>
@@ -169,13 +169,13 @@ export function SeedPhraseOnboarding() {
               <div className="flex gap-3">
                  <button 
                   onClick={() => setPhase("GENERATE")}
-                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-bold transition-all"
+                  className="px-6 py-3 bg-slate-100 dark:bg-gray-800 hover:bg-gray-700 text-slate-900 dark:text-white rounded-xl font-bold transition-all"
                  >
                     Back
                  </button>
                  <button 
                   onClick={handleVerify}
-                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all font-bold flex items-center justify-center gap-2"
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white p-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all font-bold flex items-center justify-center gap-2"
                  >
                     Verify & Continue <CheckCircle2 className="w-5 h-5" />
                  </button>

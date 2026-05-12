@@ -39,34 +39,34 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white">
       {/* Navbar */}
-      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-0 z-40">
+      <nav className="border-b border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <a href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-white" />
+                <Wallet className="w-5 h-5 text-slate-900 dark:text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</span>
             </a>
           </div>
           <div className="flex items-center gap-4">
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
-              <a href="/" className="flex items-center gap-2 hover:text-white transition-colors"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
-              <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
-              <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-gray-400">
+              <a href="/" className="flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
+              <a href="/profile" className="flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
+              <a href="/deposit" className="flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
               <a href="/withdraw" className="flex items-center gap-2 text-amber-400 hover:text-amber-300 font-bold"><ArrowRightLeft className="w-4 h-4" /> Withdraw</a>
             </nav>
-            <div className="flex items-center gap-3 border-l border-gray-800 pl-4">
+            <div className="flex items-center gap-3 border-l border-slate-200 dark:border-gray-800 pl-4">
               {user && (
                 <div className="text-right hidden sm:block">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Net Equity</div>
+                  <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase">Net Equity</div>
                   <div className="text-sm font-black text-emerald-400 flex items-center gap-1"><UsdtIcon className="w-3 h-3" />${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                 </div>
               )}
               <NotificationBell />
-              {user && <button onClick={logout} className="p-2 text-gray-500 hover:text-rose-400 transition-colors"><LogOut className="w-5 h-5" /></button>}
+              {user && <button onClick={logout} className="p-2 text-slate-400 dark:text-gray-500 hover:text-rose-400 transition-colors"><LogOut className="w-5 h-5" /></button>}
             </div>
           </div>
         </div>
@@ -75,15 +75,15 @@ export default function TransactionsPage() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-black text-white mb-1">Transaction History</h1>
-          <p className="text-gray-500 text-sm font-medium">A complete log of all account activity</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-1">Transaction History</h1>
+          <p className="text-slate-400 dark:text-gray-500 text-sm font-medium">A complete log of all account activity</p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-5">
-            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Total Transactions</div>
-            <div className="text-2xl font-black text-white">{transactions.length}</div>
+          <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 border border-slate-300 dark:border-gray-700/50 rounded-2xl p-5">
+            <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">Total Transactions</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">{transactions.length}</div>
           </div>
           <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5">
             <div className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">Total Received</div>
@@ -102,7 +102,7 @@ export default function TransactionsPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                filter === f ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" : "bg-gray-800/60 text-gray-400 hover:text-white border border-gray-700/50"
+                filter === f ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" : "bg-slate-100 dark:bg-gray-800/60 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white border border-slate-300 dark:border-gray-700/50"
               }`}
             >
               {f}
@@ -115,7 +115,7 @@ export default function TransactionsPage() {
           {filtered.length === 0 ? (
             <div className="text-center py-20 opacity-40">
               <Activity className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="text-sm font-bold text-gray-500">No transactions yet</p>
+              <p className="text-sm font-bold text-slate-400 dark:text-gray-500">No transactions yet</p>
             </div>
           ) : (
             filtered.map(tx => {
@@ -124,13 +124,13 @@ export default function TransactionsPage() {
               const Icon = T.icon;
               const isPositive = tx.type === "DEPOSIT" || tx.type === "REWARD";
               return (
-                <div key={tx.id} className="flex items-center gap-4 bg-gray-800/30 border border-gray-700/40 rounded-2xl px-5 py-4 hover:bg-gray-800/50 transition-all">
+                <div key={tx.id} className="flex items-center gap-4 bg-slate-100 dark:bg-gray-800/30 border border-slate-300 dark:border-gray-700/40 rounded-2xl px-5 py-4 hover:bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 transition-all">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${T.bg}`}>
                     <Icon className={`w-5 h-5 ${T.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-black text-white">{tx.description}</span>
+                      <span className="text-sm font-black text-slate-900 dark:text-white">{tx.description}</span>
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${T.bg} ${T.color}`}>{T.label}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -149,7 +149,7 @@ export default function TransactionsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-gray-800 py-6 mt-16">
+      <footer className="border-t border-slate-200 dark:border-gray-800 py-6 mt-16">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-gray-600 font-bold uppercase tracking-widest">
           <span>© 2026 Stocks Indicators Infrastructure Limited</span>
           <div className="flex items-center gap-6">

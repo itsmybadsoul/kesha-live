@@ -225,27 +225,27 @@ export default function AdminPage() {
 
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center p-6 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)]">
-        <div className="max-w-md w-full bg-gray-800/50 backdrop-blur-2xl border border-gray-700/50 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] flex items-center justify-center p-6 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)]">
+        <div className="max-w-md w-full bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/50 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 opacity-50"></div>
           <div className="relative z-10">
             <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500">
                <ShieldCheck className="w-10 h-10 text-indigo-400" />
             </div>
             <h1 className="text-3xl font-black text-center mb-2 tracking-tight">Restricted Area</h1>
-            <p className="text-gray-400 text-center mb-8 font-medium">Enter administrative credential to proceed.</p>
+            <p className="text-slate-500 dark:text-gray-400 text-center mb-8 font-medium">Enter administrative credential to proceed.</p>
             
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="relative group/input">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Database className="w-5 h-5 text-gray-500 group-focus-within/input:text-indigo-400 transition-colors" />
+                  <Database className="w-5 h-5 text-slate-400 dark:text-gray-500 group-focus-within/input:text-indigo-400 transition-colors" />
                 </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Admin Token Key"
-                  className="block w-full pl-12 pr-4 py-4 bg-gray-900/50 border border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm"
+                  className="block w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm"
                   autoFocus
                 />
               </div>
@@ -263,17 +263,17 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white p-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3 tracking-tighter">
               Authority Control <ShieldCheck className="w-8 h-8 text-indigo-400" />
             </h1>
-            <p className="text-gray-400 mt-1">Manage global settlements and funding validation.</p>
+            <p className="text-slate-500 dark:text-gray-400 mt-1">Manage global settlements and funding validation.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => setIsAuthorized(false)} className="bg-gray-800/50 hover:bg-rose-500/10 hover:text-rose-400 px-4 py-2 rounded-lg border border-gray-700 transition-all text-sm font-bold flex items-center gap-2">
+            <button onClick={() => setIsAuthorized(false)} className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 hover:bg-rose-500/10 hover:text-rose-400 px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 transition-all text-sm font-bold flex items-center gap-2">
                Sign Out
             </button>
             <button onClick={fetchData} className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg transition-colors text-sm font-bold shadow-lg shadow-indigo-500/20">
@@ -301,18 +301,18 @@ export default function AdminPage() {
             </div>
             <p className="text-2xl font-black">{kycRequests.length}</p>
           </div>
-          <div className="bg-gray-800 border border-gray-700 p-6 rounded-2xl">
-             <div className="flex items-center gap-3 text-gray-400 mb-2">
+          <div className="bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 p-6 rounded-2xl">
+             <div className="flex items-center gap-3 text-slate-500 dark:text-gray-400 mb-2">
               <Database className="w-5 h-5" /> <span className="font-bold uppercase text-[10px] tracking-widest">Database Node</span>
             </div>
             <p className="text-base font-bold text-emerald-400">Cloudflare KV Active</p>
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl">
+        <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl">
           <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
-              <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
+              <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest">
                 <th className="px-6 py-4">Context</th>
                 <th className="px-6 py-4">Method</th>
                 <th className="px-6 py-4">Amount</th>
@@ -322,9 +322,9 @@ export default function AdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-700/50">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-20 text-center text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Authority Cloud...</td></tr>
+                <tr><td colSpan={5} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Authority Cloud...</td></tr>
               ) : deposits.length === 0 && withdrawals.length === 0 ? (
-                <tr><td colSpan={5} className="px-6 py-20 text-center text-gray-500 italic text-sm">No pending funding requests found.</td></tr>
+                <tr><td colSpan={5} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 italic text-sm">No pending funding requests found.</td></tr>
               ) : (
                 <>
                   {/* Render Deposits */}
@@ -334,13 +334,13 @@ export default function AdminPage() {
                          <span className="bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded text-[10px] uppercase mr-2 tracking-tighter font-black">Deposit</span>
                          {d.email}
                       </td>
-                      <td className="px-6 py-6 text-xs text-gray-500 font-bold uppercase tracking-widest">USDT TRC20</td>
+                      <td className="px-6 py-6 text-xs text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest">USDT TRC20</td>
                       <td className="px-6 py-6 text-emerald-400 font-black text-lg">${d.pendingDeposit?.amount.toLocaleString()}</td>
-                      <td className="px-6 py-6"><code className="text-[10px] text-gray-400 break-all bg-black/30 p-2 rounded">{d.pendingDeposit?.txid}</code></td>
+                      <td className="px-6 py-6"><code className="text-[10px] text-slate-500 dark:text-gray-400 break-all bg-black/30 p-2 rounded">{d.pendingDeposit?.txid}</code></td>
                       <td className="px-6 py-6 text-right">
                         <div className="flex justify-end gap-2">
                           <button onClick={() => handleAction(d.email, "approve")} className="p-2 bg-emerald-500 text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20"><CheckCircle2 className="w-5 h-5" /></button>
-                          <button onClick={() => handleAction(d.email, "reject")} className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg hover:bg-rose-500/20 hover:text-rose-400 transition-colors"><XCircle className="w-5 h-5" /></button>
+                          <button onClick={() => handleAction(d.email, "reject")} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white rounded-lg hover:bg-rose-500/20 hover:text-rose-400 transition-colors"><XCircle className="w-5 h-5" /></button>
                         </div>
                       </td>
                     </tr>
@@ -352,13 +352,13 @@ export default function AdminPage() {
                          <span className="bg-rose-500/10 text-rose-400 px-2 py-1 rounded text-[10px] uppercase mr-2 tracking-tighter font-black">Withdraw</span>
                          {w.email}
                       </td>
-                      <td className="px-6 py-6 text-xs text-gray-400 font-bold uppercase tracking-widest">{w.pendingWithdrawal?.method}</td>
+                      <td className="px-6 py-6 text-xs text-slate-500 dark:text-gray-400 font-bold uppercase tracking-widest">{w.pendingWithdrawal?.method}</td>
                       <td className="px-6 py-6 text-rose-400 font-black text-lg">${w.pendingWithdrawal?.amount.toLocaleString()}</td>
                       <td className="px-6 py-6"><code className="text-[10px] text-rose-300 break-all bg-black/30 p-2 rounded">{w.pendingWithdrawal?.details}</code></td>
                       <td className="px-6 py-6 text-right">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => handleAction(w.email, "approve")} className="p-2 bg-rose-500 text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-rose-500/20"><CheckCircle2 className="w-5 h-5" /></button>
-                          <button onClick={() => handleAction(w.email, "reject")} className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg hover:bg-rose-500/20 transition-colors"><XCircle className="w-5 h-5" /></button>
+                          <button onClick={() => handleAction(w.email, "approve")} className="p-2 bg-rose-500 text-slate-900 dark:text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-rose-500/20"><CheckCircle2 className="w-5 h-5" /></button>
+                          <button onClick={() => handleAction(w.email, "reject")} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white rounded-lg hover:bg-rose-500/20 transition-colors"><XCircle className="w-5 h-5" /></button>
                         </div>
                       </td>
                     </tr>
@@ -379,10 +379,10 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+        <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
           <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
-              <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
+              <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest">
                 <th className="px-6 py-4">User</th>
                 <th className="px-6 py-4 text-center">Government ID</th>
                 <th className="px-6 py-4 text-center">Face Match</th>
@@ -391,35 +391,35 @@ export default function AdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-700/50">
               {loading ? (
-                <tr><td colSpan={4} className="px-6 py-20 text-center text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Authority Cloud...</td></tr>
+                <tr><td colSpan={4} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Authority Cloud...</td></tr>
               ) : kycRequests.length === 0 ? (
-                <tr><td colSpan={4} className="px-6 py-20 text-center text-gray-500 italic text-sm">No pending KYC applications.</td></tr>
+                <tr><td colSpan={4} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 italic text-sm">No pending KYC applications.</td></tr>
               ) : (
                 kycRequests.map((k) => (
                   <tr key={k.email} className="hover:bg-amber-500/5 transition-colors group">
                     <td className="px-6 py-6 font-bold text-sm">
                        <span className="bg-amber-500/10 text-amber-400 px-2 py-1 rounded text-[10px] uppercase block w-max tracking-tighter font-black mb-1">Level 2 KYC</span>
                        {k.email}
-                       <span className="block text-gray-500 text-xs mt-1">{new Date(k.kycDocuments?.timestamp).toLocaleString()}</span>
+                       <span className="block text-slate-400 dark:text-gray-500 text-xs mt-1">{new Date(k.kycDocuments?.timestamp).toLocaleString()}</span>
                     </td>
                     <td className="px-6 py-6 text-center">
                        {k.kycDocuments?.idFront ? (
                          <div className="relative inline-block group/img group-hover:z-50 z-10 transition-all">
                            <img src={k.kycDocuments.idFront} alt="ID Document" className="h-24 w-auto rounded border border-gray-600 shadow-xl cursor-crosshair transform origin-center transition-transform hover:scale-[3.5] duration-300 relative z-50" />
                          </div>
-                       ) : <span className="text-gray-500 text-xs italic">Missing</span>}
+                       ) : <span className="text-slate-400 dark:text-gray-500 text-xs italic">Missing</span>}
                     </td>
                     <td className="px-6 py-6 text-center">
                        {k.kycDocuments?.idBack ? (
                          <div className="relative inline-block group/img group-hover:z-50 z-10 transition-all">
                            <img src={k.kycDocuments.idBack} alt="Selfie" className="h-24 w-auto rounded border border-gray-600 shadow-xl cursor-crosshair transform origin-center transition-transform hover:scale-[3.5] duration-300 relative z-50" />
                          </div>
-                       ) : <span className="text-gray-500 text-xs italic">Missing</span>}
+                       ) : <span className="text-slate-400 dark:text-gray-500 text-xs italic">Missing</span>}
                     </td>
                     <td className="px-6 py-6 text-right">
                       <div className="flex justify-end gap-2">
                         <button onClick={() => handleKycAction(k.email, "approve")} className="p-2 bg-emerald-500 text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20"><CheckCircle2 className="w-5 h-5" /></button>
-                        <button onClick={() => handleKycAction(k.email, "reject")} className="p-2 bg-rose-500 text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-rose-500/20"><XCircle className="w-5 h-5" /></button>
+                        <button onClick={() => handleKycAction(k.email, "reject")} className="p-2 bg-rose-500 text-slate-900 dark:text-white rounded-lg hover:scale-110 transition-transform shadow-lg shadow-rose-500/20"><XCircle className="w-5 h-5" /></button>
                       </div>
                     </td>
                   </tr>
@@ -439,10 +439,10 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+        <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
           <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
-              <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
+              <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest">
                 <th className="px-6 py-4">User Identity</th>
                 <th className="px-6 py-4">Contract Asset</th>
                 <th className="px-6 py-4">Stake / Predicted</th>
@@ -452,9 +452,9 @@ export default function AdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-700/50">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-20 text-center text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Live Positions...</td></tr>
+                <tr><td colSpan={5} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing Live Positions...</td></tr>
               ) : options.length === 0 ? (
-                <tr><td colSpan={5} className="px-6 py-20 text-center text-gray-500 italic text-sm">No active options contracts detected on the platform.</td></tr>
+                <tr><td colSpan={5} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 italic text-sm">No active options contracts detected on the platform.</td></tr>
               ) : (
                 options.map((opt) => {
                   const timeLeftMs = Math.max(0, (opt.startTime + opt.durationMinutes * 60 * 1000) - Date.now());
@@ -464,10 +464,10 @@ export default function AdminPage() {
                   return (
                     <tr key={opt.id} className="hover:bg-indigo-500/5 transition-colors group">
                       <td className="px-6 py-6 font-bold text-sm flex items-center gap-3">
-                         <img src={opt.userAvatar} alt="user" className="w-8 h-8 rounded-full bg-gray-800" />
+                         <img src={opt.userAvatar} alt="user" className="w-8 h-8 rounded-full bg-slate-100 dark:bg-gray-800" />
                          {opt.userEmail}
                       </td>
-                      <td className="px-6 py-6 text-sm font-black text-white">{opt.asset}/USD Live</td>
+                      <td className="px-6 py-6 text-sm font-black text-slate-900 dark:text-white">{opt.asset}/USD Live</td>
                       <td className="px-6 py-6">
                          <div className="text-lg font-black text-indigo-400">${opt.amount.toLocaleString()}</div>
                          <div className={`text-[10px] font-bold uppercase tracking-widest ${isUp ? "text-emerald-400" : "text-rose-400"}`}>
@@ -475,8 +475,8 @@ export default function AdminPage() {
                          </div>
                       </td>
                       <td className="px-6 py-6">
-                        <div className="text-xs font-mono text-gray-400 mb-1">~{mins}m remaining</div>
-                        <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                        <div className="text-xs font-mono text-slate-500 dark:text-gray-400 mb-1">~{mins}m remaining</div>
+                        <div className="w-full bg-slate-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
                            <div className="bg-indigo-500 h-full animate-pulse" style={{ width: `${Math.max(5, (timeLeftMs / (opt.durationMinutes * 60 * 1000)) * 100)}%` }}></div>
                         </div>
                       </td>
@@ -489,10 +489,10 @@ export default function AdminPage() {
                           </div>
                         ) : (
                           <div className="flex justify-end gap-2">
-                            <button onClick={() => handleOptionsAction(opt.userEmail, opt.id, "WIN")} className="px-3 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white rounded-lg hover:-translate-y-1 transition-all shadow-lg flex items-center gap-1 text-[10px] font-black uppercase tracking-widest group/btn">
+                            <button onClick={() => handleOptionsAction(opt.userEmail, opt.id, "WIN")} className="px-3 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-slate-900 dark:text-white rounded-lg hover:-translate-y-1 transition-all shadow-lg flex items-center gap-1 text-[10px] font-black uppercase tracking-widest group/btn">
                               <TrendingUp className="w-3 h-3 group-hover/btn:animate-bounce" /> Force Win
                             </button>
-                            <button onClick={() => handleOptionsAction(opt.userEmail, opt.id, "LOSE")} className="px-3 py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white rounded-lg hover:-translate-y-1 transition-all shadow-lg flex items-center gap-1 text-[10px] font-black uppercase tracking-widest group/btn">
+                            <button onClick={() => handleOptionsAction(opt.userEmail, opt.id, "LOSE")} className="px-3 py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-slate-900 dark:text-white rounded-lg hover:-translate-y-1 transition-all shadow-lg flex items-center gap-1 text-[10px] font-black uppercase tracking-widest group/btn">
                               <TrendingDown className="w-3 h-3 group-hover/btn:animate-bounce" /> Force Lose
                             </button>
                           </div>
@@ -516,10 +516,10 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+        <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
           <table className="w-full min-w-[800px] text-left border-collapse">
              <thead>
-               <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
+               <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest">
                  <th className="px-6 py-4">Symbol / Name</th>
                  <th className="px-6 py-4">Live State</th>
                  <th className="px-6 py-4">Active Target Path</th>
@@ -528,7 +528,7 @@ export default function AdminPage() {
              </thead>
              <tbody className="divide-y divide-gray-700/50">
                {loading ? (
-                 <tr><td colSpan={4} className="px-6 py-20 text-center text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing KV Store...</td></tr>
+                 <tr><td colSpan={4} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing KV Store...</td></tr>
                ) : customMarkets.map(m => {
                   const hasTarget = m.targetPrice && m.targetEndTime && m.targetStartTime;
                   const isFinished = hasTarget && Date.now() > m.targetEndTime;
@@ -537,14 +537,14 @@ export default function AdminPage() {
                   return (
                     <tr key={m.sym} className="hover:bg-indigo-500/5 transition-colors group">
                        <td className="px-6 py-4">
-                         <div className="font-black text-lg text-white flex items-center gap-2">
+                         <div className="font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
                            {m.sym}
                            {hasTarget && !isFinished && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>}
                          </div>
-                         <div className="text-xs text-gray-500 font-mono mt-0.5">{m.name}</div>
+                         <div className="text-xs text-slate-400 dark:text-gray-500 font-mono mt-0.5">{m.name}</div>
                        </td>
                        <td className="px-6 py-4">
-                         <div className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Base Price / Vol</div>
+                         <div className="text-slate-500 dark:text-gray-400 text-[10px] uppercase tracking-widest mb-1">Base Price / Vol</div>
                          <div className="font-mono font-bold text-indigo-300">
                            ${m.basePrice.toFixed(2)} <span className="text-gray-600 font-normal">v{m.volatility}</span>
                          </div>
@@ -552,28 +552,28 @@ export default function AdminPage() {
                        <td className="px-6 py-4">
                          {hasTarget ? (
                            isFinished ? (
-                             <span className="text-[10px] px-2 py-1 bg-gray-800 text-gray-500 rounded uppercase font-black tracking-widest">Target Reached</span>
+                             <span className="text-[10px] px-2 py-1 bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500 rounded uppercase font-black tracking-widest">Target Reached</span>
                            ) : (
                              <div>
                                <div className="text-sm font-black text-emerald-400">Target: ${m.targetPrice.toFixed(2)}</div>
-                               <div className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">Hitting in ~{mins}m</div>
+                               <div className="text-[10px] text-slate-400 dark:text-gray-500 mt-1 uppercase tracking-widest">Hitting in ~{mins}m</div>
                              </div>
                            )
                          ) : (
-                           <span className="text-[10px] px-2 py-1 bg-gray-800/50 text-gray-600 rounded uppercase font-black tracking-widest">Base Trajectory</span>
+                           <span className="text-[10px] px-2 py-1 bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 text-gray-600 rounded uppercase font-black tracking-widest">Base Trajectory</span>
                          )}
                        </td>
                        <td className="px-6 py-4 text-right">
                          <div className="flex justify-end gap-2">
                            {hasTarget && !isFinished && (
-                              <button onClick={() => handleMarketAction('clear', m.sym)} className="p-2 bg-gray-800 text-gray-400 rounded-lg hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Clear Target">
+                              <button onClick={() => handleMarketAction('clear', m.sym)} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 rounded-lg hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Clear Target">
                                 <XCircle className="w-4 h-4" />
                               </button>
                            )}
-                           <button onClick={() => handleMarketAction('target', m.sym)} className="bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/20 shadow-lg">
+                           <button onClick={() => handleMarketAction('target', m.sym)} className="bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/20 shadow-lg">
                              <Target className="w-3.5 h-3.5" /> Deploy Target
                            </button>
-                           <button onClick={() => handleMarketAction('jump', m.sym)} className="bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-500/20 shadow-lg">
+                           <button onClick={() => handleMarketAction('jump', m.sym)} className="bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-500/20 shadow-lg">
                              <TrendingUp className="w-3.5 h-3.5" /> Instant Shift
                            </button>
                          </div>
@@ -588,17 +588,17 @@ export default function AdminPage() {
         {/* Global Operations History Archive */}
         <div className="mt-10 mb-6 flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2">
-            Global Trade History <Database className="w-5 h-5 text-gray-500" />
+            Global Trade History <Database className="w-5 h-5 text-slate-400 dark:text-gray-500" />
           </h2>
-          <div className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400">
+          <div className="px-3 py-1.5 bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">
              {optionsHistory.length} Settled Contracts
           </div>
         </div>
 
-        <div className="bg-gray-800/20 border border-gray-700/50 rounded-3xl overflow-x-auto mb-20 opacity-80 hover:opacity-100 transition-opacity">
+        <div className="bg-slate-100 dark:bg-gray-800/20 border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto mb-20 opacity-80 hover:opacity-100 transition-opacity">
           <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
-              <tr className="bg-gray-900 border-b border-gray-700 text-gray-500 text-[10px] font-black uppercase tracking-widest">
+              <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-widest">
                 <th className="px-6 py-4">Settled At</th>
                 <th className="px-6 py-4">User</th>
                 <th className="px-6 py-4">Contract</th>
@@ -618,13 +618,13 @@ export default function AdminPage() {
                   const userWon = hist.payout && hist.payout > 0;
                   return (
                     <tr key={`${hist.id}-${i}`} className="hover:bg-gray-700/20 transition-colors">
-                      <td className="px-6 py-4 text-xs font-mono text-gray-400">
+                      <td className="px-6 py-4 text-xs font-mono text-slate-500 dark:text-gray-400">
                          {new Date(hist.resolvedAt || hist.startTime).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 text-xs font-bold text-gray-300">
+                      <td className="px-6 py-4 text-xs font-bold text-slate-600 dark:text-gray-300">
                          {hist.email}
                       </td>
-                      <td className="px-6 py-4 text-xs font-black text-gray-200">{hist.asset}/USD <span className="text-[10px] text-gray-500 font-mono font-medium ml-2">{hist.durationMinutes}m</span></td>
+                      <td className="px-6 py-4 text-xs font-black text-gray-200">{hist.asset}/USD <span className="text-[10px] text-slate-400 dark:text-gray-500 font-mono font-medium ml-2">{hist.durationMinutes}m</span></td>
                       <td className="px-6 py-4">
                          <div className={`text-[10px] font-black uppercase tracking-widest ${isUp ? "text-emerald-500" : "text-rose-500"}`}>
                            {hist.direction} @ ${hist.strikePrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}
@@ -636,7 +636,7 @@ export default function AdminPage() {
                                Forced {hist.adminResult}
                             </div>
                          ) : (
-                             <div className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${userWon ? "text-emerald-500" : "text-gray-500"}`}>
+                             <div className={`inline-block px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${userWon ? "text-emerald-500" : "text-slate-400 dark:text-gray-500"}`}>
                                {userWon ? "Won" : "Lost"}
                              </div>
                          )}
@@ -659,10 +659,10 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-20">
+        <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-20">
           <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
-              <tr className="bg-gray-900 border-b border-gray-700 text-gray-500 text-[10px] font-black uppercase tracking-widest">
+              <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-widest">
                 <th className="px-6 py-4">Account Holder</th>
                 <th className="px-6 py-4">Available Funds</th>
                 <th className="px-6 py-4">Security Recovery Phrase</th>
@@ -680,10 +680,10 @@ export default function AdminPage() {
                   <tr key={u.email} className="hover:bg-indigo-500/5 transition-colors">
                     <td className="px-6 py-4">
                        <div className="flex items-center gap-3">
-                          <img src={u.avatar} alt="avatar" className="w-8 h-8 rounded-full border border-gray-700" />
+                          <img src={u.avatar} alt="avatar" className="w-8 h-8 rounded-full border border-slate-300 dark:border-gray-700" />
                           <div>
-                            <div className="font-bold text-white text-sm">{u.firstName} {u.lastName}</div>
-                            <div className="text-[10px] text-gray-500 font-mono">{u.email}</div>
+                            <div className="font-bold text-slate-900 dark:text-white text-sm">{u.firstName} {u.lastName}</div>
+                            <div className="text-[10px] text-slate-400 dark:text-gray-500 font-mono">{u.email}</div>
                           </div>
                        </div>
                     </td>
@@ -692,7 +692,7 @@ export default function AdminPage() {
                     </td>
                     <td className="px-6 py-4">
                        {u.seedPhrase ? (
-                         <div className="text-[9px] font-mono hover:text-white text-gray-500 bg-black/40 p-2 rounded max-w-[200px] break-all border border-gray-800 cursor-text select-all">
+                         <div className="text-[9px] font-mono hover:text-slate-900 dark:text-white text-slate-400 dark:text-gray-500 bg-black/40 p-2 rounded max-w-[200px] break-all border border-slate-200 dark:border-gray-800 cursor-text select-all">
                            {u.seedPhrase.join(" ")}
                          </div>
                        ) : <span className="text-[10px] text-rose-500 italic block">Unsecured</span>}
@@ -700,17 +700,17 @@ export default function AdminPage() {
                     <td className="px-6 py-4">
                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest ${
                          u.kycStatus === 'VERIFIED' ? 'bg-emerald-500/20 text-emerald-400' :
-                         u.kycStatus === 'PENDING' ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-800 text-gray-500'
+                         u.kycStatus === 'PENDING' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500'
                        }`}>
                          {u.kycStatus || 'UNVERIFIED'}
                        </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                        <div className="flex justify-end gap-2">
-                         <button onClick={() => setNotifModal({ open: true, email: u.email, title: "", body: "" })} className="p-2 bg-gray-800 text-gray-400 hover:text-indigo-400 rounded-lg hover:bg-indigo-500/10 transition-all" title="Send Notification">
+                         <button onClick={() => setNotifModal({ open: true, email: u.email, title: "", body: "" })} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:text-indigo-400 rounded-lg hover:bg-indigo-500/10 transition-all" title="Send Notification">
                             <MessageSquare className="w-4 h-4" />
                          </button>
-                         <button onClick={() => handleEditBalance(u.email)} className="bg-indigo-600 hover:bg-indigo-500 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg text-white shadow-lg transition-colors">
+                         <button onClick={() => handleEditBalance(u.email)} className="bg-indigo-600 hover:bg-indigo-500 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg text-slate-900 dark:text-white shadow-lg transition-colors">
                            Edit Balance
                          </button>
                        </div>
@@ -734,21 +734,21 @@ export default function AdminPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {supportTickets.length === 0 ? (
-            <div className="col-span-full py-10 text-center text-gray-600 italic text-sm bg-gray-900 border border-gray-800 rounded-2xl">Inbox is currently empty.</div>
+            <div className="col-span-full py-10 text-center text-gray-600 italic text-sm bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl">Inbox is currently empty.</div>
           ) : (
              supportTickets.map(t => (
-               <div key={t.id} className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 relative group hover:border-indigo-500/30 transition-colors">
+               <div key={t.id} className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-2xl p-6 relative group hover:border-indigo-500/30 transition-colors">
                   <div className="flex justify-between items-start mb-4">
                      <div>
-                       <div className="text-[10px] text-gray-500 font-mono mb-1">{new Date(t.timestamp).toLocaleString()}</div>
+                       <div className="text-[10px] text-slate-400 dark:text-gray-500 font-mono mb-1">{new Date(t.timestamp).toLocaleString()}</div>
                        <div className="text-sm font-bold text-indigo-400">{t.email}</div>
                      </div>
-                     <button onClick={() => handleClearTicket(t.id)} className="text-gray-500 hover:text-rose-400 transition-colors">
+                     <button onClick={() => handleClearTicket(t.id)} className="text-slate-400 dark:text-gray-500 hover:text-rose-400 transition-colors">
                         <Trash2 className="w-4 h-4" />
                      </button>
                   </div>
-                  <div className="text-base font-black text-white mb-2">{t.subject}</div>
-                  <p className="text-sm text-gray-400 leading-relaxed max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="text-base font-black text-slate-900 dark:text-white mb-2">{t.subject}</div>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 leading-relaxed max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                      {t.message}
                   </p>
                </div>
@@ -762,28 +762,28 @@ export default function AdminPage() {
       {notifModal.open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setNotifModal({ ...notifModal, open: false })}></div>
-          <div className="relative bg-gray-900 border border-gray-700 w-full max-w-lg rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
+          <div className="relative bg-white dark:bg-gray-900 border border-slate-300 dark:border-gray-700 w-full max-w-lg rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
             <h3 className="text-xl font-black mb-2 italic">Broadcast Alert</h3>
-            <p className="text-gray-400 text-sm mb-6 font-medium">Transmitting system notification to: <span className="text-indigo-400 font-bold">{notifModal.email}</span></p>
+            <p className="text-slate-500 dark:text-gray-400 text-sm mb-6 font-medium">Transmitting system notification to: <span className="text-indigo-400 font-bold">{notifModal.email}</span></p>
             
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Alert Title</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 ml-1">Alert Title</label>
                 <input 
                   type="text" 
                   value={notifModal.title} 
                   onChange={(e) => setNotifModal({ ...notifModal, title: e.target.value })}
                   placeholder="e.g. Account Verification Required"
-                  className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-500 outline-none transition-colors"
+                  className="w-full bg-black/50 border border-slate-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-500 outline-none transition-colors"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Message Body</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 ml-1">Message Body</label>
                 <textarea 
                   value={notifModal.body} 
                   onChange={(e) => setNotifModal({ ...notifModal, body: e.target.value })}
                   placeholder="Enter the detailed instructions or update for the user..."
-                  className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-500 outline-none transition-colors min-h-[120px] resize-none"
+                  className="w-full bg-black/50 border border-slate-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-500 outline-none transition-colors min-h-[120px] resize-none"
                 />
               </div>
             </div>
@@ -791,14 +791,14 @@ export default function AdminPage() {
             <div className="flex gap-3 mt-8">
               <button 
                 onClick={() => setNotifModal({ ...notifModal, open: false })}
-                className="flex-1 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors"
+                className="flex-1 py-3 text-sm font-bold text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white transition-colors"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSendNotification}
                 disabled={!notifModal.title || !notifModal.body}
-                className="flex-[2] bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+                className="flex-[2] bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 dark:text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
               >
                 Push Notification
               </button>

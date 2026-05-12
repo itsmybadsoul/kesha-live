@@ -9,8 +9,8 @@ export function DigitalMembershipCard() {
   // Determine VIP Tier based on balance
   let tier = "Standard";
   let bgGradient = "from-gray-900 via-gray-800 to-black";
-  let borderGlow = "border-gray-700/50";
-  let iconColor = "text-gray-400";
+  let borderGlow = "border-slate-300 dark:border-gray-700/50";
+  let iconColor = "text-slate-500 dark:text-gray-400";
   let textColor = "text-gray-100";
 
   if (balance >= 50000) {

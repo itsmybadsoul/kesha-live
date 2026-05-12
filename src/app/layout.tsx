@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 import { UserProvider } from "@/context/UserContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { CryptoProvider } from "@/context/CryptoContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -27,13 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <CryptoProvider>
-          <UserProvider>
-            <ToastProvider>{children}</ToastProvider>
-          </UserProvider>
-        </CryptoProvider>
+        <ThemeProvider>
+          <CryptoProvider>
+            <UserProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </UserProvider>
+          </CryptoProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -9,7 +9,7 @@ export function PendingDeposit() {
   if (!user?.pendingDeposit) return null;
 
   return (
-    <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 lg:p-8 relative overflow-hidden mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+    <div className="bg-slate-100 dark:bg-gray-800/80 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 lg:p-8 relative overflow-hidden mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
       <div className="absolute -left-10 -top-10 w-40 h-40 bg-yellow-500/10 rounded-full blur-3xl animate-pulse"></div>
       
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
@@ -19,27 +19,27 @@ export function PendingDeposit() {
             <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
               <span className="text-yellow-400">${user.pendingDeposit.amount.toLocaleString()} USDT</span> Pending
             </h3>
-            <p className="text-sm text-gray-400 max-w-md leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-gray-400 max-w-md leading-relaxed">
               We have received your request. Our system is verifying the transaction. Your funds are safe and will be credited within 5-15 minutes.
             </p>
           </div>
         </div>
 
-        <div className="bg-gray-900/60 p-4 rounded-2xl border border-gray-700/50 w-full md:w-72 shrink-0">
+        <div className="bg-white/90 dark:bg-white dark:bg-gray-900/60 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/50 w-full md:w-72 shrink-0">
           <div className="flex justify-between items-center mb-3">
-             <span className="text-xs text-gray-500 uppercase font-medium">Tx Hash</span>
-             <span className="bg-gray-800 text-[10px] text-gray-400 px-2 py-0.5 rounded border border-gray-700">TRC20</span>
+             <span className="text-xs text-slate-400 dark:text-gray-500 uppercase font-medium">Tx Hash</span>
+             <span className="bg-slate-100 dark:bg-gray-800 text-[10px] text-slate-500 dark:text-gray-400 px-2 py-0.5 rounded border border-slate-300 dark:border-gray-700">TRC20</span>
           </div>
-          <div className="flex items-center gap-2 bg-gray-800/50 px-3 py-2 rounded-lg">
-             <span className="text-sm font-mono text-gray-300 truncate">
+          <div className="flex items-center gap-2 bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 px-3 py-2 rounded-lg">
+             <span className="text-sm font-mono text-slate-600 dark:text-gray-300 truncate">
                {user.pendingDeposit.txid}
              </span>
              <button 
                onClick={() => navigator.clipboard.writeText(user.pendingDeposit?.txid || "")}
-               className="text-gray-500 hover:text-white transition-colors block ml-auto shrink-0"
+               className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-colors block ml-auto shrink-0"
               >
                <Copy className="w-4 h-4" />
              </button>

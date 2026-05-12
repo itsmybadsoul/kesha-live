@@ -49,21 +49,21 @@ export function TradeActivityToasts() {
       {toasts.map((toast) => (
         <div 
           key={toast.id} 
-          className="pointer-events-auto bg-gray-900/90 backdrop-blur-xl border border-indigo-500/30 p-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right-10 duration-500 min-w-[280px]"
+          className="pointer-events-auto bg-white dark:bg-gray-900/90 backdrop-blur-xl border border-indigo-500/30 p-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right-10 duration-500 min-w-[280px]"
         >
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shrink-0">
-            <User className="w-5 h-5 text-white" />
+            <User className="w-5 h-5 text-slate-900 dark:text-white" />
           </div>
           <div className="flex-1">
              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-xs font-black text-white">{toast.user}</span>
+                <span className="text-xs font-black text-slate-900 dark:text-white">{toast.user}</span>
                 <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-md font-black">WINNER</span>
              </div>
-             <p className="text-[10px] text-gray-400 leading-tight">
+             <p className="text-[10px] text-slate-500 dark:text-gray-400 leading-tight">
                 Just closed <span className="text-indigo-400 font-bold">{toast.strategy}</span> with <span className="text-emerald-400 font-bold">{toast.profit} ROI</span>.
              </p>
           </div>
-          <button onClick={() => removeToast(toast.id)} className="text-gray-600 hover:text-white transition-colors">
+          <button onClick={() => removeToast(toast.id)} className="text-gray-600 hover:text-slate-900 dark:text-white transition-colors">
              <X className="w-4 h-4" />
           </button>
         </div>

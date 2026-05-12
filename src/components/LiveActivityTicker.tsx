@@ -40,17 +40,17 @@ export function LiveActivityTicker() {
   }, []);
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 mt-8 relative overflow-hidden">
+    <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-2xl p-6 mt-8 relative overflow-hidden">
        <div className="flex items-center gap-2 mb-4">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-          <h3 className="text-gray-300 font-bold text-sm uppercase tracking-wider">Live Platform Activity</h3>
+          <h3 className="text-slate-600 dark:text-gray-300 font-bold text-sm uppercase tracking-wider">Live Platform Activity</h3>
        </div>
 
        <div className="space-y-4">
         {activities.map((activity, index) => (
           <div 
             key={activity.id} 
-            className="flex items-center gap-4 bg-gray-900/40 p-3 rounded-xl border border-gray-700/50 hover:bg-gray-700/30 transition-all cursor-default"
+            className="flex items-center gap-4 bg-white dark:bg-gray-900/40 p-3 rounded-xl border border-slate-300 dark:border-gray-700/50 hover:bg-gray-700/30 transition-all cursor-default"
             style={{
               animation: index === 0 ? "slideIn 0.5s ease-out forwards" : "none",
             }}
@@ -68,9 +68,9 @@ export function LiveActivityTicker() {
 
             {/* Content */}
             <div className="flex-1">
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {activity.user}
-                <span className="text-gray-400 font-normal ml-2">
+                <span className="text-slate-500 dark:text-gray-400 font-normal ml-2">
                   {activity.type === "deposit" && "deposited"}
                   {activity.type === "withdrawal" && "withdrew"}
                   {activity.type === "upgrade" && "upgraded to VIP Gold!"}
@@ -78,7 +78,7 @@ export function LiveActivityTicker() {
               </p>
               {activity.amount && (
                 <p className={`text-sm font-bold mt-0.5 ${
-                  activity.type === "deposit" ? "text-emerald-400" : "text-white"
+                  activity.type === "deposit" ? "text-emerald-400" : "text-slate-900 dark:text-white"
                 }`}>
                   {activity.type === "deposit" ? "+" : "-"}${activity.amount.toLocaleString()} USDT
                 </p>
@@ -87,7 +87,7 @@ export function LiveActivityTicker() {
 
             {/* Time / Trust Badge */}
             <div className="text-right">
-              <span className="text-xs text-gray-500 block mb-1">{activity.time}</span>
+              <span className="text-xs text-slate-400 dark:text-gray-500 block mb-1">{activity.time}</span>
               {activity.type === "deposit" && (
                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-medium">
                    <ShieldCheck className="w-3 h-3" /> Secure

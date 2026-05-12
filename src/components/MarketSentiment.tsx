@@ -37,9 +37,9 @@ export function MarketSentiment() {
   const ny = cy - needleLen * Math.sin(needleRad);
 
   return (
-    <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6">
+    <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           Market Sentiment
         </h3>
         <div className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-[10px] font-black text-amber-400 uppercase tracking-widest">
@@ -100,14 +100,14 @@ export function MarketSentiment() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-black/40 p-3 rounded-2xl border border-gray-700/30">
-          <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Buy Momentum</div>
+        <div className="bg-black/40 p-3 rounded-2xl border border-slate-300 dark:border-gray-700/30">
+          <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase mb-1">Buy Momentum</div>
           <div className="text-sm font-black text-emerald-400 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" /> 68.2%
           </div>
         </div>
-        <div className="bg-black/40 p-3 rounded-2xl border border-gray-700/30">
-          <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Sell Pressure</div>
+        <div className="bg-black/40 p-3 rounded-2xl border border-slate-300 dark:border-gray-700/30">
+          <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase mb-1">Sell Pressure</div>
           <div className="text-sm font-black text-rose-500 flex items-center gap-1.5">
             <TrendingDown className="w-3.5 h-3.5" /> 31.8%
           </div>

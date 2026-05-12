@@ -11,10 +11,10 @@ function NotifIcon({ type }: { type: Notification["type"] }) {
     trade:    <Activity      className="w-4 h-4 text-indigo-400"  />,
     kyc:      <Coins         className="w-4 h-4 text-amber-400"   />,
     reward:   <Gift          className="w-4 h-4 text-fuchsia-400" />,
-    system:   <Info          className="w-4 h-4 text-gray-400"    />,
+    system:   <Info          className="w-4 h-4 text-slate-500 dark:text-gray-400"    />,
   };
   return (
-    <div className="w-8 h-8 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+    <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 flex items-center justify-center shrink-0">
       {map[type]}
     </div>
   );
@@ -53,23 +53,23 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={handleOpen}
-        className="relative p-2 text-gray-400 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+        className="relative p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white transition-colors rounded-xl hover:bg-white/5"
         title="Notifications"
       >
         <Bell className="w-5 h-5" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center leading-none">
+          <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 bg-rose-500 text-slate-900 dark:text-white text-[9px] font-black rounded-full flex items-center justify-center leading-none">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 w-80 bg-[#0F1117] border border-gray-800 rounded-2xl shadow-2xl z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
-            <span className="text-sm font-black text-white uppercase tracking-widest">Notifications</span>
+        <div className="absolute right-0 top-12 w-80 bg-[#0F1117] border border-slate-200 dark:border-gray-800 rounded-2xl shadow-2xl z-50 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-gray-800">
+            <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Notifications</span>
             {notifications.length > 0 && (
-              <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-indigo-400 hover:text-white font-bold uppercase tracking-widest">
+              <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-indigo-400 hover:text-slate-900 dark:text-white font-bold uppercase tracking-widest">
                 <CheckCheck className="w-3 h-3" /> Mark all read
               </button>
             )}
@@ -87,12 +87,12 @@ export function NotificationBell() {
                   <NotifIcon type={n.type} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-black text-white truncate">{n.title}</p>
+                      <p className="text-xs font-black text-slate-900 dark:text-white truncate">{n.title}</p>
                       <span className="text-[9px] text-gray-600 font-bold shrink-0">{timeAgo(n.timestamp)}</span>
                     </div>
-                    <p className="text-[10px] text-gray-400 font-medium mt-0.5 leading-snug">{n.body}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-gray-400 font-medium mt-0.5 leading-snug">{n.body}</p>
                   </div>
-                  <button onClick={() => clearNotification(n.id)} className="text-gray-700 hover:text-gray-400 transition-colors shrink-0 mt-0.5">
+                  <button onClick={() => clearNotification(n.id)} className="text-gray-700 hover:text-slate-500 dark:text-gray-400 transition-colors shrink-0 mt-0.5">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -101,8 +101,8 @@ export function NotificationBell() {
           </div>
 
           {notifications.length > 0 && (
-            <div className="px-4 py-3 border-t border-gray-800">
-              <a href="/transactions" className="text-[10px] text-indigo-400 hover:text-white font-black uppercase tracking-widest transition-colors">
+            <div className="px-4 py-3 border-t border-slate-200 dark:border-gray-800">
+              <a href="/transactions" className="text-[10px] text-indigo-400 hover:text-slate-900 dark:text-white font-black uppercase tracking-widest transition-colors">
                 View full transaction history →
               </a>
             </div>

@@ -134,12 +134,12 @@ export function OptionsChart({ asset, basePrice, activeTrade, onPriceUpdate }: O
     : (isUp ? "#10B981" : "#F43F5E"));
 
   return (
-    <div className="w-full h-full relative font-mono overflow-hidden rounded-2xl bg-[#0f111a] border border-gray-800">
+    <div className="w-full h-full relative font-mono overflow-hidden rounded-2xl bg-[#0f111a] border border-slate-200 dark:border-gray-800">
       <div className="absolute top-4 left-4 z-10">
         <div className="text-3xl font-black tracking-tighter" style={{ color: strokeColor }}>
           ${currentPriceRef.current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
         </div>
-        <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
+        <div className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mt-1">
           {asset}/USD Live Feed
         </div>
         {activeTrade?.adminResult && (

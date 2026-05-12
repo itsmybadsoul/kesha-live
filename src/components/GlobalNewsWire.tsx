@@ -18,8 +18,8 @@ export function GlobalNewsWire() {
       
       <div className="flex items-center">
         <div className="px-4 py-1.5 bg-blue-600 flex items-center gap-2 relative z-20 shadow-[4px_0_15px_rgba(0,0,0,0.5)]">
-          <Globe className="w-4 h-4 text-white animate-pulse" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-white whitespace-nowrap">Global Wire</span>
+          <Globe className="w-4 h-4 text-slate-900 dark:text-white animate-pulse" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap">Global Wire</span>
         </div>
         
         <div className="flex-1 whitespace-nowrap overflow-hidden py-1.5 flex items-center">

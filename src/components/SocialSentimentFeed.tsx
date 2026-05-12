@@ -41,9 +41,9 @@ export function SocialSentimentFeed() {
   }, []);
 
   return (
-    <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6">
+    <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           Social Sentiment <Users className="w-5 h-5 text-indigo-400" />
         </h3>
         <div className="text-[10px] text-emerald-400 font-black uppercase tracking-widest flex items-center gap-1.5 anim-pulse">
@@ -54,12 +54,12 @@ export function SocialSentimentFeed() {
 
       <div className="space-y-4">
         {activities.map((act) => (
-          <div key={act.id} className="bg-gray-900/50 rounded-2xl p-4 border border-gray-800/50 hover:border-indigo-500/30 transition-all group">
+          <div key={act.id} className="bg-white/80 dark:bg-white dark:bg-gray-900/50 rounded-2xl p-4 border border-slate-200 dark:border-gray-800/50 hover:border-indigo-500/30 transition-all group">
             <div className="flex justify-between items-start mb-1">
-              <span className="text-xs font-bold text-gray-300 group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{act.user}</span>
-              <span className="text-[9px] text-gray-500 font-medium">{act.time}</span>
+              <span className="text-xs font-bold text-slate-600 dark:text-gray-300 group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{act.user}</span>
+              <span className="text-[9px] text-slate-400 dark:text-gray-500 font-medium">{act.time}</span>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed mb-3">{act.message}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 leading-relaxed mb-3">{act.message}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button className="text-gray-600 hover:text-rose-500 transition-colors flex items-center gap-1 text-[10px] font-bold">
@@ -79,7 +79,7 @@ export function SocialSentimentFeed() {
         ))}
       </div>
 
-      <button className="w-full mt-6 bg-gray-900/50 hover:bg-gray-700/50 text-gray-500 hover:text-white font-bold py-3 rounded-2xl transition-all text-xs border border-gray-800 flex items-center justify-center gap-2">
+      <button className="w-full mt-6 bg-white/80 dark:bg-white dark:bg-gray-900/50 hover:bg-gray-700/50 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:text-white font-bold py-3 rounded-2xl transition-all text-xs border border-slate-200 dark:border-gray-800 flex items-center justify-center gap-2">
          Join Community Chat
       </button>
     </div>

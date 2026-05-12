@@ -25,15 +25,15 @@ export function DailyQuests() {
   };
 
   return (
-    <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-6 lg:p-8 relative overflow-hidden">
+    <div className="bg-slate-100 dark:bg-gray-800/80 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 lg:p-8 relative overflow-hidden">
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="flex justify-between items-center mb-6 relative z-10">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             Daily Quests <Zap className="w-5 h-5 text-amber-400" />
           </h2>
-          <p className="text-sm text-gray-400 mt-1">Complete tasks to earn real rewards.</p>
+          <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Complete tasks to earn real rewards.</p>
         </div>
         <span className="text-sm font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
           {completedCount}/{quests.length} Done
@@ -41,7 +41,7 @@ export function DailyQuests() {
       </div>
 
       <div className="mb-6 relative z-10">
-        <div className="h-2 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-700">
+        <div className="h-2 w-full bg-white dark:bg-gray-900 rounded-full overflow-hidden border border-slate-300 dark:border-gray-700">
           <div
             className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all duration-700"
             style={{ width: `${progress}%` }}
@@ -56,24 +56,24 @@ export function DailyQuests() {
             className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
               quest.completed
                 ? "bg-emerald-500/5 border-emerald-500/20 opacity-70"
-                : "bg-gray-900/50 border-gray-700/50"
+                : "bg-white/80 dark:bg-white dark:bg-gray-900/50 border-slate-300 dark:border-gray-700/50"
             }`}
           >
             <div className="flex items-center gap-4">
               {quest.completed ? (
                 <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
               ) : (
-                <CircleDashed className="w-6 h-6 text-gray-500 hover:text-indigo-400 transition-colors shrink-0" />
+                <CircleDashed className="w-6 h-6 text-slate-400 dark:text-gray-500 hover:text-indigo-400 transition-colors shrink-0" />
               )}
               <div>
-                <h3 className={`font-bold text-sm ${quest.completed ? "text-gray-400 line-through" : "text-white"}`}>
+                <h3 className={`font-bold text-sm ${quest.completed ? "text-slate-500 dark:text-gray-400 line-through" : "text-slate-900 dark:text-white"}`}>
                   {quest.title}
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">{quest.description}</p>
+                <p className="text-xs text-slate-400 dark:text-gray-500 mt-0.5">{quest.description}</p>
               </div>
             </div>
             <div className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 ${
-              quest.completed ? "bg-gray-800 text-gray-500" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+              quest.completed ? "bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
             }`}>
               <Gift className="w-3 h-3" />{quest.reward}
             </div>

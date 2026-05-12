@@ -265,7 +265,7 @@ export default function MarketsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080810] text-slate-900 dark:text-white font-sans">
       {/* ── Navbar ── */}
       <div className="sticky top-0 z-50 w-full flex flex-col">
         <Navbar />
@@ -280,11 +280,11 @@ export default function MarketsPage() {
             { label: "Fear & Greed Index", value: `${fearGreed} — ${fearGreed > 60 ? "Greed" : fearGreed < 40 ? "Fear" : "Neutral"}`, icon: <Zap className="w-4 h-4 text-amber-400" />, color: "amber" },
             { label: "Live Instruments", value: `${stocks.length} Stocks`, icon: <Activity className="w-4 h-4 text-cyan-400" />, color: "cyan" },
           ].map(stat => (
-            <div key={stat.label} className="bg-white/[0.03] border border-white/5 rounded-xl p-3.5 flex items-center gap-3">
+            <div key={stat.label} className="bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-xl p-3.5 flex items-center gap-3">
               <div className={`w-8 h-8 rounded-lg bg-${stat.color}-500/10 flex items-center justify-center shrink-0`}>{stat.icon}</div>
               <div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wide">{stat.label}</div>
-                <div className="text-sm font-bold text-white mt-0.5">{stat.value}</div>
+                <div className="text-[10px] text-slate-400 dark:text-gray-500 uppercase tracking-wide">{stat.label}</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">{stat.value}</div>
               </div>
             </div>
           ))}
@@ -294,16 +294,16 @@ export default function MarketsPage() {
         <div className="flex flex-wrap gap-2.5 items-center">
           {/* Search */}
           <div className="relative flex-1 min-w-[160px] max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-gray-500 pointer-events-none" />
             <input
               value={search} onChange={e => setSearch(e.target.value)} placeholder="Search ticker or name..."
-              className="w-full bg-white/[0.04] border border-white/8 rounded-lg pl-8 pr-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
+              className="w-full bg-white/[0.04] border border-white/8 rounded-lg pl-8 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
             />
           </div>
           {/* Sector filter */}
           <select
             value={sector} onChange={e => setSector(e.target.value)}
-            className="bg-white/[0.04] border border-white/8 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500/50 transition-colors"
+            className="bg-white/[0.04] border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-gray-300 focus:outline-none focus:border-indigo-500/50 transition-colors"
           >
             <option value="All">All Sectors</option>
             {SECTORS.map(s => <option key={s}>{s}</option>)}
@@ -311,7 +311,7 @@ export default function MarketsPage() {
           {/* Quick filters */}
           {(["all", "gainers", "losers", "hot"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${filter === f ? "bg-indigo-600 text-white" : "bg-white/[0.04] text-gray-400 hover:text-white border border-white/5"}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${filter === f ? "bg-indigo-600 text-white" : "bg-white/[0.04] text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white border border-slate-200 dark:border-white/5"}`}>
               {f === "hot" ? "🔥 Hot" : f === "gainers" ? "📈 Gainers" : f === "losers" ? "📉 Losers" : "All"}
             </button>
           ))}
@@ -319,11 +319,11 @@ export default function MarketsPage() {
         </div>
 
         {/* ── Table ── */}
-        <div className="rounded-xl border border-white/5 overflow-x-auto bg-white/[0.015]">
+        <div className="rounded-xl border border-slate-200 dark:border-white/5 overflow-x-auto bg-white/[0.015]">
           {/* Header */}
-          <div className="min-w-[800px] grid grid-cols-[2fr_3fr_1.2fr_1.2fr_1.2fr_1fr_1fr_auto] gap-2 px-4 py-2.5 bg-white/[0.025] border-b border-white/5 text-[10px] uppercase tracking-widest text-gray-500">
+          <div className="min-w-[800px] grid grid-cols-[2fr_3fr_1.2fr_1.2fr_1.2fr_1fr_1fr_auto] gap-2 px-4 py-2.5 bg-white/[0.025] border-b border-slate-200 dark:border-white/5 text-[10px] uppercase tracking-widest text-slate-400 dark:text-gray-500">
             {([["sym", "Symbol"], ["name", "Company"], ["price", "Price"], ["changePct", "Change %"], ["vol", "Volume"], ["cap", "Mkt Cap"], ["volatility", "Volatility"]] as [SortKey, string][]).map(([k, label]) => (
-              <button key={k} onClick={() => toggleSort(k)} className="flex items-center gap-1 hover:text-gray-300 transition-colors">
+              <button key={k} onClick={() => toggleSort(k)} className="flex items-center gap-1 hover:text-slate-600 dark:text-gray-300 transition-colors">
                 {label}<SortIcon k={k} />
               </button>
             ))}
@@ -344,21 +344,21 @@ export default function MarketsPage() {
                 >
                   {/* Symbol */}
                   <div>
-                    <div className="font-bold text-white">{s.sym}</div>
+                    <div className="font-bold text-slate-900 dark:text-white">{s.sym}</div>
                     <div className={`text-[10px] px-1.5 py-0.5 rounded inline-block mt-0.5 font-medium
                       ${s.sector === "Tech" ? "bg-indigo-500/15 text-indigo-400" :
                         s.sector === "Finance" ? "bg-cyan-500/15 text-cyan-400" :
                         s.sector === "Energy" ? "bg-amber-500/15 text-amber-400" :
                         s.sector === "Healthcare" || s.sector === "Pharma" ? "bg-emerald-500/15 text-emerald-400" :
                         s.sector === "Automotive" ? "bg-orange-500/15 text-orange-400" :
-                        "bg-gray-500/15 text-gray-400"}`}>
+                        "bg-gray-500/15 text-slate-500 dark:text-gray-400"}`}>
                       {s.sector}
                     </div>
                   </div>
                   {/* Name */}
-                  <div className="text-gray-300 truncate text-xs">{s.name}</div>
+                  <div className="text-slate-600 dark:text-gray-300 truncate text-xs">{s.name}</div>
                   {/* Price */}
-                  <div className={`font-mono font-bold ${s.flash === "green" ? "text-emerald-300" : s.flash === "red" ? "text-red-300" : "text-white"} transition-colors`}>
+                  <div className={`font-mono font-bold ${s.flash === "green" ? "text-emerald-300" : s.flash === "red" ? "text-red-300" : "text-slate-900 dark:text-white"} transition-colors`}>
                     ${fmt(s.price)}
                   </div>
                   {/* Change % */}
@@ -368,9 +368,9 @@ export default function MarketsPage() {
                     <span className="text-[10px] opacity-60">({isUp ? "+" : ""}{fmt(s.change)})</span>
                   </div>
                   {/* Volume */}
-                  <div className="text-gray-400 text-xs font-mono">{fmtVol(s.vol)}</div>
+                  <div className="text-slate-500 dark:text-gray-400 text-xs font-mono">{fmtVol(s.vol)}</div>
                   {/* Market Cap */}
-                  <div className="text-gray-400 text-xs font-mono">{fmtCap(s.cap)}</div>
+                  <div className="text-slate-500 dark:text-gray-400 text-xs font-mono">{fmtCap(s.cap)}</div>
                   {/* Volatility */}
                   <div className="flex items-center gap-1.5">
                     <div className="flex-1 h-1 rounded-full bg-white/5 max-w-[48px]">
@@ -399,12 +399,12 @@ export default function MarketsPage() {
       {/* ── Bet Modal ── */}
       {betModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setBetModal(null)}>
-          <div className="w-full max-w-md bg-[#0f0f1a] border border-white/10 rounded-2xl shadow-2xl p-6 space-y-5" onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-md bg-white dark:bg-[#0f0f1a] border border-slate-300 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-5" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
-                <div className="text-xl font-black text-white">{betModal.sym}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{betModal.name}</div>
+                <div className="text-xl font-black text-slate-900 dark:text-white">{betModal.sym}</div>
+                <div className="text-xs text-slate-400 dark:text-gray-500 mt-0.5">{betModal.name}</div>
               </div>
               <button onClick={() => setBetModal(null)} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"><X className="w-4 h-4" /></button>
             </div>
@@ -412,17 +412,17 @@ export default function MarketsPage() {
             {/* Live Price */}
             <div className="bg-white/[0.025] rounded-xl p-4 grid grid-cols-3 gap-3 text-center">
               <div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wide">Price</div>
-                <div className="text-lg font-black text-white mt-1">${fmt(betModal.price)}</div>
+                <div className="text-[10px] text-slate-400 dark:text-gray-500 uppercase tracking-wide">Price</div>
+                <div className="text-lg font-black text-slate-900 dark:text-white mt-1">${fmt(betModal.price)}</div>
               </div>
               <div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wide">24h Change</div>
+                <div className="text-[10px] text-slate-400 dark:text-gray-500 uppercase tracking-wide">24h Change</div>
                 <div className={`text-base font-bold mt-1 ${betModal.changePct >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {betModal.changePct >= 0 ? "+" : ""}{fmt(betModal.changePct)}%
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wide">Volatility</div>
+                <div className="text-[10px] text-slate-400 dark:text-gray-500 uppercase tracking-wide">Volatility</div>
                 <div className={`text-base font-bold mt-1 ${betModal.volatility > 3 ? "text-red-400" : betModal.volatility > 1.5 ? "text-amber-400" : "text-emerald-400"}`}>
                   {betModal.volatility}%
                 </div>
@@ -431,16 +431,16 @@ export default function MarketsPage() {
 
             {/* Direction */}
             <div className="space-y-1.5">
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Your Prediction</div>
+              <div className="text-xs text-slate-400 dark:text-gray-500 uppercase tracking-wider">Your Prediction</div>
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setBetDir("UP")}
                   className={`p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold
-                    ${betDir === "UP" ? "border-emerald-500 bg-emerald-500/15 text-emerald-300" : "border-white/10 bg-white/[0.03] text-gray-400 hover:border-emerald-500/30"}`}>
+                    ${betDir === "UP" ? "border-emerald-500 bg-emerald-500/15 text-emerald-300" : "border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-emerald-500/30"}`}>
                   <TrendingUp className="w-4 h-4" /> UP / BUY
                 </button>
                 <button onClick={() => setBetDir("DOWN")}
                   className={`p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold
-                    ${betDir === "DOWN" ? "border-red-500 bg-red-500/15 text-red-300" : "border-white/10 bg-white/[0.03] text-gray-400 hover:border-red-500/30"}`}>
+                    ${betDir === "DOWN" ? "border-red-500 bg-red-500/15 text-red-300" : "border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-red-500/30"}`}>
                   <TrendingDown className="w-4 h-4" /> DOWN / SELL
                 </button>
               </div>
@@ -449,18 +449,18 @@ export default function MarketsPage() {
             {/* Amount */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <div className="text-xs text-gray-500 uppercase tracking-wider">Bet Amount (USDT)</div>
+                <div className="text-xs text-slate-400 dark:text-gray-500 uppercase tracking-wider">Bet Amount (USDT)</div>
                 <div className="text-xs text-gray-600">Balance: <span className="text-emerald-400 font-semibold">${fmt(balance)}</span></div>
               </div>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-500" />
                 <input type="number" min="1" value={betAmount} onChange={e => setBetAmount(e.target.value)} placeholder="50"
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-4 py-3 text-white font-mono focus:outline-none focus:border-indigo-500/50 transition-colors" />
+                  className="w-full bg-white/[0.04] border border-slate-300 dark:border-white/10 rounded-xl pl-9 pr-4 py-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-indigo-500/50 transition-colors" />
               </div>
               <div className="flex gap-2">
                 {[25, 50, 100, 250].map(amt => (
                   <button key={amt} onClick={() => setBetAmount(String(Math.min(amt, balance)))}
-                    className="flex-1 py-1 text-xs text-gray-400 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors border border-white/5">
+                    className="flex-1 py-1 text-xs text-slate-500 dark:text-gray-400 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors border border-slate-200 dark:border-white/5">
                     ${amt}
                   </button>
                 ))}
@@ -473,12 +473,12 @@ export default function MarketsPage() {
 
             {/* Duration */}
             <div className="space-y-1.5">
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Expiry Duration</div>
+              <div className="text-xs text-slate-400 dark:text-gray-500 uppercase tracking-wider">Expiry Duration</div>
               <div className="flex gap-2">
                 {[1, 5, 15, 30, 60].map(m => (
                   <button key={m} onClick={() => setBetDuration(m)}
                     className={`flex-1 py-2 text-xs rounded-lg font-semibold transition-all border
-                      ${betDuration === m ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-white/5 bg-white/[0.03] text-gray-500 hover:text-gray-300"}`}>
+                      ${betDuration === m ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-200 dark:border-white/5 bg-white/[0.03] text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:text-gray-300"}`}>
                     {m < 60 ? `${m}m` : "1h"}
                   </button>
                 ))}
@@ -487,7 +487,7 @@ export default function MarketsPage() {
 
             {/* Payout Preview */}
             <div className="bg-white/[0.025] rounded-xl p-3.5 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-gray-500">
                 <Target className="w-3.5 h-3.5" /> Potential Payout
               </div>
               <div className="text-base font-black text-emerald-400">
@@ -516,7 +516,7 @@ export default function MarketsPage() {
               </button>
             )}
             {betResult === "success" && (
-              <button onClick={() => setBetModal(null)} className="w-full py-3 rounded-xl bg-white/[0.04] border border-white/10 text-gray-300 hover:text-white font-semibold transition-colors text-sm">
+              <button onClick={() => setBetModal(null)} className="w-full py-3 rounded-xl bg-white/[0.04] border border-slate-300 dark:border-white/10 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:text-white font-semibold transition-colors text-sm">
                 Close & Continue Trading
               </button>
             )}
