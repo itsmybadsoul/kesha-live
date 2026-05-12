@@ -47,7 +47,7 @@ export function VIPProgress() {
   ];
 
   return (
-    <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-2xl p-6 relative overflow-hidden">
+    <div className="bg-white/70 dark:bg-gray-900/40 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-2xl p-6 relative overflow-hidden">
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
       
       <div className="flex justify-between items-start mb-4 relative z-10">
@@ -110,7 +110,7 @@ export function VIPProgress() {
               
               <div className="space-y-4">
                 {tiers.map((t) => (
-                  <div key={t.name} className={`p-4 rounded-2xl border transition-all ${t.name === tier ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 border-slate-300 dark:border-gray-700/50'}`}>
+                  <div key={t.name} className={`p-4 rounded-2xl border transition-all ${t.name === tier ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/70 dark:bg-gray-900/40 dark:bg-gray-800/50 border-slate-300 dark:border-gray-700/50'}`}>
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-bold text-slate-900 dark:text-white text-lg">{t.name}</span>
                       <span className="text-emerald-400 font-black text-sm">+{t.bonus} APY</span>

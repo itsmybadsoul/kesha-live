@@ -58,68 +58,60 @@ export default function RegisterPage() {
           <p className="text-sm font-semibold text-indigo-400">🎁 New users get <span className="text-slate-900 dark:text-white font-bold">$50 welcome bonus</span>!</p>
         </div>
 
-        <div className="bg-slate-100 dark:bg-gray-800/60 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/60 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-2xl border border-slate-200 dark:border-gray-800 rounded-3xl p-8 shadow-2xl">
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Create your account</h1>
-            <p className="text-slate-500 dark:text-gray-400 text-sm mt-2">Join thousands of traders on Stocks Indicators.</p>
+            <p className="text-slate-500 dark:text-gray-400 text-sm mt-2 font-medium">Join thousands of traders on Stocks Indicators.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">First Name</label>
+                <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">First Name</label>
                 <input name="firstName" type="text" value={form.firstName} onChange={handleChange} placeholder="John"
-                  className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                  className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-gray-700 focus:outline-none transition-all shadow-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Last Name</label>
+                <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">Last Name</label>
                 <input name="lastName" type="text" value={form.lastName} onChange={handleChange} placeholder="Doe"
-                  className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                  className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-gray-700 focus:outline-none transition-all shadow-sm" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Email Address</label>
+              <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">Email Address</label>
               <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@example.com"
-                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-gray-700 focus:outline-none transition-all shadow-sm" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Password</label>
+              <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">Password</label>
               <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Create a strong password"
-                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-gray-700 focus:outline-none transition-all shadow-sm" />
             </div>
 
             <div className="flex items-start gap-3 pt-1">
               <input type="checkbox" id="terms" checked={agreed} onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-1 accent-indigo-500" />
-              <label htmlFor="terms" className="text-xs text-slate-500 dark:text-gray-400 cursor-pointer">
-                I agree to the <a href="#" className="text-indigo-400 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-400 hover:underline">Privacy Policy</a>. I understand this is a high-performance trading platform.
+                className="mt-1 accent-indigo-500 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+              <label htmlFor="terms" className="text-xs text-slate-500 dark:text-gray-400 cursor-pointer font-medium leading-relaxed">
+                I agree to the <a href="/terms" className="text-indigo-500 hover:underline font-bold">Terms of Service</a> and <a href="/privacy" className="text-indigo-500 hover:underline font-bold">Privacy Policy</a>.
               </label>
             </div>
 
             {error && (
-              <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+              <p className="text-xs text-rose-500 bg-rose-500/5 border border-rose-500/10 rounded-xl px-4 py-3 font-medium">
                 {error}
               </p>
             )}
 
             <button type="submit" disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] active:scale-[0.98] flex items-center justify-center gap-2">
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 text-slate-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Creating account...
-                </>
-              ) : "Create Free Account"}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black py-4 rounded-xl transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-widest text-xs">
+              {loading ? <span className="animate-pulse">Generating Profile...</span> : "Create Secure Account"}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-slate-300 dark:border-gray-700/50 text-center">
-            <p className="text-sm text-slate-500 dark:text-gray-400">
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-gray-800 text-center">
+            <p className="text-xs text-slate-400 dark:text-gray-500 font-medium">
               Already have an account?{" "}
-              <a href="/login" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">Sign in</a>
+              <a href="/login" className="text-indigo-500 font-black tracking-widest uppercase ml-1 hover:text-indigo-400 transition-colors">Sign in</a>
             </p>
           </div>
         </div>

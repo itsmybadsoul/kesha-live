@@ -10,7 +10,7 @@ export function MarketOverview() {
   if (loading) return null;
 
   return (
-    <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 lg:p-8">
+    <div className="bg-white/60 dark:bg-gray-900/40 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           Market Overview <BarChart3 className="w-5 h-5 text-indigo-400" />

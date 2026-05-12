@@ -57,76 +57,76 @@ export default function LoginPage() {
           <a href="/" className="text-2xl font-bold bg-gradient-to-r from-slate-900 dark:from-white to-slate-500 dark:to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
         </a>
 
-        <div className="bg-slate-100 dark:bg-gray-800/60 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/60 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-2xl border border-slate-200 dark:border-gray-800 rounded-3xl p-8 shadow-2xl">
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome back</h1>
-            <p className="text-slate-500 dark:text-gray-400 text-sm mt-2">Sign in to your account to continue trading.</p>
+            <p className="text-slate-500 dark:text-gray-400 text-sm mt-2 font-medium">Sign in to your account to continue trading.</p>
           </div>
 
-          <div className="flex gap-2 mb-8 bg-white/80 dark:bg-gray-900/50 p-1.5 rounded-xl border border-slate-300 dark:border-gray-700/50">
+          <div className="flex gap-2 mb-8 bg-slate-50 dark:bg-gray-950/50 p-1.5 rounded-2xl border border-slate-200 dark:border-gray-800">
             <button
               type="button"
               onClick={() => setLoginType("PASSWORD")}
-              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "PASSWORD" ? "bg-indigo-600 shadow-md text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"}`}
+              className={`flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${loginType === "PASSWORD" ? "bg-indigo-600 shadow-lg text-white" : "text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white"}`}
             >
               Password
             </button>
             <button
               type="button"
               onClick={() => setLoginType("RECOVERY")}
-              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "RECOVERY" ? "bg-amber-600 shadow-md text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"}`}
+              className={`flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${loginType === "RECOVERY" ? "bg-amber-600 shadow-lg text-white" : "text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white"}`}
             >
-              Recovery Phrase
+              Recovery
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Email Address</label>
+              <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors"
+                className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-gray-700 focus:outline-none transition-all shadow-sm"
               />
             </div>
 
             {loginType === "PASSWORD" ? (
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium text-slate-600 dark:text-gray-300">Password</label>
+                <div className="flex justify-between items-center mb-2 ml-1">
+                  <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Password</label>
                   <button type="button" onClick={() => {
                       toast("Please use your 12-Word Recovery Phrase to sign in, or contact support.", "warning");
                       setLoginType("RECOVERY");
-                  }} className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</button>
+                  }} className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 transition-colors">Forgot password?</button>
                 </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors"
+                  className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-gray-700 focus:outline-none transition-all shadow-sm"
                 />
               </div>
             ) : (
                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-slate-600 dark:text-gray-300">12-Word Seed Phrase</label>
+                  <div className="flex justify-between items-center mb-2 ml-1">
+                    <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">12-Word Seed Phrase</label>
                   </div>
                   <textarea
                     value={seedPhrase}
                     onChange={(e) => setSeedPhrase(e.target.value)}
                     placeholder="word1 word2 word3..."
                     rows={3}
-                    className="w-full bg-white/90 dark:bg-gray-900/60 border border-amber-900/50 hover:border-amber-600 focus:border-amber-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-600 focus:outline-none transition-colors font-mono text-sm leading-relaxed"
+                    className="w-full bg-slate-50 dark:bg-gray-900/60 border border-amber-900/30 focus:border-amber-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-600 focus:outline-none transition-all font-mono text-sm leading-relaxed"
                   />
-                  <p className="text-[10px] text-amber-500 mt-2 font-medium">Use spaces to separate your recovery words.</p>
+                  <p className="text-[10px] text-amber-500 mt-2 font-bold tracking-tight">Use spaces to separate your recovery words.</p>
                </div>
             )}
 
             {error && (
-              <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+              <p className="text-xs text-rose-500 bg-rose-500/5 border border-rose-500/10 rounded-xl px-4 py-3 font-medium">
                 {error}
               </p>
             )}
@@ -134,26 +134,15 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] active:scale-[0.98] mt-2 flex items-center justify-center gap-2"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black py-4 rounded-xl transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98] mt-2 flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 text-slate-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Signing in...
-                </>
-              ) : "Sign In"}
+              {loading ? <span className="animate-pulse">Authenticating...</span> : "Sign In to Terminal"}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-slate-300 dark:border-gray-700/50 text-center">
-            <p className="text-center text-slate-500 dark:text-gray-400 text-sm">
-              Don't have an account? <a href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium tracking-wide">Register here</a>
-            </p>
-            <p className="text-center text-slate-400 dark:text-gray-500 text-xs mt-3">
-              Locked out? <a href="/support" className="text-indigo-400 hover:text-indigo-300 font-medium">Contact Support</a>
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-gray-800 text-center">
+            <p className="text-center text-slate-400 dark:text-gray-500 text-xs font-medium">
+              Don't have an account? <a href="/register" className="text-indigo-500 hover:text-indigo-400 font-black tracking-widest uppercase ml-1">Register</a>
             </p>
           </div>
         </div>

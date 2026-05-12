@@ -40,7 +40,7 @@ export function LiveActivityTicker() {
   }, []);
 
   return (
-    <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-2xl p-6 mt-8 relative overflow-hidden">
+    <div className="bg-white/70 dark:bg-gray-900/40 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-2xl p-6 mt-8 relative overflow-hidden">
        <div className="flex items-center gap-2 mb-4">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
           <h3 className="text-slate-600 dark:text-gray-300 font-bold text-sm uppercase tracking-wider">Live Platform Activity</h3>

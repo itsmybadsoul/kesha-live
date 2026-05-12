@@ -45,7 +45,7 @@ export default function SupportPage() {
          <ChevronLeft className="w-4 h-4" /> Back to Login
       </a>
       
-      <div className="max-w-md w-full bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/50 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+      <div className="max-w-md w-full bg-white/70 dark:bg-gray-900/40 dark:bg-gray-800/50 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/50 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 opacity-50"></div>
         
         <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500">

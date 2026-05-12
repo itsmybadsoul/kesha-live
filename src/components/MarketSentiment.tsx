@@ -37,7 +37,7 @@ export function MarketSentiment() {
   const ny = cy - needleLen * Math.sin(needleRad);
 
   return (
-    <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6">
+    <div className="bg-white/60 dark:bg-gray-900/40 dark:bg-gray-800/40 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           Market Sentiment

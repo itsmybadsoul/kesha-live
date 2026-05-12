@@ -39,70 +39,50 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white">
-      {/* Navbar */}
-      <nav className="border-b border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <a href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-slate-900 dark:text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-4">
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-gray-400">
-              <a href="/" className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
-              <a href="/profile" className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
-              <a href="/deposit" className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
-              <a href="/withdraw" className="flex items-center gap-2 text-amber-400 hover:text-amber-300 font-bold"><ArrowRightLeft className="w-4 h-4" /> Withdraw</a>
-            </nav>
-            <div className="flex items-center gap-3 border-l border-slate-200 dark:border-gray-800 pl-4">
-              {user && (
-                <div className="text-right hidden sm:block">
-                  <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase">Net Equity</div>
-                  <div className="text-sm font-black text-emerald-400 flex items-center gap-1"><UsdtIcon className="w-3 h-3" />${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-                </div>
-              )}
-              <NotificationBell />
-              {user && <button onClick={logout} className="p-2 text-slate-400 dark:text-gray-500 hover:text-rose-400 transition-colors"><LogOut className="w-5 h-5" /></button>}
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30">
+      <Navbar />
 
-      <main className="max-w-5xl mx-auto px-4 py-10">
+      <main className="max-w-[1200px] mx-auto px-4 py-10 md:py-16">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-1">Transaction History</h1>
-          <p className="text-slate-400 dark:text-gray-500 text-sm font-medium">A complete log of all account activity</p>
+        <div className="mb-12 relative">
+          <div className="absolute -top-10 -left-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-3 tracking-tighter">Settlement Ledger</h1>
+          <p className="text-slate-500 dark:text-gray-400 text-sm md:text-base font-bold uppercase tracking-widest opacity-60">Cryptographic audit log of institutional activity</p>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 border border-slate-300 dark:border-gray-700/50 rounded-2xl p-5">
-            <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">Total Transactions</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white">{transactions.length}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+          <div className="bg-white dark:bg-gray-900/40 backdrop-blur-xl border border-slate-200 dark:border-gray-800 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+              <Activity className="w-24 h-24" />
+            </div>
+            <div className="text-[10px] text-slate-400 dark:text-gray-500 font-black uppercase tracking-[0.2em] mb-3">Audit Entries</div>
+            <div className="text-4xl font-black text-slate-900 dark:text-white tabular-nums tracking-tighter">{transactions.length}</div>
           </div>
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5">
-            <div className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">Total Received</div>
-            <div className="text-2xl font-black text-emerald-400">+${totals.in.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+          <div className="bg-white dark:bg-gray-900/40 backdrop-blur-xl border border-slate-200 dark:border-gray-800 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+              <ArrowDownLeft className="w-24 h-24 text-emerald-500" />
+            </div>
+            <div className="text-[10px] text-emerald-500 dark:text-emerald-400 font-black uppercase tracking-[0.2em] mb-3">Cumulative Inflow</div>
+            <div className="text-4xl font-black text-emerald-500 dark:text-emerald-400 tabular-nums tracking-tighter">+${totals.in.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
           </div>
-          <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-5">
-            <div className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mb-1">Total Withdrawn</div>
-            <div className="text-2xl font-black text-rose-400">-${totals.out.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+          <div className="bg-white dark:bg-gray-900/40 backdrop-blur-xl border border-slate-200 dark:border-gray-800 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+              <ArrowUpRight className="w-24 h-24 text-rose-500" />
+            </div>
+            <div className="text-[10px] text-rose-500 dark:text-rose-400 font-black uppercase tracking-[0.2em] mb-3">Cumulative Outflow</div>
+            <div className="text-4xl font-black text-rose-500 dark:text-rose-400 tabular-nums tracking-tighter">-${totals.out.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-10 bg-slate-100/50 dark:bg-gray-950/40 p-2 rounded-[1.5rem] border border-slate-200 dark:border-gray-800 w-fit shadow-inner">
           {FILTERS.map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                filter === f ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" : "bg-slate-100 dark:bg-gray-800/60 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-gray-700/50"
+              className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+                filter === f ? "bg-indigo-600 text-white shadow-xl shadow-indigo-600/30" : "text-slate-400 dark:text-gray-600 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {f}
@@ -111,11 +91,11 @@ export default function TransactionsPage() {
         </div>
 
         {/* Transaction List */}
-        <div className="space-y-3">
+        <div className="space-y-6">
           {filtered.length === 0 ? (
-            <div className="text-center py-20 opacity-40">
-              <Activity className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="text-sm font-bold text-slate-400 dark:text-gray-500">No transactions yet</p>
+            <div className="text-center py-40 bg-white/40 dark:bg-gray-950/20 border-2 border-dashed border-slate-200 dark:border-gray-800 rounded-[3rem]">
+              <Activity className="w-20 h-20 mx-auto mb-6 text-slate-200 dark:text-gray-800 opacity-20" />
+              <p className="text-[10px] font-black text-slate-400 dark:text-gray-600 uppercase tracking-[0.3em]">Node Search: No Records Found</p>
             </div>
           ) : (
             filtered.map(tx => {
@@ -124,23 +104,28 @@ export default function TransactionsPage() {
               const Icon = T.icon;
               const isPositive = tx.type === "DEPOSIT" || tx.type === "REWARD";
               return (
-                <div key={tx.id} className="flex items-center gap-4 bg-slate-100 dark:bg-gray-800/30 border border-slate-300 dark:border-gray-700/40 rounded-2xl px-5 py-4 hover:bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 transition-all">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${T.bg}`}>
-                    <Icon className={`w-5 h-5 ${T.color}`} />
+                <div key={tx.id} className="flex items-center gap-6 bg-white dark:bg-gray-900/40 backdrop-blur-xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] px-8 py-6 hover:border-indigo-500/40 transition-all group shadow-sm hover:shadow-2xl active:scale-[0.99] cursor-default">
+                  <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-2 ${T.bg} shadow-lg group-hover:rotate-6 transition-transform duration-500`}>
+                    <Icon className={`w-8 h-8 ${T.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-black text-slate-900 dark:text-white">{tx.description}</span>
-                      <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${T.bg} ${T.color}`}>{T.label}</span>
+                    <div className="flex items-center gap-4 flex-wrap mb-2">
+                      <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{tx.description}</span>
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border-2 ${T.bg} ${T.color} shadow-sm`}>{T.label}</span>
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <div className={`w-1.5 h-1.5 rounded-full ${S.dot}`}></div>
-                      <span className={`text-[10px] font-bold ${S.text}`}>{S.label}</span>
-                      <span className="text-[10px] text-gray-600 font-medium">· {formatDate(tx.timestamp)}</span>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${S.dot} shadow-[0_0_10px_rgba(0,0,0,0.1)] animate-pulse`}></div>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${S.text}`}>{S.label}</span>
+                      </div>
+                      <div className="w-1 h-1 bg-slate-300 dark:bg-gray-700 rounded-full"></div>
+                      <span className="text-[10px] text-slate-400 dark:text-gray-600 font-black uppercase tracking-widest tabular-nums">{formatDate(tx.timestamp)}</span>
                     </div>
                   </div>
-                  <div className={`text-sm font-black tabular-nums ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
-                    {isPositive ? "+" : "-"}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  <div className={`text-2xl font-black tabular-nums tracking-tighter ${isPositive ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"}`}>
+                    <span className="mr-1">{isPositive ? "+" : "-"}</span>
+                    <span className="text-sm opacity-60 mr-0.5">$</span>
+                    {tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </div>
                 </div>
               );
@@ -149,15 +134,16 @@ export default function TransactionsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-slate-200 dark:border-gray-800 py-6 mt-16">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-gray-600 font-bold uppercase tracking-widest">
-          <span>© 2026 Stocks Indicators Infrastructure Limited</span>
-          <div className="flex items-center gap-6">
-            <a href="/terms" className="hover:text-indigo-400 transition-colors">Terms of Use</a>
-            <a href="/privacy" className="hover:text-indigo-400 transition-colors">Privacy Policy</a>
+      <footer className="border-t border-slate-200 dark:border-gray-800 py-16 mt-32 bg-white/40 dark:bg-black/20">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-10 text-[10px] text-slate-400 dark:text-gray-600 font-black uppercase tracking-[0.25em]">
+          <span>© 2026 Kesha Institutional Infrastructure</span>
+          <div className="flex items-center gap-12">
+            <a href="/terms" className="hover:text-indigo-500 transition-colors">Framework</a>
+            <a href="/privacy" className="hover:text-indigo-500 transition-colors">Privacy</a>
+            <a href="/support" className="hover:text-indigo-500 transition-colors">Terminal</a>
           </div>
         </div>
       </footer>
-    </div>
+    </div>>
   );
 }

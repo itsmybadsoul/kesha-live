@@ -33,7 +33,7 @@ export function PendingDeposit() {
              <span className="text-xs text-slate-400 dark:text-gray-500 uppercase font-medium">Tx Hash</span>
              <span className="bg-slate-100 dark:bg-gray-800 text-[10px] text-slate-500 dark:text-gray-400 px-2 py-0.5 rounded border border-slate-300 dark:border-gray-700">TRC20</span>
           </div>
-          <div className="flex items-center gap-2 bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 px-3 py-2 rounded-lg">
+          <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-900/40 dark:bg-gray-800/50 px-3 py-2 rounded-lg">
              <span className="text-sm font-mono text-slate-600 dark:text-gray-300 truncate">
                {user.pendingDeposit.txid}
              </span>
