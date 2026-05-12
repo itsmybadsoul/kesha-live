@@ -11,10 +11,18 @@ export async function GET() {
     if (!exists) {
       markets.push(def);
       changed = true;
-    } else if (!exists.category) {
-      // Add category if missing on existing items
-      exists.category = def.category;
-      changed = true;
+    } else {
+      let itemChanged = false;
+      if (!exists.category) {
+        exists.category = def.category;
+        itemChanged = true;
+      }
+      // Migration: Force cryptos to 0 base if no target is active, to track live market
+      if (exists.category === "CRYPTO" && !exists.targetPrice && exists.basePrice !== 0) {
+        exists.basePrice = 0;
+        itemChanged = true;
+      }
+      if (itemChanged) changed = true;
     }
   });
 
