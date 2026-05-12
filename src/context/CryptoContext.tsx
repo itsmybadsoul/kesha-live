@@ -105,6 +105,9 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                  finalPrice = m.basePrice + (m.targetPrice - m.basePrice) * progress;
               } else if (hasTarget && isFinished) {
                  finalPrice = m.targetPrice;
+              } else if (m.category === "CRYPTO" && (!m.basePrice || m.basePrice === 0)) {
+                 // If basePrice is 0, use the real Binance price
+                 if (liveMap[m.sym]) finalPrice = liveMap[m.sym];
               }
 
               if (finalPrice > 0) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3 } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw } from "lucide-react";
 import { useCrypto } from "@/context/CryptoContext";
 
 export default function AdminPage() {
@@ -174,10 +174,13 @@ export default function AdminPage() {
     }
   };
 
-  const handleMarketAction = async (action: "jump" | "target" | "clear", sym: string) => {
+  const handleMarketAction = async (action: "jump" | "target" | "clear", sym: string, forcedPrice?: number, forcedDuration?: number) => {
     let price;
     let durationMinutes;
-    if (action === "jump") {
+    if (forcedPrice !== undefined) {
+       price = forcedPrice;
+       durationMinutes = forcedDuration;
+    } else if (action === "jump") {
        const pr = prompt(`Enter new exact Base Price for ${sym}:`);
        if (!pr || isNaN(Number(pr))) return;
        price = Number(pr);
@@ -193,7 +196,7 @@ export default function AdminPage() {
     }
     
     const currentPrice = prices[sym];
-
+    
     try {
       const res = await fetch("/api/admin/market", {
         method: "POST",
@@ -209,6 +212,26 @@ export default function AdminPage() {
       }
     } catch (e) {
       toast("Action failed.", "error");
+    }
+  };
+
+  const handleQuickShift = (sym: string, percent: number) => {
+    const cur = prices[sym];
+    if (!cur) return;
+    const dur = prompt(`How many minutes should it take to reach ${percent > 0 ? "+" : ""}${percent}% ($${(cur * (1 + percent / 100)).toLocaleString()})? (Enter 0 for instant)`);
+    if (dur === null) return;
+    const minutes = Number(dur);
+    const target = cur * (1 + percent / 100);
+    
+    if (minutes <= 0) {
+      handleMarketAction("jump", sym, target);
+    } else {
+      // We pass the price as target and duration as duration
+      // handleMarketAction expects (action, sym, forcedPrice, forcedDuration)
+      // Wait, handleMarketAction signature is:
+      // async (action: "jump" | "target" | "clear", sym: string, forcedPrice?: number)
+      // I need to update handleMarketAction to also accept forcedDuration.
+      handleMarketAction("target", sym, target, minutes);
     }
   };
 
@@ -627,9 +650,9 @@ export default function AdminPage() {
                          <div className="text-xs text-slate-400 dark:text-gray-500 font-mono mt-0.5">{m.name}</div>
                        </td>
                        <td className="px-6 py-4">
-                         <div className="text-slate-500 dark:text-gray-400 text-[10px] uppercase tracking-widest mb-1">Base Price / Vol</div>
+                         <div className="text-slate-500 dark:text-gray-400 text-[10px] uppercase tracking-widest mb-1">Live Market Price / Vol</div>
                          <div className="font-mono font-bold text-indigo-300">
-                           ${m.basePrice < 1 ? m.basePrice.toFixed(4) : m.basePrice.toLocaleString()} <span className="text-gray-600 font-normal">v{m.volatility}</span>
+                           ${(prices[m.sym] || m.basePrice) < 1 ? (prices[m.sym] || m.basePrice).toFixed(4) : (prices[m.sym] || m.basePrice).toLocaleString()} <span className="text-gray-600 font-normal">v{m.volatility}</span>
                          </div>
                        </td>
                        <td className="px-6 py-4">
@@ -647,18 +670,38 @@ export default function AdminPage() {
                          )}
                        </td>
                        <td className="px-6 py-4 text-right">
-                         <div className="flex justify-end gap-2">
-                           {hasTarget && !isFinished && (
-                              <button onClick={() => handleMarketAction('clear', m.sym)} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 rounded-lg hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Clear Target">
-                                <XCircle className="w-4 h-4" />
-                              </button>
-                           )}
-                           <button onClick={() => handleMarketAction('target', m.sym)} className="bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/20 shadow-lg">
-                             <Target className="w-3.5 h-3.5" /> Deploy Target
-                           </button>
-                           <button onClick={() => handleMarketAction('jump', m.sym)} className="bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-500/20 shadow-lg">
-                             <TrendingUp className="w-3.5 h-3.5" /> Instant Shift
-                           </button>
+                         <div className="flex flex-col gap-2">
+                           <div className="flex justify-end gap-1">
+                             {[-5, -2, -1, 1, 2, 5].map(pct => (
+                               <button 
+                                 key={pct} 
+                                 onClick={() => handleQuickShift(m.sym, pct)}
+                                 className={`px-1.5 py-0.5 text-[9px] font-black rounded border transition-colors ${pct > 0 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500/20"}`}
+                               >
+                                 {pct > 0 ? `+${pct}%` : `${pct}%`}
+                               </button>
+                             ))}
+                           </div>
+                           <div className="flex justify-end gap-2">
+                             {hasTarget && !isFinished && (
+                                <button onClick={() => handleMarketAction('clear', m.sym)} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 rounded-lg hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Clear Target">
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                             )}
+                             <button 
+                               onClick={() => handleMarketAction('jump', m.sym, 0)} 
+                               className="bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 p-2 rounded-lg hover:bg-indigo-500/10 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/20" 
+                               title="Reset to Real Market"
+                             >
+                               <RefreshCw className="w-4 h-4" />
+                             </button>
+                             <button onClick={() => handleMarketAction('target', m.sym)} className="bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 border border-emerald-500/20 shadow-lg">
+                               <Target className="w-3.5 h-3.5" /> Target
+                             </button>
+                             <button onClick={() => handleMarketAction('jump', m.sym)} className="bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 border border-indigo-500/20 shadow-lg">
+                               <TrendingUp className="w-3.5 h-3.5" /> Shift
+                             </button>
+                           </div>
                          </div>
                        </td>
                     </tr>

@@ -315,16 +315,16 @@ export const DEFAULT_CUSTOM_STOCKS: CustomStock[] = [
   { sym: "VRTX", name: "Vertex Meta Platforms", sector: "Media", basePrice: 65.00, volatility: 3.2, category: "STOCK" },
   { sym: "AUR", name: "Aura Gold Mining", sector: "Industrial", basePrice: 18.50, volatility: 1.8, category: "STOCK" },
   // Cryptocurrencies
-  { sym: "BTC", name: "Bitcoin", sector: "Currency", basePrice: 64230.50, volatility: 4.5, category: "CRYPTO" },
-  { sym: "ETH", name: "Ethereum", sector: "Currency", basePrice: 3450.20, volatility: 5.2, category: "CRYPTO" },
-  { sym: "SOL", name: "Solana", sector: "Currency", basePrice: 145.80, volatility: 8.5, category: "CRYPTO" },
-  { sym: "BNB", name: "Binance Coin", sector: "Currency", basePrice: 580.40, volatility: 3.5, category: "CRYPTO" },
-  { sym: "XRP", name: "Ripple", sector: "Currency", basePrice: 0.62, volatility: 6.0, category: "CRYPTO" },
-  { sym: "ADA", name: "Cardano", sector: "Currency", basePrice: 0.45, volatility: 5.5, category: "CRYPTO" },
-  { sym: "DOGE", name: "Dogecoin", sector: "Currency", basePrice: 0.16, volatility: 12.0, category: "CRYPTO" },
-  { sym: "LINK", name: "Chainlink", sector: "Currency", basePrice: 18.10, volatility: 7.0, category: "CRYPTO" },
-  { sym: "AVAX", name: "Avalanche", sector: "Currency", basePrice: 36.40, volatility: 7.5, category: "CRYPTO" },
-  { sym: "TON", name: "Toncoin", sector: "Currency", basePrice: 7.20, volatility: 6.5, category: "CRYPTO" }
+  { sym: "BTC", name: "Bitcoin", sector: "Currency", basePrice: 0, volatility: 4.5, category: "CRYPTO" },
+  { sym: "ETH", name: "Ethereum", sector: "Currency", basePrice: 0, volatility: 5.2, category: "CRYPTO" },
+  { sym: "SOL", name: "Solana", sector: "Currency", basePrice: 0, volatility: 8.5, category: "CRYPTO" },
+  { sym: "BNB", name: "Binance Coin", sector: "Currency", basePrice: 0, volatility: 3.5, category: "CRYPTO" },
+  { sym: "XRP", name: "Ripple", sector: "Currency", basePrice: 0, volatility: 6.0, category: "CRYPTO" },
+  { sym: "ADA", name: "Cardano", sector: "Currency", basePrice: 0, volatility: 5.5, category: "CRYPTO" },
+  { sym: "DOGE", name: "Dogecoin", sector: "Currency", basePrice: 0, volatility: 12.0, category: "CRYPTO" },
+  { sym: "LINK", name: "Chainlink", sector: "Currency", basePrice: 0, volatility: 7.0, category: "CRYPTO" },
+  { sym: "AVAX", name: "Avalanche", sector: "Currency", basePrice: 0, volatility: 7.5, category: "CRYPTO" },
+  { sym: "TON", name: "Toncoin", sector: "Currency", basePrice: 0, volatility: 6.5, category: "CRYPTO" }
 ];
 
 export async function getCustomMarkets(_env?: any): Promise<CustomStock[]> {
