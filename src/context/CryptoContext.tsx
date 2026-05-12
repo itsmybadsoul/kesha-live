@@ -51,15 +51,29 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       if (response && response.ok) {
         const allPrices = await response.json();
-        rawArr = allPrices.filter((p: any) => SYMBOLS.includes(p.symbol))
-          .map((p: any) => ({
+        
+        const featuredSymbols = SYMBOLS.map(s => s.replace("USDT", ""));
+        let filtered = allPrices.filter((p: any) => p.symbol.endsWith("USDT") && !p.symbol.includes("UPUSDT") && !p.symbol.includes("DOWNUSDT") && !p.symbol.includes("BEAR") && !p.symbol.includes("BULL"));
+        
+        filtered.sort((a: any, b: any) => {
+          const aSym = a.symbol.replace("USDT", "");
+          const bSym = b.symbol.replace("USDT", "");
+          const aIndex = featuredSymbols.indexOf(aSym);
+          const bIndex = featuredSymbols.indexOf(bSym);
+          if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+          if (aIndex !== -1) return -1;
+          if (bIndex !== -1) return 1;
+          return a.symbol.localeCompare(b.symbol);
+        });
+
+        rawArr = filtered.map((p: any) => ({
             symbol: p.symbol.replace("USDT", ""),
             price: parseFloat(p.price).toLocaleString(undefined, { 
               minimumFractionDigits: p.price < 1 ? 4 : 2,
               maximumFractionDigits: p.price < 1 ? 6 : 2
             }),
             rawPrice: parseFloat(p.price)
-          }));
+        }));
           
         rawArr.forEach(p => {
            liveMap[p.symbol] = p.rawPrice;
