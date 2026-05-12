@@ -47,7 +47,7 @@ export function MysteryBox() {
         <div className="flex items-center gap-5 relative z-10">
           {/* Box Icon Container */}
           <div className="relative shrink-0">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-white/5 relative overflow-hidden">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-200 dark:border-white/5 relative overflow-hidden">
                <div className="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
                <Gift className="w-8 h-8 text-indigo-400 group-hover:scale-110 transition-transform duration-500" />
                <Sparkles className="absolute top-1 right-1 w-3 h-3 text-amber-400 animate-bounce" />
@@ -68,7 +68,7 @@ export function MysteryBox() {
           </div>
 
           <div className="shrink-0 flex flex-col items-center gap-1">
-             <div className={`w-10 h-10 rounded-full bg-white dark:bg-white dark:bg-gray-900/80 border ${user.hasOpenedMysteryBox ? 'border-slate-200 dark:border-gray-800' : isUnlocked ? 'border-fuchsia-500' : 'border-slate-300 dark:border-gray-700'} flex items-center justify-center group-hover:border-indigo-500/50 transition-colors`}>
+             <div className={`w-10 h-10 rounded-full bg-white dark:bg-gray-900/80 border ${user.hasOpenedMysteryBox ? 'border-slate-200 dark:border-gray-800' : isUnlocked ? 'border-fuchsia-500' : 'border-slate-300 dark:border-gray-700'} flex items-center justify-center group-hover:border-indigo-500/50 transition-colors`}>
                 {opening ? (
                    <Sparkles className="w-4 h-4 text-fuchsia-400 animate-spin" />
                 ) : user.hasOpenedMysteryBox ? (
@@ -86,7 +86,7 @@ export function MysteryBox() {
         </div>
 
         {/* Progress Bar (Actual requirement) */}
-        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-white/5 flex items-center gap-3">
+        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-200 dark:border-white/5 flex items-center gap-3">
            <div className="flex-1 h-1.5 bg-white dark:bg-gray-900 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 group-hover:opacity-80 transition-all duration-1000" style={{ width: `${progress}%` }}></div>
            </div>

@@ -7,7 +7,7 @@ export function LivePriceTicker() {
   const { prices, loading } = useCryptoPrices();
 
   if (loading) return (
-    <div className="h-10 bg-white/80 dark:bg-white dark:bg-gray-900/50 border-b border-slate-200 dark:border-gray-800 flex items-center justify-center">
+    <div className="h-10 bg-white/80 dark:bg-gray-900/50 border-b border-slate-200 dark:border-gray-800 flex items-center justify-center">
       <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest animate-pulse">
         <Activity className="w-3 h-3" /> Syncing Real-Time Market Data...
       </div>

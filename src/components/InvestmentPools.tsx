@@ -54,7 +54,7 @@ export function InvestmentPools() {
         {/* Pool Card 2 */}
         <a 
           href="/deposit"
-          className="bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-2xl p-5 hover:border-gray-600 transition-colors cursor-pointer opacity-80 block"
+          className="bg-white/80 dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-2xl p-5 hover:border-gray-600 transition-colors cursor-pointer opacity-80 block"
         >
           <div className="flex justify-between items-start mb-4">
             <div>

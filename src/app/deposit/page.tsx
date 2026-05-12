@@ -62,7 +62,7 @@ export default function DepositPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <button onClick={() => router.push("/")} className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white mb-8 transition-colors">
+        <button onClick={() => router.push("/")} className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </button>
 
@@ -90,7 +90,7 @@ export default function DepositPage() {
           </h1>
           <p className="text-slate-500 dark:text-gray-400 mb-8">Send USDT (TRC20) to the address below. Your funds will be credited after verification.</p>
 
-          <div className="bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-300 dark:border-gray-700 rounded-2xl p-6 mb-8">
+          <div className="bg-white dark:bg-gray-900/80 border border-slate-300 dark:border-gray-700 rounded-2xl p-6 mb-8">
             <label className="block text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider mb-3">Network: TRON (TRC20)</label>
             <div className="flex items-center gap-4">
               <div className="flex-1 bg-slate-100 dark:bg-gray-800 px-4 py-3 rounded-xl font-mono text-sm break-all border border-slate-300 dark:border-gray-700/50 text-indigo-400">
@@ -125,7 +125,7 @@ export default function DepositPage() {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none transition-colors"
+                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none transition-colors"
                 required
               />
             </div>
@@ -136,7 +136,7 @@ export default function DepositPage() {
                 placeholder="Paste your TRC20 transaction hash here"
                 value={txid}
                 onChange={(e) => setTxid(e.target.value)}
-                className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none transition-colors"
+                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none transition-colors"
                 required
               />
             </div>

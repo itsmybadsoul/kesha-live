@@ -13,7 +13,7 @@ export default function PrivacyPage() {
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</span>
           </a>
-          <a href="/" className="text-sm text-indigo-400 hover:text-slate-900 dark:text-white font-bold transition-colors">← Back to Dashboard</a>
+          <a href="/" className="text-sm text-indigo-400 hover:text-slate-900 dark:hover:text-white font-bold transition-colors">← Back to Dashboard</a>
         </div>
       </nav>
 
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-black text-slate-900 dark:text-white mb-3">7. Your Rights</h2>
-            <p>Depending on your jurisdiction, you may have the right to access, correct, or delete your personal data, or to restrict how we process it. To exercise these rights, please contact us via the <a href="/support" className="text-indigo-400 hover:text-slate-900 dark:text-white transition-colors font-semibold">Support Portal</a>.</p>
+            <p>Depending on your jurisdiction, you may have the right to access, correct, or delete your personal data, or to restrict how we process it. To exercise these rights, please contact us via the <a href="/support" className="text-indigo-400 hover:text-slate-900 dark:hover:text-white transition-colors font-semibold">Support Portal</a>.</p>
           </section>
 
           <section>
@@ -79,7 +79,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-black text-slate-900 dark:text-white mb-3">9. Contact Us</h2>
-            <p>For any privacy-related inquiries, please reach out through our <a href="/support" className="text-indigo-400 hover:text-slate-900 dark:text-white transition-colors font-semibold">Support Portal</a> and our compliance team will respond within 72 hours.</p>
+            <p>For any privacy-related inquiries, please reach out through our <a href="/support" className="text-indigo-400 hover:text-slate-900 dark:hover:text-white transition-colors font-semibold">Support Portal</a> and our compliance team will respond within 72 hours.</p>
           </section>
         </div>
       </main>

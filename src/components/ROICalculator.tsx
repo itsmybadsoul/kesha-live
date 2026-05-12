@@ -71,7 +71,7 @@ export function ROICalculator() {
         </div>
 
         {/* Results Box */}
-        <div className="bg-white/90 dark:bg-white dark:bg-gray-900/60 rounded-2xl p-6 border border-slate-300 dark:border-gray-700/50 relative overflow-hidden">
+        <div className="bg-white/90 dark:bg-gray-900/60 rounded-2xl p-6 border border-slate-300 dark:border-gray-700/50 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <TrendingUp className="w-24 h-24" />
           </div>

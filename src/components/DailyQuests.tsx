@@ -56,7 +56,7 @@ export function DailyQuests() {
             className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
               quest.completed
                 ? "bg-emerald-500/5 border-emerald-500/20 opacity-70"
-                : "bg-white/80 dark:bg-white dark:bg-gray-900/50 border-slate-300 dark:border-gray-700/50"
+                : "bg-white/80 dark:bg-gray-900/50 border-slate-300 dark:border-gray-700/50"
             }`}
           >
             <div className="flex items-center gap-4">

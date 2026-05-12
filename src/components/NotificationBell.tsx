@@ -53,7 +53,7 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={handleOpen}
-        className="relative p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white transition-colors rounded-xl hover:bg-white/5"
+        className="relative p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-xl hover:bg-white/5"
         title="Notifications"
       >
         <Bell className="w-5 h-5" />
@@ -69,7 +69,7 @@ export function NotificationBell() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-gray-800">
             <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Notifications</span>
             {notifications.length > 0 && (
-              <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-indigo-400 hover:text-slate-900 dark:text-white font-bold uppercase tracking-widest">
+              <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-indigo-400 hover:text-slate-900 dark:hover:text-white font-bold uppercase tracking-widest">
                 <CheckCheck className="w-3 h-3" /> Mark all read
               </button>
             )}
@@ -102,7 +102,7 @@ export function NotificationBell() {
 
           {notifications.length > 0 && (
             <div className="px-4 py-3 border-t border-slate-200 dark:border-gray-800">
-              <a href="/transactions" className="text-[10px] text-indigo-400 hover:text-slate-900 dark:text-white font-black uppercase tracking-widest transition-colors">
+              <a href="/transactions" className="text-[10px] text-indigo-400 hover:text-slate-900 dark:hover:text-white font-black uppercase tracking-widest transition-colors">
                 View full transaction history →
               </a>
             </div>

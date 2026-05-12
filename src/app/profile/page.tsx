@@ -102,7 +102,7 @@ export default function ProfilePage() {
                    <div className="col-span-full py-8 text-center text-slate-400 dark:text-gray-500 italic text-sm border-2 border-dashed border-slate-300 dark:border-gray-700/50 rounded-2xl">No assets currently held. Head to Dashboard to trade!</div>
                 ) : (
                   Object.entries(user?.holdings || {}).map(([symbol, amount]) => (
-                    <div key={symbol} className="bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-2xl p-4 flex items-center justify-between group hover:border-emerald-500/30 transition-colors">
+                    <div key={symbol} className="bg-white/80 dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-2xl p-4 flex items-center justify-between group hover:border-emerald-500/30 transition-colors">
                       <div className="flex items-center gap-3">
                          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 flex items-center justify-center font-black text-[10px] text-emerald-400">
                            {symbol}

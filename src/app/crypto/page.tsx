@@ -71,13 +71,13 @@ export default function CryptoOverviewPage() {
               <div className="grid grid-cols-2 gap-2 mt-5">
                 <button 
                   onClick={() => handleTrade(p.symbol, "UP")}
-                  className="bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white dark:hover:text-white text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
+                  className="bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
                 >
                   <TrendingUp className="w-3.5 h-3.5" /> CALL
                 </button>
                 <button 
                   onClick={() => handleTrade(p.symbol, "DOWN")}
-                  className="bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-500 text-red-600 dark:text-red-400 hover:text-white dark:hover:text-white text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
+                  className="bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-500 text-red-600 dark:text-red-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
                 >
                   <TrendingDown className="w-3.5 h-3.5" /> PUT
                 </button>

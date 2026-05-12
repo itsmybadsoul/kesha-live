@@ -157,7 +157,7 @@ export default function Home() {
                     amount > 0 && (
                       <div key={symbol} className="flex items-center justify-between p-4 bg-black/20 border border-slate-200 dark:border-gray-800 rounded-2xl hover:border-slate-300 dark:border-gray-700 transition-all group">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center font-black text-xs text-indigo-400 group-hover:bg-indigo-600 group-hover:text-slate-900 dark:text-white transition-colors">
+                          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center font-black text-xs text-indigo-400 group-hover:bg-indigo-600 group-hover:text-slate-900 dark:hover:text-white transition-colors">
                             {symbol[0]}
                           </div>
                           <div>

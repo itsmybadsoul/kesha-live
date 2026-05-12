@@ -26,32 +26,32 @@ export function Navbar() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shrink-0">
             <BlocksIcon className="w-5 h-5 text-slate-900 dark:text-white" />
           </div>
-          <a href="/" className="text-lg md:text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform whitespace-nowrap">
+          <a href="/" className="text-lg md:text-xl font-bold bg-gradient-to-r from-slate-900 dark:from-white to-slate-500 dark:to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform whitespace-nowrap">
             Stocks Indicators
           </a>
         </div>
 
         <div className="flex items-center gap-2 md:gap-6">
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-gray-400">
-            <a href="/" className={`flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors ${isActive("/") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </a>
-            <a href="/markets" className={`flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors ${isActive("/markets") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/markets" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/markets") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <BarChart3 className="w-4 h-4 text-cyan-400" /> Markets
             </a>
-            <a href="/crypto" className={`flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors ${isActive("/crypto") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/crypto" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/crypto") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Activity className="w-4 h-4 text-emerald-400" /> All Crypto
             </a>
-            <a href="/profile" className={`flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors ${isActive("/profile") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/profile" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/profile") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <User className="w-4 h-4" /> Profile
             </a>
-            <a href="/deposit" className={`flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors ${isActive("/deposit") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/deposit" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/deposit") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Wallet className="w-4 h-4 text-indigo-400" /> Deposit
             </a>
-            <a href="/withdraw" className={`flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors font-bold ${isActive("/withdraw") ? "border-b-2 border-amber-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/withdraw" className={`flex items-center gap-2 text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors font-bold ${isActive("/withdraw") ? "border-b-2 border-amber-500 pb-1 translate-y-[2px]" : ""}`}>
               <ArrowRightLeft className="w-4 h-4" /> Withdraw
             </a>
-            <a href="/futures" className={`flex items-center gap-2 text-indigo-400 font-black hover:text-indigo-300 transition-colors uppercase tracking-widest ${isActive("/futures") ? "border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <a href="/futures" className={`flex items-center gap-2 text-indigo-500 dark:text-indigo-400 font-black hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest ${isActive("/futures") ? "border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Activity className="w-4 h-4 animate-pulse" /> Pro Options
             </a>
           </nav>
@@ -59,7 +59,7 @@ export function Navbar() {
           <div className="flex items-center gap-2 md:gap-4 border-l border-slate-200 dark:border-gray-800 lg:pl-6 pl-2">
             <button 
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white transition-colors"
+              className="p-2 text-slate-500 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors"
               title="Toggle Theme"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -95,13 +95,13 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <a href="/login" className="text-xs md:text-sm font-medium text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white transition-colors hidden sm:block">Login</a>
+                <a href="/login" className="text-xs md:text-sm font-medium text-slate-500 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors hidden sm:block">Login</a>
                 <a href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 active:scale-95">Register</a>
               </div>
             )}
             
             {/* Mobile Menu Toggle - Visible to everyone */}
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-1.5 md:p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white shrink-0">
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-1.5 md:p-2 text-slate-500 dark:text-gray-400 hover:text-white dark:hover:text-white shrink-0">
               {mobileMenuOpen ? <X className="w-6 h-6 md:w-7 md:h-7" /> : <Menu className="w-6 h-6 md:w-7 md:h-7" />}
             </button>
           </div>

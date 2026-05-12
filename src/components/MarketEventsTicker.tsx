@@ -24,7 +24,7 @@ export function MarketEventsTicker() {
   return (
     <div className={`transition-all duration-500 border rounded-2xl p-4 flex items-center justify-between overflow-hidden relative ${event.color}`}>
       <div className="flex items-center gap-4">
-        <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 p-2 rounded-xl backdrop-blur-md">
+        <div className="bg-white/80 dark:bg-gray-900/50 p-2 rounded-xl backdrop-blur-md">
            {event.icon}
         </div>
         <div>
@@ -38,7 +38,7 @@ export function MarketEventsTicker() {
         </div>
       </div>
       
-      <button className="hidden sm:flex bg-white dark:bg-white dark:bg-gray-900/80 hover:bg-slate-100 dark:bg-gray-800 text-slate-900 dark:text-white text-xs font-semibold px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 transition-colors shrink-0">
+      <button className="hidden sm:flex bg-white dark:bg-gray-900/80 hover:bg-slate-100 dark:bg-gray-800 text-slate-900 dark:text-white text-xs font-semibold px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 transition-colors shrink-0">
         Trade Now
       </button>
 

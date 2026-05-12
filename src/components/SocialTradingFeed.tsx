@@ -59,7 +59,7 @@ export function SocialTradingFeed() {
   };
 
   return (
-    <div className="bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl"></div>
       
@@ -105,7 +105,7 @@ export function SocialTradingFeed() {
                 </div>
               </div>
 
-              <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 rounded-xl p-3 flex justify-between items-center border border-slate-200 dark:border-gray-800/50 group-hover:border-indigo-500/20 transition-colors">
+              <div className="bg-white/80 dark:bg-gray-900/50 rounded-xl p-3 flex justify-between items-center border border-slate-200 dark:border-gray-800/50 group-hover:border-indigo-500/20 transition-colors">
                 <div className="flex items-center gap-3">
                    <div className={`p-2 rounded-lg ${isUp ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
                      {isUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}

@@ -38,7 +38,7 @@ export function CountdownBanner() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 bg-black/40 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 shrink-0">
+        <div className="flex items-center gap-4 bg-black/40 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-300 dark:border-white/10 shrink-0">
           <Timer className="w-5 h-5 text-cyan-400" />
           <div className="flex items-center gap-2 text-slate-900 dark:text-white font-mono text-xl font-bold">
             <span>{String(timeLeft.hours).padStart(2, '0')}</span>

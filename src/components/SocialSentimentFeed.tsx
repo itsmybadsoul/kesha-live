@@ -54,7 +54,7 @@ export function SocialSentimentFeed() {
 
       <div className="space-y-4">
         {activities.map((act) => (
-          <div key={act.id} className="bg-white/80 dark:bg-white dark:bg-gray-900/50 rounded-2xl p-4 border border-slate-200 dark:border-gray-800/50 hover:border-indigo-500/30 transition-all group">
+          <div key={act.id} className="bg-white/80 dark:bg-gray-900/50 rounded-2xl p-4 border border-slate-200 dark:border-gray-800/50 hover:border-indigo-500/30 transition-all group">
             <div className="flex justify-between items-start mb-1">
               <span className="text-xs font-bold text-slate-600 dark:text-gray-300 group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{act.user}</span>
               <span className="text-[9px] text-slate-400 dark:text-gray-500 font-medium">{act.time}</span>
@@ -79,7 +79,7 @@ export function SocialSentimentFeed() {
         ))}
       </div>
 
-      <button className="w-full mt-6 bg-white/80 dark:bg-white dark:bg-gray-900/50 hover:bg-gray-700/50 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:text-white font-bold py-3 rounded-2xl transition-all text-xs border border-slate-200 dark:border-gray-800 flex items-center justify-center gap-2">
+      <button className="w-full mt-6 bg-white/80 dark:bg-gray-900/50 hover:bg-gray-700/50 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white font-bold py-3 rounded-2xl transition-all text-xs border border-slate-200 dark:border-gray-800 flex items-center justify-center gap-2">
          Join Community Chat
       </button>
     </div>

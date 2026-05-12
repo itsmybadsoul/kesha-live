@@ -6,7 +6,7 @@ import { useToast } from "@/context/ToastContext";
 export function StakingWidget() {
   const { toast } = useToast();
   return (
-    <div className="bg-gradient-to-br from-indigo-600/20 to-gray-800/40 backdrop-blur-xl border border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
+    <div className="bg-white dark:bg-gradient-to-br dark:from-indigo-600/20 dark:to-gray-800/40 backdrop-blur-xl border border-slate-200 dark:border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full translate-x-10 -translate-y-10"></div>
       
@@ -21,7 +21,7 @@ export function StakingWidget() {
       </div>
 
       <div className="space-y-4 relative z-10">
-        <div className="bg-black/40 p-5 rounded-2xl border border-indigo-500/10">
+        <div className="bg-slate-50 dark:bg-black/40 p-5 rounded-2xl border border-slate-200 dark:border-indigo-500/10">
            <div className="flex justify-between items-start mb-2">
               <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest">Current APY</div>
               <div className="text-emerald-400 font-black text-xs px-2 py-0.5 bg-emerald-500/10 rounded-md">+12.4% Est.</div>
@@ -33,11 +33,11 @@ export function StakingWidget() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-           <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/30">
+           <div className="bg-white/80 dark:bg-gray-900/50 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/30">
               <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase mb-1">Staked Total</div>
               <div className="text-lg font-black text-slate-900 dark:text-white tabular-nums">$0.00</div>
            </div>
-           <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/30">
+           <div className="bg-white/80 dark:bg-gray-900/50 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/30">
               <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase mb-1">Rewards Earned</div>
               <div className="text-lg font-black text-emerald-400 tabular-nums">+$0.00</div>
            </div>
@@ -48,7 +48,7 @@ export function StakingWidget() {
          <button onClick={() => toast("Staking Protocol v2 is launching next week. Stay tuned!", "info")} className="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest shadow-xl active:scale-95 flex items-center justify-center gap-2 group">
             Stake USDT <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
          </button>
-         <button onClick={() => toast("No active staking history found.", "error")} className="w-full bg-white/80 dark:bg-white dark:bg-gray-900/50 hover:bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 font-bold py-3 rounded-2xl transition-all text-[10px] border border-slate-300 dark:border-gray-700/50 uppercase tracking-widest">
+         <button onClick={() => toast("No active staking history found.", "error")} className="w-full bg-white/80 dark:bg-gray-900/50 hover:bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 font-bold py-3 rounded-2xl transition-all text-[10px] border border-slate-300 dark:border-gray-700/50 uppercase tracking-widest">
             Stake History
          </button>
       </div>

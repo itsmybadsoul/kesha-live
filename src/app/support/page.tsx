@@ -41,7 +41,7 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] flex flex-col items-center justify-center p-6 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)]">
-      <a href="/login" className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-colors text-sm font-bold">
+      <a href="/login" className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-bold">
          <ChevronLeft className="w-4 h-4" /> Back to Login
       </a>
       
@@ -66,7 +66,7 @@ export default function SupportPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Account Email"
                 disabled={loading}
-                className="block w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm text-slate-900 dark:text-white"
+                className="block w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm text-slate-900 dark:text-white"
                 required
               />
            </div>
@@ -80,12 +80,12 @@ export default function SupportPage() {
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Subject Request"
                 disabled={loading}
-                className="block w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm text-slate-900 dark:text-white"
+                className="block w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600 font-mono text-sm text-slate-900 dark:text-white"
                 required
               />
            </div>
            
-           <div className="relative group/input border border-slate-300 dark:border-gray-700 rounded-2xl bg-white/80 dark:bg-white dark:bg-gray-900/50 focus-within:border-indigo-500 overflow-hidden">
+           <div className="relative group/input border border-slate-300 dark:border-gray-700 rounded-2xl bg-white/80 dark:bg-gray-900/50 focus-within:border-indigo-500 overflow-hidden">
                <textarea
                  value={message}
                  onChange={(e) => setMessage(e.target.value)}

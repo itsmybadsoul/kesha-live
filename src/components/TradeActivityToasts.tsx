@@ -63,7 +63,7 @@ export function TradeActivityToasts() {
                 Just closed <span className="text-indigo-400 font-bold">{toast.strategy}</span> with <span className="text-emerald-400 font-bold">{toast.profit} ROI</span>.
              </p>
           </div>
-          <button onClick={() => removeToast(toast.id)} className="text-gray-600 hover:text-slate-900 dark:text-white transition-colors">
+          <button onClick={() => removeToast(toast.id)} className="text-gray-600 hover:text-slate-900 dark:hover:text-white transition-colors">
              <X className="w-4 h-4" />
           </button>
         </div>

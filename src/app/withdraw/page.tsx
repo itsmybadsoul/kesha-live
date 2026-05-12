@@ -77,7 +77,7 @@ export default function WithdrawPage() {
           >
              Complete KYC
           </button>
-          <button onClick={() => router.push("/")} className="mt-4 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:text-white text-sm font-bold transition-colors">
+          <button onClick={() => router.push("/")} className="mt-4 text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white text-sm font-bold transition-colors">
              Return to Dashboard
           </button>
         </div>
@@ -88,7 +88,7 @@ export default function WithdrawPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <button onClick={() => router.push("/")} className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white mb-8 transition-colors group">
+        <button onClick={() => router.push("/")} className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white mb-8 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
         </button>
 
@@ -117,7 +117,7 @@ export default function WithdrawPage() {
             <button 
               onClick={() => setMethod("CRYPTO")}
               className={`p-6 rounded-2xl border transition-all flex flex-col items-center gap-3 ${
-                method === "CRYPTO" ? "bg-indigo-600/10 border-indigo-500 text-slate-900 dark:text-white" : "bg-white/80 dark:bg-white dark:bg-gray-900/50 border-slate-200 dark:border-gray-800 text-slate-400 dark:text-gray-500 hover:border-slate-300 dark:border-gray-700"
+                method === "CRYPTO" ? "bg-indigo-600/10 border-indigo-500 text-slate-900 dark:text-white" : "bg-white/80 dark:bg-gray-900/50 border-slate-200 dark:border-gray-800 text-slate-400 dark:text-gray-500 hover:border-slate-300 dark:border-gray-700"
               }`}
             >
               <Wallet className={`w-8 h-8 ${method === "CRYPTO" ? "text-indigo-400" : "text-gray-600"}`} />
@@ -126,7 +126,7 @@ export default function WithdrawPage() {
             <button 
               onClick={() => setMethod("BANK")}
               className={`p-6 rounded-2xl border transition-all flex flex-col items-center gap-3 ${
-                method === "BANK" ? "bg-indigo-600/10 border-indigo-500 text-slate-900 dark:text-white" : "bg-white/80 dark:bg-white dark:bg-gray-900/50 border-slate-200 dark:border-gray-800 text-slate-400 dark:text-gray-500 hover:border-slate-300 dark:border-gray-700"
+                method === "BANK" ? "bg-indigo-600/10 border-indigo-500 text-slate-900 dark:text-white" : "bg-white/80 dark:bg-gray-900/50 border-slate-200 dark:border-gray-800 text-slate-400 dark:text-gray-500 hover:border-slate-300 dark:border-gray-700"
               }`}
             >
               <Landmark className={`w-8 h-8 ${method === "BANK" ? "text-indigo-400" : "text-gray-600"}`} />
@@ -149,7 +149,7 @@ export default function WithdrawPage() {
                  <button 
                    type="button"
                    onClick={() => setAmount(balance.toString())}
-                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-indigo-400 uppercase hover:text-slate-900 dark:text-white transition-colors"
+                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-indigo-400 uppercase hover:text-slate-900 dark:hover:text-white transition-colors"
                  >
                    Withdraw All
                  </button>
@@ -211,7 +211,7 @@ export default function WithdrawPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-               <div className="flex gap-3 p-4 bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-2xl">
+               <div className="flex gap-3 p-4 bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-2xl">
                   <Info className="w-5 h-5 text-slate-400 dark:text-gray-500 shrink-0" />
                   <p className="text-[10px] text-slate-400 dark:text-gray-500 font-medium leading-relaxed">
                      Withdrawals are subject to 24-hour verification. Ensure your destination details are correct, as settlements to wrong addresses/IBANs cannot be reversed.

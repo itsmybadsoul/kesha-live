@@ -54,7 +54,7 @@ export default function LoginPage() {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-900 dark:text-white"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
           </div>
-          <a href="/" className="text-2xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
+          <a href="/" className="text-2xl font-bold bg-gradient-to-r from-slate-900 dark:from-white to-slate-500 dark:to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
         </a>
 
         <div className="bg-slate-100 dark:bg-gray-800/60 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/60 rounded-3xl p-8 shadow-2xl">
@@ -63,18 +63,18 @@ export default function LoginPage() {
             <p className="text-slate-500 dark:text-gray-400 text-sm mt-2">Sign in to your account to continue trading.</p>
           </div>
 
-          <div className="flex gap-2 mb-8 bg-white/80 dark:bg-white dark:bg-gray-900/50 p-1.5 rounded-xl border border-slate-300 dark:border-gray-700/50">
+          <div className="flex gap-2 mb-8 bg-white/80 dark:bg-gray-900/50 p-1.5 rounded-xl border border-slate-300 dark:border-gray-700/50">
             <button
               type="button"
               onClick={() => setLoginType("PASSWORD")}
-              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "PASSWORD" ? "bg-indigo-600 shadow-md text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white"}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "PASSWORD" ? "bg-indigo-600 shadow-md text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"}`}
             >
               Password
             </button>
             <button
               type="button"
               onClick={() => setLoginType("RECOVERY")}
-              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "RECOVERY" ? "bg-amber-600 shadow-md text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white"}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginType === "RECOVERY" ? "bg-amber-600 shadow-md text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"}`}
             >
               Recovery Phrase
             </button>
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors"
+                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors"
               />
             </div>
 
@@ -106,7 +106,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors"
+                  className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors"
                 />
               </div>
             ) : (
@@ -119,7 +119,7 @@ export default function LoginPage() {
                     onChange={(e) => setSeedPhrase(e.target.value)}
                     placeholder="word1 word2 word3..."
                     rows={3}
-                    className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-amber-900/50 hover:border-amber-600 focus:border-amber-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-600 focus:outline-none transition-colors font-mono text-sm leading-relaxed"
+                    className="w-full bg-white/90 dark:bg-gray-900/60 border border-amber-900/50 hover:border-amber-600 focus:border-amber-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-600 focus:outline-none transition-colors font-mono text-sm leading-relaxed"
                   />
                   <p className="text-[10px] text-amber-500 mt-2 font-medium">Use spaces to separate your recovery words.</p>
                </div>

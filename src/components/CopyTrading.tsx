@@ -76,14 +76,14 @@ export function CopyTrading() {
             placeholder="Search traders..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 text-slate-900 dark:text-white w-full sm:w-64 transition-colors"
+            className="bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700/50 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 text-slate-900 dark:text-white w-full sm:w-64 transition-colors"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredTraders.map((trader) => (
-          <div key={trader.id} className="group bg-gradient-to-br from-gray-900 to-gray-800 border border-slate-300 dark:border-gray-700/50 hover:border-gray-600 rounded-2xl p-5 transition-all duration-300 relative cursor-pointer">
+          <div key={trader.id} className="group bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 border border-slate-200 dark:border-gray-700/50 hover:border-indigo-500/50 dark:hover:border-gray-600 rounded-2xl p-5 transition-all duration-300 relative cursor-pointer">
              <div className="flex justify-between items-start mb-4">
                <div className="flex items-center gap-3">
                  <div className="relative">
@@ -104,7 +104,7 @@ export function CopyTrading() {
                </div>
              </div>
 
-             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-gray-400 mt-4 bg-white/80 dark:bg-white dark:bg-gray-900/50 rounded-xl p-3 border border-slate-200 dark:border-gray-800">
+             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-gray-400 mt-4 bg-slate-50 dark:bg-gray-900/50 rounded-xl p-3 border border-slate-200 dark:border-gray-800">
                <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-indigo-400" /> {trader.copiers.toLocaleString()}</span>
                <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-cyan-400" /> WR: <span className="text-slate-900 dark:text-white font-medium">{trader.winRate}</span></span>
              </div>
@@ -112,7 +112,7 @@ export function CopyTrading() {
              <div className="mt-4 pt-4 border-t border-slate-300 dark:border-gray-700/50">
                <button 
                  onClick={() => handleCopy(trader)}
-                 className="w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-slate-900 dark:text-white border border-indigo-500/30 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(79,70,229,0.2)]"
+                 className="w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 hover:text-white border border-indigo-500/30 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(79,70,229,0.2)]"
                >
                  <HeartHandshake className="w-4 h-4" /> Copy Trader
                </button>

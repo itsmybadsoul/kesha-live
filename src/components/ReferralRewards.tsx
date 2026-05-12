@@ -28,7 +28,7 @@ export function ReferralRewards() {
   const progress = (currentInvites / nextMilestone.count) * 100;
 
   return (
-    <div className="bg-gradient-to-br from-indigo-900/40 to-gray-800/40 backdrop-blur-xl border border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
+    <div className="bg-white dark:bg-gradient-to-br dark:from-indigo-900/40 dark:to-gray-800/40 backdrop-blur-xl border border-slate-200 dark:border-indigo-500/20 rounded-3xl p-6 relative overflow-hidden group">
       <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
       
       <div className="flex justify-between items-center mb-6 relative z-10">
@@ -39,7 +39,7 @@ export function ReferralRewards() {
            <UsdtIcon className="w-2.5 h-2.5" />
            <span className="text-[8px] font-black text-indigo-400 uppercase tracking-tighter italic">Tether (USDT) Paid</span>
         </div>
-        <button className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-1 hover:text-slate-900 dark:text-white transition-colors">
+        <button className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-1 hover:text-slate-900 dark:hover:text-white transition-colors">
           View All <ChevronRight className="w-3 h-3" />
         </button>
       </div>
@@ -49,7 +49,7 @@ export function ReferralRewards() {
            <div className="text-xs font-bold text-slate-500 dark:text-gray-400 uppercase tracking-tight">Next Milestone: {nextMilestone.count} Friends</div>
            <div className="text-sm font-black text-indigo-400">{currentInvites} / {nextMilestone.count}</div>
         </div>
-        <div className="w-full h-2.5 bg-white/90 dark:bg-white dark:bg-gray-900/60 rounded-full overflow-hidden border border-slate-300 dark:border-gray-700/50 p-0.5">
+        <div className="w-full h-2.5 bg-white/90 dark:bg-gray-900/60 rounded-full overflow-hidden border border-slate-300 dark:border-gray-700/50 p-0.5">
            <div 
              className="h-full bg-gradient-to-r from-indigo-600 to-cyan-400 rounded-full transition-all duration-1000 shadow-lg shadow-indigo-500/20"
              style={{ width: `${Math.min(progress, 100)}%` }}
@@ -57,7 +57,7 @@ export function ReferralRewards() {
         </div>
       </div>
 
-      <div className="bg-black/40 rounded-2xl p-4 border border-indigo-500/10 mb-6 relative z-10">
+      <div className="bg-slate-50 dark:bg-black/40 rounded-2xl p-4 border border-slate-200 dark:border-indigo-500/10 mb-6 relative z-10">
          <div className="text-[10px] text-slate-400 dark:text-gray-500 font-bold uppercase mb-1">Upcoming Bonus</div>
          <div className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-400" /> {nextMilestone.reward} Reward

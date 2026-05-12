@@ -69,23 +69,23 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">First Name</label>
                 <input name="firstName" type="text" value={form.firstName} onChange={handleChange} placeholder="John"
-                  className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                  className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Last Name</label>
                 <input name="lastName" type="text" value={form.lastName} onChange={handleChange} placeholder="Doe"
-                  className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                  className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Email Address</label>
               <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@example.com"
-                className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-600 dark:text-gray-300 mb-2">Password</label>
               <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Create a strong password"
-                className="w-full bg-white/90 dark:bg-white dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
+                className="w-full bg-white/90 dark:bg-gray-900/60 border border-slate-300 dark:border-gray-700 hover:border-gray-600 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-colors" />
             </div>
 
             <div className="flex items-start gap-3 pt-1">

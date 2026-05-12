@@ -53,9 +53,9 @@ export default function TransactionsPage() {
           </div>
           <div className="flex items-center gap-4">
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-gray-400">
-              <a href="/" className="flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
-              <a href="/profile" className="flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
-              <a href="/deposit" className="flex items-center gap-2 hover:text-slate-900 dark:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
+              <a href="/" className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
+              <a href="/profile" className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
+              <a href="/deposit" className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
               <a href="/withdraw" className="flex items-center gap-2 text-amber-400 hover:text-amber-300 font-bold"><ArrowRightLeft className="w-4 h-4" /> Withdraw</a>
             </nav>
             <div className="flex items-center gap-3 border-l border-slate-200 dark:border-gray-800 pl-4">
@@ -102,7 +102,7 @@ export default function TransactionsPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                filter === f ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" : "bg-slate-100 dark:bg-gray-800/60 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white border border-slate-300 dark:border-gray-700/50"
+                filter === f ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" : "bg-slate-100 dark:bg-gray-800/60 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-gray-700/50"
               }`}
             >
               {f}

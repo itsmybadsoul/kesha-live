@@ -103,7 +103,7 @@ export default function FuturesOptions() {
             <div className="lg:col-span-8 flex flex-col gap-6">
                
                {/* Asset Strip */}
-               <div className="bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl p-2 flex overflow-x-auto gap-2 scrollbar-none">
+               <div className="bg-white/80 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl p-2 flex overflow-x-auto gap-2 scrollbar-none">
                  {ASSET_SYMBOLS.map((sym) => {
                    const price = liveMarketPrices[sym] || 0;
                    return (
@@ -138,7 +138,7 @@ export default function FuturesOptions() {
             <div className="lg:col-span-4 flex flex-col gap-6">
                
                {/* Trade Panel */}
-               <div className="bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl">
+               <div className="bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl">
                  <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mb-6 uppercase tracking-widest">
                    Order Entry <ShieldCheck className="w-4 h-4 text-emerald-400" />
                  </h2>
@@ -208,7 +208,7 @@ export default function FuturesOptions() {
                </div>
 
              {/* Active Options Tracker */}
-               <div className="flex-1 bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
+               <div className="flex-1 bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
                  <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
                    Active Positions <span className="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded-full">{allActiveTrades.length}</span>
                  </h2>
@@ -261,7 +261,7 @@ export default function FuturesOptions() {
                </div>
 
                {/* Recent History Tracker */}
-               <div className="flex-1 bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
+               <div className="flex-1 bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl flex flex-col">
                  <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mb-4 uppercase tracking-widest">
                    Recent History <span className="text-slate-400 dark:text-gray-500 font-mono text-[10px] bg-black/50 px-2 py-0.5 rounded-full">Last 24</span>
                  </h2>

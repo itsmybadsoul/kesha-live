@@ -63,7 +63,7 @@ export function SwapTrade() {
 
       <div className="space-y-4">
         {/* From */}
-        <div className="bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 transition-all focus-within:border-indigo-500/50">
+        <div className="bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 transition-all focus-within:border-indigo-500/50">
            <div className="flex justify-between items-center mb-2">
               <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Pay With</span>
               <span className="text-[10px] font-medium text-slate-500 dark:text-gray-400">
@@ -92,14 +92,14 @@ export function SwapTrade() {
         <div className="flex justify-center -my-2 relative z-10">
            <button 
              onClick={handleSwapSelection}
-             className="bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 p-2.5 rounded-xl text-indigo-400 hover:text-slate-900 dark:text-white hover:bg-indigo-600 transition-all shadow-xl active:scale-90"
+             className="bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 p-2.5 rounded-xl text-indigo-400 hover:text-slate-900 dark:hover:text-white hover:bg-indigo-600 transition-all shadow-xl active:scale-90"
            >
               <RefreshCw className="w-5 h-5" />
            </button>
         </div>
 
         {/* To */}
-        <div className="bg-white dark:bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 transition-all focus-within:border-indigo-500/50">
+        <div className="bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 transition-all focus-within:border-indigo-500/50">
            <div className="flex justify-between items-center mb-2">
               <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Receive Approximately</span>
            </div>

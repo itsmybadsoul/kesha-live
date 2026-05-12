@@ -280,7 +280,7 @@ export default function MarketsPage() {
             { label: "Fear & Greed Index", value: `${fearGreed} — ${fearGreed > 60 ? "Greed" : fearGreed < 40 ? "Fear" : "Neutral"}`, icon: <Zap className="w-4 h-4 text-amber-400" />, color: "amber" },
             { label: "Live Instruments", value: `${stocks.length} Stocks`, icon: <Activity className="w-4 h-4 text-cyan-400" />, color: "cyan" },
           ].map(stat => (
-            <div key={stat.label} className="bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-xl p-3.5 flex items-center gap-3">
+            <div key={stat.label} className="bg-white/[0.03] border border-slate-200 dark:border-slate-200 dark:border-white/5 rounded-xl p-3.5 flex items-center gap-3">
               <div className={`w-8 h-8 rounded-lg bg-${stat.color}-500/10 flex items-center justify-center shrink-0`}>{stat.icon}</div>
               <div>
                 <div className="text-[10px] text-slate-400 dark:text-gray-500 uppercase tracking-wide">{stat.label}</div>
@@ -297,13 +297,13 @@ export default function MarketsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-gray-500 pointer-events-none" />
             <input
               value={search} onChange={e => setSearch(e.target.value)} placeholder="Search ticker or name..."
-              className="w-full bg-white/[0.04] border border-white/8 rounded-lg pl-8 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
+              className="w-full bg-slate-100/80 dark:bg-white/[0.04] border border-white/8 rounded-lg pl-8 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
             />
           </div>
           {/* Sector filter */}
           <select
             value={sector} onChange={e => setSector(e.target.value)}
-            className="bg-white/[0.04] border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-gray-300 focus:outline-none focus:border-indigo-500/50 transition-colors"
+            className="bg-slate-100/80 dark:bg-white/[0.04] border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-gray-300 focus:outline-none focus:border-indigo-500/50 transition-colors"
           >
             <option value="All">All Sectors</option>
             {SECTORS.map(s => <option key={s}>{s}</option>)}
@@ -311,7 +311,7 @@ export default function MarketsPage() {
           {/* Quick filters */}
           {(["all", "gainers", "losers", "hot"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${filter === f ? "bg-indigo-600 text-white" : "bg-white/[0.04] text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white border border-slate-200 dark:border-white/5"}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${filter === f ? "bg-indigo-600 text-white" : "bg-slate-100/80 dark:bg-white/[0.04] text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-200 dark:border-white/5"}`}>
               {f === "hot" ? "🔥 Hot" : f === "gainers" ? "📈 Gainers" : f === "losers" ? "📉 Losers" : "All"}
             </button>
           ))}
@@ -319,9 +319,9 @@ export default function MarketsPage() {
         </div>
 
         {/* ── Table ── */}
-        <div className="rounded-xl border border-slate-200 dark:border-white/5 overflow-x-auto bg-white/[0.015]">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/5 overflow-x-auto bg-white/[0.015]">
           {/* Header */}
-          <div className="min-w-[800px] grid grid-cols-[2fr_3fr_1.2fr_1.2fr_1.2fr_1fr_1fr_auto] gap-2 px-4 py-2.5 bg-white/[0.025] border-b border-slate-200 dark:border-white/5 text-[10px] uppercase tracking-widest text-slate-400 dark:text-gray-500">
+          <div className="min-w-[800px] grid grid-cols-[2fr_3fr_1.2fr_1.2fr_1.2fr_1fr_1fr_auto] gap-2 px-4 py-2.5 bg-white/[0.025] border-b border-slate-200 dark:border-slate-200 dark:border-white/5 text-[10px] uppercase tracking-widest text-slate-400 dark:text-gray-500">
             {([["sym", "Symbol"], ["name", "Company"], ["price", "Price"], ["changePct", "Change %"], ["vol", "Volume"], ["cap", "Mkt Cap"], ["volatility", "Volatility"]] as [SortKey, string][]).map(([k, label]) => (
               <button key={k} onClick={() => toggleSort(k)} className="flex items-center gap-1 hover:text-slate-600 dark:text-gray-300 transition-colors">
                 {label}<SortIcon k={k} />
@@ -399,7 +399,7 @@ export default function MarketsPage() {
       {/* ── Bet Modal ── */}
       {betModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setBetModal(null)}>
-          <div className="w-full max-w-md bg-white dark:bg-[#0f0f1a] border border-slate-300 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-5" onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-md bg-white dark:bg-[#0f0f1a] border border-slate-300 dark:border-slate-300 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-5" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
@@ -435,12 +435,12 @@ export default function MarketsPage() {
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setBetDir("UP")}
                   className={`p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold
-                    ${betDir === "UP" ? "border-emerald-500 bg-emerald-500/15 text-emerald-300" : "border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-emerald-500/30"}`}>
+                    ${betDir === "UP" ? "border-emerald-500 bg-emerald-500/15 text-emerald-300" : "border-slate-300 dark:border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-emerald-500/30"}`}>
                   <TrendingUp className="w-4 h-4" /> UP / BUY
                 </button>
                 <button onClick={() => setBetDir("DOWN")}
                   className={`p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold
-                    ${betDir === "DOWN" ? "border-red-500 bg-red-500/15 text-red-300" : "border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-red-500/30"}`}>
+                    ${betDir === "DOWN" ? "border-red-500 bg-red-500/15 text-red-300" : "border-slate-300 dark:border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-red-500/30"}`}>
                   <TrendingDown className="w-4 h-4" /> DOWN / SELL
                 </button>
               </div>
@@ -455,12 +455,12 @@ export default function MarketsPage() {
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-500" />
                 <input type="number" min="1" value={betAmount} onChange={e => setBetAmount(e.target.value)} placeholder="50"
-                  className="w-full bg-white/[0.04] border border-slate-300 dark:border-white/10 rounded-xl pl-9 pr-4 py-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-indigo-500/50 transition-colors" />
+                  className="w-full bg-slate-100/80 dark:bg-white/[0.04] border border-slate-300 dark:border-slate-300 dark:border-white/10 rounded-xl pl-9 pr-4 py-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-indigo-500/50 transition-colors" />
               </div>
               <div className="flex gap-2">
                 {[25, 50, 100, 250].map(amt => (
                   <button key={amt} onClick={() => setBetAmount(String(Math.min(amt, balance)))}
-                    className="flex-1 py-1 text-xs text-slate-500 dark:text-gray-400 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors border border-slate-200 dark:border-white/5">
+                    className="flex-1 py-1 text-xs text-slate-500 dark:text-gray-400 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors border border-slate-200 dark:border-slate-200 dark:border-white/5">
                     ${amt}
                   </button>
                 ))}
@@ -478,7 +478,7 @@ export default function MarketsPage() {
                 {[1, 5, 15, 30, 60].map(m => (
                   <button key={m} onClick={() => setBetDuration(m)}
                     className={`flex-1 py-2 text-xs rounded-lg font-semibold transition-all border
-                      ${betDuration === m ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-200 dark:border-white/5 bg-white/[0.03] text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:text-gray-300"}`}>
+                      ${betDuration === m ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-200 dark:border-slate-200 dark:border-white/5 bg-white/[0.03] text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:text-gray-300"}`}>
                     {m < 60 ? `${m}m` : "1h"}
                   </button>
                 ))}
@@ -516,7 +516,7 @@ export default function MarketsPage() {
               </button>
             )}
             {betResult === "success" && (
-              <button onClick={() => setBetModal(null)} className="w-full py-3 rounded-xl bg-white/[0.04] border border-slate-300 dark:border-white/10 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:text-white font-semibold transition-colors text-sm">
+              <button onClick={() => setBetModal(null)} className="w-full py-3 rounded-xl bg-slate-100/80 dark:bg-white/[0.04] border border-slate-300 dark:border-slate-300 dark:border-white/10 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white font-semibold transition-colors text-sm">
                 Close & Continue Trading
               </button>
             )}

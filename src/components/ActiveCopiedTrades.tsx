@@ -9,7 +9,7 @@ export function ActiveCopiedTrades() {
   if (activeTrades.length === 0) {
     return (
       <div className="bg-slate-100 dark:bg-gray-800/80 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 lg:p-8 text-center py-12">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/80 dark:bg-white dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 mb-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/80 dark:bg-gray-900/50 border border-slate-300 dark:border-gray-700 mb-4">
           <Activity className="w-6 h-6 text-slate-400 dark:text-gray-500" />
         </div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Active Trades</h2>
@@ -24,7 +24,7 @@ export function ActiveCopiedTrades() {
         <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           Live Copied Trades <Activity className="w-5 h-5 text-emerald-400 animate-pulse" />
         </h2>
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-gray-400 bg-white/80 dark:bg-white dark:bg-gray-900/50 px-3 py-1.5 rounded-full border border-slate-300 dark:border-gray-700">
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-gray-400 bg-white/80 dark:bg-gray-900/50 px-3 py-1.5 rounded-full border border-slate-300 dark:border-gray-700">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
           {activeTrades.length} Active
         </div>

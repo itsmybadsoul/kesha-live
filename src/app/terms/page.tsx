@@ -13,7 +13,7 @@ export default function TermsPage() {
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</span>
           </a>
-          <a href="/" className="text-sm text-indigo-400 hover:text-slate-900 dark:text-white font-bold transition-colors">← Back to Dashboard</a>
+          <a href="/" className="text-sm text-indigo-400 hover:text-slate-900 dark:hover:text-white font-bold transition-colors">← Back to Dashboard</a>
         </div>
       </nav>
  
@@ -79,7 +79,7 @@ export default function TermsPage() {
  
           <section>
             <h2 className="text-lg font-black text-slate-900 dark:text-white mb-3">10. Contact</h2>
-            <p>For any questions regarding these Terms, please contact us via our <a href="/support" className="text-indigo-400 hover:text-slate-900 dark:text-white transition-colors font-semibold">Support Portal</a>.</p>
+            <p>For any questions regarding these Terms, please contact us via our <a href="/support" className="text-indigo-400 hover:text-slate-900 dark:hover:text-white transition-colors font-semibold">Support Portal</a>.</p>
           </section>
         </div>
       </main>

@@ -28,7 +28,7 @@ export function PendingDeposit() {
           </div>
         </div>
 
-        <div className="bg-white/90 dark:bg-white dark:bg-gray-900/60 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/50 w-full md:w-72 shrink-0">
+        <div className="bg-white/90 dark:bg-gray-900/60 p-4 rounded-2xl border border-slate-300 dark:border-gray-700/50 w-full md:w-72 shrink-0">
           <div className="flex justify-between items-center mb-3">
              <span className="text-xs text-slate-400 dark:text-gray-500 uppercase font-medium">Tx Hash</span>
              <span className="bg-slate-100 dark:bg-gray-800 text-[10px] text-slate-500 dark:text-gray-400 px-2 py-0.5 rounded border border-slate-300 dark:border-gray-700">TRC20</span>
@@ -39,7 +39,7 @@ export function PendingDeposit() {
              </span>
              <button 
                onClick={() => navigator.clipboard.writeText(user.pendingDeposit?.txid || "")}
-               className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:text-white transition-colors block ml-auto shrink-0"
+               className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors block ml-auto shrink-0"
               >
                <Copy className="w-4 h-4" />
              </button>
