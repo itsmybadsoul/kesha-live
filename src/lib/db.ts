@@ -295,23 +295,36 @@ export interface CustomStock {
   sector: string;
   basePrice: number;
   volatility: number;
+  category: "STOCK" | "CRYPTO";
   targetPrice?: number;
   targetStartTime?: number;
   targetEndTime?: number;
   targetStartPrice?: number;
 }
 
-const DEFAULT_CUSTOM_STOCKS: CustomStock[] = [
-  { sym: "NXT", name: "NextGen Tech", sector: "Tech", basePrice: 150.00, volatility: 2.5 },
-  { sym: "QNTM", name: "Quantum Computing Solutions", sector: "Tech", basePrice: 45.20, volatility: 4.0 },
-  { sym: "EVM", name: "EcoVehicle Motors", sector: "Automotive", basePrice: 210.50, volatility: 3.5 },
-  { sym: "AIG", name: "AI Global Systems", sector: "Tech", basePrice: 89.30, volatility: 2.8 },
-  { sym: "SLR", name: "Solaris Energy", sector: "Energy", basePrice: 34.10, volatility: 1.5 },
-  { sym: "BIOX", name: "BioX Pharma", sector: "Pharma", basePrice: 120.40, volatility: 2.1 },
-  { sym: "CRPT", name: "Cryptographic Holdings", sector: "Finance", basePrice: 500.00, volatility: 5.0 },
-  { sym: "AERO", name: "AeroDynamics Inc", sector: "Industrial", basePrice: 245.80, volatility: 1.2 },
-  { sym: "VRTX", name: "Vertex Meta Platforms", sector: "Media", basePrice: 65.00, volatility: 3.2 },
-  { sym: "AUR", name: "Aura Gold Mining", sector: "Industrial", basePrice: 18.50, volatility: 1.8 }
+export const DEFAULT_CUSTOM_STOCKS: CustomStock[] = [
+  // Stocks
+  { sym: "NXT", name: "NextGen Tech", sector: "Tech", basePrice: 150.00, volatility: 2.5, category: "STOCK" },
+  { sym: "QNTM", name: "Quantum Computing Solutions", sector: "Tech", basePrice: 45.20, volatility: 4.0, category: "STOCK" },
+  { sym: "EVM", name: "EcoVehicle Motors", sector: "Automotive", basePrice: 210.50, volatility: 3.5, category: "STOCK" },
+  { sym: "AIG", name: "AI Global Systems", sector: "Tech", basePrice: 89.30, volatility: 2.8, category: "STOCK" },
+  { sym: "SLR", name: "Solaris Energy", sector: "Energy", basePrice: 34.10, volatility: 1.5, category: "STOCK" },
+  { sym: "BIOX", name: "BioX Pharma", sector: "Pharma", basePrice: 120.40, volatility: 2.1, category: "STOCK" },
+  { sym: "CRPT", name: "Cryptographic Holdings", sector: "Finance", basePrice: 500.00, volatility: 5.0, category: "STOCK" },
+  { sym: "AERO", name: "AeroDynamics Inc", sector: "Industrial", basePrice: 245.80, volatility: 1.2, category: "STOCK" },
+  { sym: "VRTX", name: "Vertex Meta Platforms", sector: "Media", basePrice: 65.00, volatility: 3.2, category: "STOCK" },
+  { sym: "AUR", name: "Aura Gold Mining", sector: "Industrial", basePrice: 18.50, volatility: 1.8, category: "STOCK" },
+  // Cryptocurrencies
+  { sym: "BTC", name: "Bitcoin", sector: "Currency", basePrice: 64230.50, volatility: 4.5, category: "CRYPTO" },
+  { sym: "ETH", name: "Ethereum", sector: "Currency", basePrice: 3450.20, volatility: 5.2, category: "CRYPTO" },
+  { sym: "SOL", name: "Solana", sector: "Currency", basePrice: 145.80, volatility: 8.5, category: "CRYPTO" },
+  { sym: "BNB", name: "Binance Coin", sector: "Currency", basePrice: 580.40, volatility: 3.5, category: "CRYPTO" },
+  { sym: "XRP", name: "Ripple", sector: "Currency", basePrice: 0.62, volatility: 6.0, category: "CRYPTO" },
+  { sym: "ADA", name: "Cardano", sector: "Currency", basePrice: 0.45, volatility: 5.5, category: "CRYPTO" },
+  { sym: "DOGE", name: "Dogecoin", sector: "Currency", basePrice: 0.16, volatility: 12.0, category: "CRYPTO" },
+  { sym: "LINK", name: "Chainlink", sector: "Currency", basePrice: 18.10, volatility: 7.0, category: "CRYPTO" },
+  { sym: "AVAX", name: "Avalanche", sector: "Currency", basePrice: 36.40, volatility: 7.5, category: "CRYPTO" },
+  { sym: "TON", name: "Toncoin", sector: "Currency", basePrice: 7.20, volatility: 6.5, category: "CRYPTO" }
 ];
 
 export async function getCustomMarkets(_env?: any): Promise<CustomStock[]> {

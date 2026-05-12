@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2 } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3 } from "lucide-react";
+import { useCrypto } from "@/context/CryptoContext";
 
 export default function AdminPage() {
+  const { prices } = useCrypto();
   const [deposits, setDeposits] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [kycRequests, setKycRequests] = useState<any[]>([]);
@@ -190,11 +192,13 @@ export default function AdminPage() {
        price = 0;
     }
     
+    const currentPrice = prices[sym];
+
     try {
       const res = await fetch("/api/admin/market", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, sym, price, durationMinutes })
+        body: JSON.stringify({ action, sym, price, durationMinutes, currentPrice })
       });
       const data = await res.json();
       if (data.success) {
@@ -506,13 +510,13 @@ export default function AdminPage() {
           </table>
         </div>
 
-        {/* Unique Market Control */}
+        {/* Unique Market Control - Stocks */}
         <div className="mt-10 mb-6 flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2">
-            Unique Market Control <Activity className="w-5 h-5 text-indigo-400" />
+            Stock Market Control <Activity className="w-5 h-5 text-indigo-400" />
           </h2>
           <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-widest text-indigo-400">
-             {customMarkets.length} Custom Stocks
+             {customMarkets.filter(m => m.category === 'STOCK').length} Custom Stocks
           </div>
         </div>
 
@@ -529,7 +533,7 @@ export default function AdminPage() {
              <tbody className="divide-y divide-gray-700/50">
                {loading ? (
                  <tr><td colSpan={4} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing KV Store...</td></tr>
-               ) : customMarkets.map(m => {
+               ) : customMarkets.filter(m => m.category === 'STOCK').map(m => {
                   const hasTarget = m.targetPrice && m.targetEndTime && m.targetStartTime;
                   const isFinished = hasTarget && Date.now() > m.targetEndTime;
                   const timeLeftMs = hasTarget && !isFinished ? m.targetEndTime - Date.now() : 0;
@@ -556,6 +560,85 @@ export default function AdminPage() {
                            ) : (
                              <div>
                                <div className="text-sm font-black text-emerald-400">Target: ${m.targetPrice.toFixed(2)}</div>
+                               <div className="text-[10px] text-slate-400 dark:text-gray-500 mt-1 uppercase tracking-widest">Hitting in ~{mins}m</div>
+                             </div>
+                           )
+                         ) : (
+                           <span className="text-[10px] px-2 py-1 bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 text-gray-600 rounded uppercase font-black tracking-widest">Base Trajectory</span>
+                         )}
+                       </td>
+                       <td className="px-6 py-4 text-right">
+                         <div className="flex justify-end gap-2">
+                           {hasTarget && !isFinished && (
+                              <button onClick={() => handleMarketAction('clear', m.sym)} className="p-2 bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 rounded-lg hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="Clear Target">
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                           )}
+                           <button onClick={() => handleMarketAction('target', m.sym)} className="bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/20 shadow-lg">
+                             <Target className="w-3.5 h-3.5" /> Deploy Target
+                           </button>
+                           <button onClick={() => handleMarketAction('jump', m.sym)} className="bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-500/20 shadow-lg">
+                             <TrendingUp className="w-3.5 h-3.5" /> Instant Shift
+                           </button>
+                         </div>
+                       </td>
+                    </tr>
+                  )
+               })}
+             </tbody>
+          </table>
+        </div>
+
+        {/* Unique Market Control - Crypto */}
+        <div className="mt-10 mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            Crypto Market Control <BarChart3 className="w-5 h-5 text-indigo-400" />
+          </h2>
+          <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-widest text-indigo-400">
+             {customMarkets.filter(m => m.category === 'CRYPTO').length} Custom Cryptocurrencies
+          </div>
+        </div>
+
+        <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+          <table className="w-full min-w-[800px] text-left border-collapse">
+             <thead>
+               <tr className="bg-white dark:bg-gray-900 border-b border-slate-300 dark:border-gray-700 text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest">
+                 <th className="px-6 py-4">Symbol / Name</th>
+                 <th className="px-6 py-4">Live State</th>
+                 <th className="px-6 py-4">Active Target Path</th>
+                 <th className="px-6 py-4 text-right">Market Manipulations</th>
+               </tr>
+             </thead>
+             <tbody className="divide-y divide-gray-700/50">
+               {loading ? (
+                 <tr><td colSpan={4} className="px-6 py-20 text-center text-slate-400 dark:text-gray-500 animate-pulse font-bold uppercase text-xs tracking-widest">Syncing KV Store...</td></tr>
+               ) : customMarkets.filter(m => m.category === 'CRYPTO').map(m => {
+                  const hasTarget = m.targetPrice && m.targetEndTime && m.targetStartTime;
+                  const isFinished = hasTarget && Date.now() > m.targetEndTime;
+                  const timeLeftMs = hasTarget && !isFinished ? m.targetEndTime - Date.now() : 0;
+                  const mins = Math.ceil(timeLeftMs / 60000);
+                  return (
+                    <tr key={m.sym} className="hover:bg-indigo-500/5 transition-colors group">
+                       <td className="px-6 py-4">
+                         <div className="font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                           {m.sym}
+                           {hasTarget && !isFinished && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>}
+                         </div>
+                         <div className="text-xs text-slate-400 dark:text-gray-500 font-mono mt-0.5">{m.name}</div>
+                       </td>
+                       <td className="px-6 py-4">
+                         <div className="text-slate-500 dark:text-gray-400 text-[10px] uppercase tracking-widest mb-1">Base Price / Vol</div>
+                         <div className="font-mono font-bold text-indigo-300">
+                           ${m.basePrice < 1 ? m.basePrice.toFixed(4) : m.basePrice.toLocaleString()} <span className="text-gray-600 font-normal">v{m.volatility}</span>
+                         </div>
+                       </td>
+                       <td className="px-6 py-4">
+                         {hasTarget ? (
+                           isFinished ? (
+                             <span className="text-[10px] px-2 py-1 bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-500 rounded uppercase font-black tracking-widest">Target Reached</span>
+                           ) : (
+                             <div>
+                               <div className="text-sm font-black text-emerald-400">Target: ${m.targetPrice < 1 ? m.targetPrice.toFixed(4) : m.targetPrice.toLocaleString()}</div>
                                <div className="text-[10px] text-slate-400 dark:text-gray-500 mt-1 uppercase tracking-widest">Hitting in ~{mins}m</div>
                              </div>
                            )

@@ -1,22 +1,41 @@
 import { NextResponse } from "next/server";
-import { getCustomMarkets, saveCustomMarkets } from "@/lib/db";
+import { getCustomMarkets, saveCustomMarkets, DEFAULT_CUSTOM_STOCKS } from "@/lib/db";
 
 export async function GET() {
-  const markets = await getCustomMarkets();
+  let markets = await getCustomMarkets();
+  
+  // Migration: Ensure all default stocks/cryptos exist in the KV store
+  let changed = false;
+  DEFAULT_CUSTOM_STOCKS.forEach(def => {
+    const exists = markets.find(m => m.sym === def.sym);
+    if (!exists) {
+      markets.push(def);
+      changed = true;
+    } else if (!exists.category) {
+      // Add category if missing on existing items
+      exists.category = def.category;
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    await saveCustomMarkets(markets);
+  }
+
   return NextResponse.json({ success: true, markets });
 }
 
 export async function POST(req: Request) {
   try {
-    const { action, sym, price, durationMinutes } = await req.json();
-    if (!action || !sym || price === undefined) {
+    const { action, sym, price, durationMinutes, currentPrice } = await req.json();
+    if (!action || !sym || (price === undefined && action !== "clear")) {
       return NextResponse.json({ success: false, error: "Missing parameters" }, { status: 400 });
     }
 
     const markets = await getCustomMarkets();
     const stockIndex = markets.findIndex(m => m.sym === sym);
     if (stockIndex === -1) {
-      return NextResponse.json({ success: false, error: "Stock not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Market not found" }, { status: 404 });
     }
 
     const stock = markets[stockIndex];
@@ -34,26 +53,27 @@ export async function POST(req: Request) {
          return NextResponse.json({ success: false, error: "Missing duration" }, { status: 400 });
       }
       
-      // We need to know what the latest price was roughly to start from.
-      // But the server doesn't know the exact random jitter the client is showing.
-      // It DOES know the current basePrice, or if a previous target was running, where it roughly is.
-      // For simplicity, let's calculate where it should be right now based on old targets, or default to base price.
-      let currentPrice = stock.basePrice;
+      // We use the current live price from the admin panel if provided, 
+      // otherwise fallback to internal calculation
+      let startPrice = currentPrice || stock.basePrice;
       const now = Date.now();
-      if (stock.targetPrice && stock.targetEndTime && stock.targetStartTime && stock.targetStartPrice) {
+      
+      // If we already have an active target and no currentPrice was provided, 
+      // calculate where it should be now.
+      if (!currentPrice && stock.targetPrice && stock.targetEndTime && stock.targetStartTime && stock.targetStartPrice) {
         if (now < stock.targetEndTime) {
            const progress = (now - stock.targetStartTime) / (stock.targetEndTime - stock.targetStartTime);
-           currentPrice = stock.targetStartPrice + (stock.targetPrice - stock.targetStartPrice) * progress;
+           startPrice = stock.targetStartPrice + (stock.targetPrice - stock.targetStartPrice) * progress;
         } else {
-           currentPrice = stock.targetPrice;
+           startPrice = stock.targetPrice;
         }
       }
 
-      stock.basePrice = currentPrice; // Set base to current so it starts correctly
+      stock.basePrice = startPrice; 
       stock.targetPrice = price;
       stock.targetStartTime = now;
       stock.targetEndTime = now + durationMinutes * 60 * 1000;
-      stock.targetStartPrice = currentPrice;
+      stock.targetStartPrice = startPrice;
     } else if (action === "clear") {
        // Just clear the target
        stock.targetPrice = undefined;
