@@ -1,5 +1,4 @@
-"use client";
-
+import Link from "next/link";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -26,34 +25,34 @@ export function Navbar() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shrink-0">
             <BlocksIcon className="w-5 h-5 text-slate-900 dark:text-white" />
           </div>
-          <a href="/" className="text-lg md:text-xl font-bold bg-gradient-to-r from-slate-900 dark:from-white to-slate-500 dark:to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform whitespace-nowrap">
+          <Link href="/" className="text-lg md:text-xl font-bold bg-gradient-to-r from-slate-900 dark:from-white to-slate-500 dark:to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform whitespace-nowrap">
             Stocks Indicators
-          </a>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 md:gap-6">
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-gray-400">
-            <a href="/" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            <Link href="/" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <LayoutDashboard className="w-4 h-4" /> Dashboard
-            </a>
-            <a href="/markets" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/markets") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            </Link>
+            <Link href="/markets" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/markets") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <BarChart3 className="w-4 h-4 text-cyan-400" /> Markets
-            </a>
-            <a href="/crypto" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/crypto") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            </Link>
+            <Link href="/crypto" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/crypto") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Activity className="w-4 h-4 text-emerald-400" /> All Crypto
-            </a>
-            <a href="/profile" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/profile") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            </Link>
+            <Link href="/profile" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/profile") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <User className="w-4 h-4" /> Profile
-            </a>
-            <a href="/deposit" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/deposit") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            </Link>
+            <Link href="/deposit" className={`flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors ${isActive("/deposit") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Wallet className="w-4 h-4 text-indigo-400" /> Deposit
-            </a>
-            <a href="/withdraw" className={`flex items-center gap-2 text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors font-bold ${isActive("/withdraw") ? "border-b-2 border-amber-500 pb-1 translate-y-[2px]" : ""}`}>
+            </Link>
+            <Link href="/withdraw" className={`flex items-center gap-2 text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors font-bold ${isActive("/withdraw") ? "border-b-2 border-amber-500 pb-1 translate-y-[2px]" : ""}`}>
               <ArrowRightLeft className="w-4 h-4" /> Withdraw
-            </a>
-            <a href="/futures" className={`flex items-center gap-2 text-indigo-500 dark:text-indigo-400 font-black hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest ${isActive("/futures") ? "border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+            </Link>
+            <Link href="/futures" className={`flex items-center gap-2 text-indigo-500 dark:text-indigo-400 font-black hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest ${isActive("/futures") ? "border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Activity className="w-4 h-4 animate-pulse" /> Pro Options
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4 border-l border-slate-200 dark:border-gray-800 lg:pl-6 pl-2">
@@ -75,16 +74,16 @@ export function Navbar() {
                   </div>
                 </div>
                 {/* Mobile Deposit / Withdraw */}
-                <a href="/deposit" className="hidden sm:block lg:hidden p-2.5 bg-indigo-600 rounded-xl text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform" title="Deposit">
+                <Link href="/deposit" className="hidden sm:block lg:hidden p-2.5 bg-indigo-600 rounded-xl text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform" title="Deposit">
                   <Wallet className="w-5 h-5" />
-                </a>
+                </Link>
                 
                 <div className="relative group">
                   <img src={user.avatar} alt="User" className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white dark:bg-gray-900 border border-slate-300 dark:border-gray-700 transition-transform group-hover:scale-110 cursor-pointer shadow-lg" />
                   <div className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 p-1 rounded-full border border-gray-900 shadow-lg" title="VIP Status">
                     <ShieldCheck className="w-2.5 h-2.5 text-slate-900 dark:text-white" fill="currentColor" />
                   </div>
-                  <a href="/admin" className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></a>
+                  <Link href="/admin" className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></Link>
                 </div>
 
                 <NotificationBell />
@@ -95,8 +94,8 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <a href="/login" className="text-xs md:text-sm font-medium text-slate-500 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors hidden sm:block">Login</a>
-                <a href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 active:scale-95">Register</a>
+                <Link href="/login" className="text-xs md:text-sm font-medium text-slate-500 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors hidden sm:block">Login</Link>
+                <Link href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 active:scale-95">Register</Link>
               </div>
             )}
             
@@ -112,28 +111,28 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-800 p-4 animate-in slide-in-from-top duration-300 absolute w-full left-0 z-40 shadow-2xl">
           <div className="grid grid-cols-1 gap-3">
-            <a href="/" className="flex items-center gap-3 p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 font-bold">
+            <Link href="/" className="flex items-center gap-3 p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 font-bold">
               <LayoutDashboard className="w-5 h-5" /> Home Dashboard
-            </a>
-            <a href="/markets" className="flex items-center gap-3 p-4 bg-cyan-500/10 rounded-2xl text-cyan-400 font-bold">
+            </Link>
+            <Link href="/markets" className="flex items-center gap-3 p-4 bg-cyan-500/10 rounded-2xl text-cyan-400 font-bold">
               <BarChart3 className="w-5 h-5" /> Live Markets
-            </a>
-            <a href="/crypto" className="flex items-center gap-3 p-4 bg-violet-500/10 rounded-2xl text-violet-400 font-bold">
+            </Link>
+            <Link href="/crypto" className="flex items-center gap-3 p-4 bg-violet-500/10 rounded-2xl text-violet-400 font-bold">
               <Activity className="w-5 h-5" /> All Crypto (400+)
-            </a>
-            <a href="/futures" className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 font-black uppercase tracking-widest overflow-hidden relative">
+            </Link>
+            <Link href="/futures" className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 font-black uppercase tracking-widest overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 animate-translate-x"></div>
               <Activity className="w-5 h-5 animate-pulse" /> Pro Options
-            </a>
+            </Link>
             
             {user ? (
               <>
-                <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
+                <Link href="/profile" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
                   <User className="w-5 h-5" /> My Personal Profile
-                </a>
-                <a href="/deposit" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
+                </Link>
+                <Link href="/deposit" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
                   <Wallet className="w-5 h-5" /> Funds & Deposits
-                </a>
+                </Link>
                 <div className="border-t border-slate-200 dark:border-gray-800 my-2 pt-4">
                   <button onClick={logout} className="flex items-center gap-3 p-4 text-rose-500 font-bold w-full">
                     <LogOut className="w-5 h-5" /> Sign Out of Platform
@@ -142,8 +141,8 @@ export function Navbar() {
               </>
             ) : (
               <div className="border-t border-slate-200 dark:border-gray-800 my-2 pt-4 grid grid-cols-2 gap-3">
-                <a href="/login" className="bg-slate-100 dark:bg-gray-800 hover:bg-gray-700 text-slate-900 dark:text-white px-4 py-3 rounded-xl text-sm font-bold transition-all text-center">Login</a>
-                <a href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all text-center">Register</a>
+                <Link href="/login" className="bg-slate-100 dark:bg-gray-800 hover:bg-gray-700 text-slate-900 dark:text-white px-4 py-3 rounded-xl text-sm font-bold transition-all text-center">Login</Link>
+                <Link href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all text-center">Register</Link>
               </div>
             )}
           </div>

@@ -175,12 +175,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("ys_user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("ys_user");
+    if (!isLoading) {
+      if (user) {
+        localStorage.setItem("ys_user", JSON.stringify(user));
+      } else {
+        localStorage.removeItem("ys_user");
+      }
     }
-  }, [user]);
+  }, [user, isLoading]);
 
   useEffect(() => {
     if (user?.email) {

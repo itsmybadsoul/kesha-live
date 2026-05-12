@@ -1,5 +1,4 @@
-"use client";
-
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
@@ -51,9 +50,9 @@ export default function DepositPage() {
            </div>
            <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Session Required</h1>
            <p className="text-slate-500 dark:text-gray-400 text-sm mb-8">Please login to your secure trading account to manage funds and deposits.</p>
-           <a href="/login" className="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
+           <Link href="/login" className="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 text-center">
              Go to Login
-           </a>
+           </Link>
         </div>
       </div>
     );
@@ -62,9 +61,9 @@ export default function DepositPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <button onClick={() => router.push("/")} className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white mb-8 transition-colors">
+        <Link href="/" className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white mb-8 transition-colors w-fit">
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-        </button>
+        </Link>
 
         <div className="bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 backdrop-blur-xl border border-slate-300 dark:border-gray-700/50 rounded-3xl p-6 md:p-10 shadow-2xl">
           
