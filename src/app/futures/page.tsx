@@ -12,6 +12,8 @@ import { useCrypto } from "@/context/CryptoContext";
 
 const ASSET_SYMBOLS = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "LINK", "AVAX", "MATIC"];
 
+const fmt = (val: number) => val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export default function FuturesOptions() {
   const { user, balance, placeOptionsTrade, resolveOptionsTrade, refreshUser, isLoading } = useUser();
   const { prices: liveMarketPrices } = useCrypto();

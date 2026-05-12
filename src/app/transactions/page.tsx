@@ -6,6 +6,7 @@ import { UsdtIcon } from "@/components/UsdtIcon";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { NotificationBell } from "@/components/NotificationBell";
+import { Navbar } from "@/components/Navbar";
 
 const TYPE_CONFIG = {
   DEPOSIT:  { icon: ArrowDownLeft, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", label: "Deposit" },
@@ -144,6 +145,6 @@ export default function TransactionsPage() {
           </div>
         </div>
       </footer>
-    </div>>
+    </div>
   );
 }

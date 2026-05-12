@@ -226,11 +226,6 @@ export default function AdminPage() {
     if (minutes <= 0) {
       handleMarketAction("jump", sym, target);
     } else {
-      // We pass the price as target and duration as duration
-      // handleMarketAction expects (action, sym, forcedPrice, forcedDuration)
-      // Wait, handleMarketAction signature is:
-      // async (action: "jump" | "target" | "clear", sym: string, forcedPrice?: number)
-      // I need to update handleMarketAction to also accept forcedDuration.
       handleMarketAction("target", sym, target, minutes);
     }
   };
@@ -371,7 +366,6 @@ export default function AdminPage() {
                 <tr><td colSpan={5} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 italic text-xs font-medium tracking-widest">LEGER_EMPTY: No pending settlement requests detected.</td></tr>
               ) : (
                 <>
-                  {/* Render Deposits */}
                   {deposits.map((d) => (
                     <tr key={d.email} className="hover:bg-indigo-500/[0.02] transition-colors group">
                       <td className="px-8 py-8 font-black text-sm text-slate-900 dark:text-white">
@@ -397,7 +391,6 @@ export default function AdminPage() {
                       </td>
                     </tr>
                   ))}
-                  {/* Render Withdrawals */}
                   {withdrawals.map((w) => (
                     <tr key={w.email} className="hover:bg-rose-500/[0.02] transition-colors group">
                       <td className="px-8 py-8 font-black text-sm text-slate-900 dark:text-white">
@@ -429,7 +422,6 @@ export default function AdminPage() {
           </table>
         </div>
 
-        {/* KYC Verification Queue */}
         <div className="mt-16 mb-8 flex justify-between items-center px-4">
           <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter uppercase italic">
             Identity <span className="text-amber-500 not-italic">Verification</span> <ShieldCheck className="w-8 h-8 text-amber-500" />
@@ -496,7 +488,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Binary Options Intercept Console */}
         <div className="mt-16 mb-8 flex justify-between items-center px-4">
           <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter uppercase italic">
             Contract <span className="text-indigo-500 not-italic">Intercept</span> <Activity className="w-8 h-8 text-indigo-500 animate-pulse" />
@@ -586,7 +577,7 @@ export default function AdminPage() {
                           )}
                         </td>
                       </tr>
-                    )
+                    );
                   })
                 )}
               </tbody>
@@ -594,7 +585,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Unique Market Control - Stocks */}
         <div className="mt-16 mb-8 flex justify-between items-center px-4">
           <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter uppercase italic">
             Equities <span className="text-indigo-500 not-italic">Manipulation</span> <Activity className="w-8 h-8 text-indigo-500" />
@@ -616,9 +606,10 @@ export default function AdminPage() {
                  </tr>
                </thead>
                <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
-                 {loading ? (
-                   <tr><td colSpan={4} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-[0.4em]">Synchronizing Authority Node...</td></tr>
-                 ) : customMarkets.filter(m => m.category === 'STOCK').map(m => {
+                {loading ? (
+                  <tr><td colSpan={4} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-[0.4em]">Synchronizing Authority Node...</td></tr>
+                ) : (
+                  customMarkets.filter(m => m.category === 'STOCK').map(m => {
                     const hasTarget = m.targetPrice && m.targetEndTime && m.targetStartTime;
                     const isFinished = hasTarget && Date.now() > m.targetEndTime;
                     const timeLeftMs = hasTarget && !isFinished ? m.targetEndTime - Date.now() : 0;
@@ -673,11 +664,13 @@ export default function AdminPage() {
                          </td>
                       </tr>
                     )
-                 })}
+                  })
+                )}
                </tbody>
             </table>
           </div>
-        </div>        {/* Unique Market Control - Crypto */}
+        </div>
+
         <div className="mt-16 mb-8 flex justify-between items-center px-4">
           <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter uppercase italic">
             Digital <span className="text-indigo-500 not-italic">Liquidity</span> <BarChart3 className="w-8 h-8 text-indigo-500" />
@@ -699,9 +692,10 @@ export default function AdminPage() {
                  </tr>
                </thead>
                <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
-                 {loading ? (
-                   <tr><td colSpan={4} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-[0.4em]">Synchronizing Authority Node...</td></tr>
-                 ) : customMarkets.filter(m => m.category === 'CRYPTO').map(m => {
+                {loading ? (
+                  <tr><td colSpan={4} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-[0.4em]">Synchronizing Authority Node...</td></tr>
+                ) : (
+                  customMarkets.filter(m => m.category === 'CRYPTO').map(m => {
                     const hasTarget = m.targetPrice && m.targetEndTime && m.targetStartTime;
                     const isFinished = hasTarget && Date.now() > m.targetEndTime;
                     const timeLeftMs = hasTarget && !isFinished ? m.targetEndTime - Date.now() : 0;
@@ -776,7 +770,8 @@ export default function AdminPage() {
                          </td>
                       </tr>
                     )
-                 })}
+                  })
+                )}
                </tbody>
             </table>
           </div>
@@ -909,7 +904,7 @@ export default function AdminPage() {
                       <td className="px-8 py-8">
                          <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${
                            u.kycStatus === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                           u.kycStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-600 border-slate-200 dark:border-gray-700'
+                           u.kycStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-600 border-slate-200 dark:border-gray-700'
                          }`}>
                            {u.kycStatus || 'UNVERIFIED'}
                          </span>
