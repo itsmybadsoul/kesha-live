@@ -7,6 +7,7 @@ import { useToast } from "@/context/ToastContext";
 import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle, ShieldAlert } from "lucide-react";
 import { UsdtIcon } from "@/components/UsdtIcon";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { Navbar } from "@/components/Navbar";
 
 export default function WithdrawPage() {
   const router = useRouter();

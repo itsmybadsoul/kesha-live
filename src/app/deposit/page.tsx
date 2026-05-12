@@ -7,6 +7,7 @@ import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { Wallet, Copy, CheckCircle2, ArrowLeft, Info } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { Navbar } from "@/components/Navbar";
 
 export default function DepositPage() {
   const router = useRouter();
