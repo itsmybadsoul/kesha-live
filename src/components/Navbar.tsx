@@ -118,6 +118,9 @@ export function Navbar() {
             <a href="/markets" className="flex items-center gap-3 p-4 bg-cyan-500/10 rounded-2xl text-cyan-400 font-bold">
               <BarChart3 className="w-5 h-5" /> Live Markets
             </a>
+            <a href="/crypto" className="flex items-center gap-3 p-4 bg-violet-500/10 rounded-2xl text-violet-400 font-bold">
+              <Activity className="w-5 h-5" /> All Crypto (400+)
+            </a>
             <a href="/futures" className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 font-black uppercase tracking-widest overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 animate-translate-x"></div>
               <Activity className="w-5 h-5 animate-pulse" /> Pro Options
@@ -125,10 +128,10 @@ export function Navbar() {
             
             {user ? (
               <>
-                <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
+                <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
                   <User className="w-5 h-5" /> My Personal Profile
                 </a>
-                <a href="/deposit" className="flex items-center gap-3 p-4 hover:bg-white/70 dark:bg-slate-100 dark:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
+                <a href="/deposit" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
                   <Wallet className="w-5 h-5" /> Funds & Deposits
                 </a>
                 <div className="border-t border-slate-200 dark:border-gray-800 my-2 pt-4">

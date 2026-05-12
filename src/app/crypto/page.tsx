@@ -4,91 +4,135 @@ import { useState } from "react";
 import { useCrypto } from "@/context/CryptoContext";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import { TrendingUp, TrendingDown, Search, ArrowUpRight, BarChart3, Activity } from "lucide-react";
+import { TrendingUp, TrendingDown, Search, ArrowUpRight, BarChart3, Activity, ChevronDown } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+
+const PAGE_SIZE = 50;
 
 export default function CryptoOverviewPage() {
   const { rawPrices: prices, loading } = useCrypto();
   const { user } = useUser();
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const handleTrade = (sym: string, direction: "UP" | "DOWN") => {
     if (!user) {
       router.push("/login");
       return;
     }
-    // Redirect to Futures/Pro Options with the asset pre-selected
-    // Assuming futures page can take a query param or just navigate there
     router.push(`/futures?asset=${sym}&dir=${direction}`);
   };
 
-  const filtered = prices.filter((p) => p.symbol.toLowerCase().includes(search.toLowerCase()));
+  const filtered = prices.filter((p) =>
+    p.symbol.toLowerCase().includes(search.toLowerCase())
+  );
+  const visible = filtered.slice(0, page * PAGE_SIZE);
+  const hasMore = visible.length < filtered.length;
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Activity className="w-8 h-8 text-indigo-400 animate-pulse" />
+          <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">Loading live markets…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30">
-      <div className="sticky top-0 z-50 w-full flex flex-col">
-        <Navbar />
-      </div>
+      <Navbar />
 
-      <div className="max-w-[1600px] mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div className="max-w-[1600px] mx-auto px-3 sm:px-4 py-6 sm:py-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-              Market Overview <BarChart3 className="w-8 h-8 text-indigo-400" />
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-2 sm:gap-3">
+              All Crypto <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
             </h1>
-            <p className="text-slate-500 dark:text-gray-400 mt-1">Live streaming data for over {prices.length} cryptocurrencies.</p>
+            <p className="text-slate-500 dark:text-gray-400 mt-1 text-sm">
+              Live prices for{" "}
+              <span className="font-bold text-indigo-400">{prices.length}</span>{" "}
+              cryptocurrencies
+            </p>
           </div>
-          
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-gray-500" />
-            <input 
-              type="text" 
-              placeholder="Search markets..." 
+
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 dark:text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by symbol…"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl pl-12 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500/50 transition-colors"
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="w-full bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl sm:rounded-2xl pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500/50 transition-colors"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filtered.map((p) => (
-            <div key={p.symbol} className="bg-white/80 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 hover:border-indigo-500/30 transition-all rounded-2xl p-5 flex flex-col justify-between group">
+        {/* Grid — 2 cols on mobile, scales up on larger screens */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+          {visible.map((p) => (
+            <div
+              key={p.symbol}
+              className="bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 hover:border-indigo-500/40 dark:hover:border-indigo-500/30 transition-all rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col justify-between group"
+            >
               <div>
-                <div className="flex justify-between items-start mb-3">
-                  <span className="text-sm font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">{p.symbol}</span>
-                  <Activity className="w-4 h-4 text-emerald-500/30 group-hover:text-emerald-500 transition-colors animate-pulse" />
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wide group-hover:text-indigo-400 transition-colors truncate pr-1">
+                    {p.symbol}
+                  </span>
+                  <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-500/30 group-hover:text-emerald-500 transition-colors animate-pulse shrink-0" />
                 </div>
-                <div className="text-2xl font-black text-slate-900 dark:text-white tabular-nums">${p.price}</div>
-                <div className="flex items-center gap-1 mt-1 text-[10px] font-bold text-emerald-400/80">
-                  <ArrowUpRight className="w-3 h-3" /> LIVE DATA
+                <div className="text-base sm:text-xl font-black text-slate-900 dark:text-white tabular-nums truncate">
+                  ${p.price}
+                </div>
+                <div className="flex items-center gap-1 mt-1 text-[9px] font-bold text-emerald-500/70">
+                  <ArrowUpRight className="w-2.5 h-2.5" /> LIVE
                 </div>
               </div>
-              
-              <div className="grid grid-cols-2 gap-2 mt-5">
-                <button 
+
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mt-3 sm:mt-5">
+                <button
                   onClick={() => handleTrade(p.symbol, "UP")}
-                  className="bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
+                  className="bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-0.5 sm:gap-1"
                 >
-                  <TrendingUp className="w-3.5 h-3.5" /> CALL
+                  <TrendingUp className="w-3 h-3 shrink-0" /> CALL
                 </button>
-                <button 
+                <button
                   onClick={() => handleTrade(p.symbol, "DOWN")}
-                  className="bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-500 text-red-600 dark:text-red-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
+                  className="bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-500 text-red-600 dark:text-red-400 hover:text-white text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-0.5 sm:gap-1"
                 >
-                  <TrendingDown className="w-3.5 h-3.5" /> PUT
+                  <TrendingDown className="w-3 h-3 shrink-0" /> PUT
                 </button>
               </div>
             </div>
           ))}
         </div>
-        
+
+        {/* Empty state */}
         {filtered.length === 0 && (
-          <div className="py-20 text-center text-slate-400 dark:text-gray-500">
-            No cryptocurrencies found matching "{search}"
+          <div className="py-20 text-center text-slate-400 dark:text-gray-500 text-sm">
+            No results for &ldquo;<span className="font-bold">{search}</span>&rdquo;
+          </div>
+        )}
+
+        {/* Load more */}
+        {hasMore && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              className="flex items-center gap-2 text-sm font-bold text-indigo-500 dark:text-indigo-400 bg-white dark:bg-indigo-500/10 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 border border-slate-200 dark:border-indigo-500/20 px-6 py-3 rounded-xl transition-all"
+            >
+              Load more <ChevronDown className="w-4 h-4" />
+              <span className="text-slate-400 dark:text-gray-500 font-normal">
+                ({filtered.length - visible.length} remaining)
+              </span>
+            </button>
           </div>
         )}
       </div>

@@ -436,12 +436,12 @@ export default function MarketsPage() {
                 <button onClick={() => setBetDir("UP")}
                   className={`p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold
                     ${betDir === "UP" ? "border-emerald-500 bg-emerald-500/15 text-emerald-300" : "border-slate-300 dark:border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-emerald-500/30"}`}>
-                  <TrendingUp className="w-4 h-4" /> UP / BUY
+                  <TrendingUp className="w-4 h-4" /> ↑ CALL
                 </button>
                 <button onClick={() => setBetDir("DOWN")}
                   className={`p-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold
                     ${betDir === "DOWN" ? "border-red-500 bg-red-500/15 text-red-300" : "border-slate-300 dark:border-slate-300 dark:border-white/10 bg-white/[0.03] text-slate-500 dark:text-gray-400 hover:border-red-500/30"}`}>
-                  <TrendingDown className="w-4 h-4" /> DOWN / SELL
+                  <TrendingDown className="w-4 h-4" /> ↓ PUT
                 </button>
               </div>
             </div>
