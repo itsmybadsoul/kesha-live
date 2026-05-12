@@ -125,8 +125,8 @@ export default function CryptoOverviewPage() {
 
         {/* Chart Modal */}
         {selectedSymbol && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-10 bg-black/80 backdrop-blur-md" onClick={() => setSelectedSymbol(null)}>
-             <div className="relative bg-[#131722] w-full max-w-6xl aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-10 bg-black/80 backdrop-blur-md" onClick={() => setSelectedSymbol(null)}>
+             <div className="relative bg-[#131722] w-full max-w-6xl h-[85vh] sm:h-auto sm:aspect-video rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="p-6 flex justify-between items-center border-b border-white/5 bg-black/20">
                    <div className="flex items-center gap-4">
                      <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white shadow-lg shadow-indigo-600/20">
