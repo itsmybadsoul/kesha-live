@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCrypto } from "@/context/CryptoContext";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import { TrendingUp, TrendingDown, Search, ArrowUpRight, BarChart3, Activity, ChevronDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Search, ArrowUpRight, BarChart3, Activity, ChevronDown, X } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 
 const PAGE_SIZE = 50;

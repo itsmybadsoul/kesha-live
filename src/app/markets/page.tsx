@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { Navbar } from "@/components/Navbar";
+import { UsdtIcon } from "@/components/UsdtIcon";
 
 // ─── Static Company Data ─────────────────────────────────────────────────────
 
