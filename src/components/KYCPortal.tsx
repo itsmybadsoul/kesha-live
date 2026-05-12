@@ -103,12 +103,12 @@ export function KYCPortal() {
   };
 
   return (
-    <div className="bg-white/60 dark:bg-slate-100 dark:bg-gray-800/40 backdrop-blur-2xl border border-slate-300 dark:border-gray-700/50 rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden shadow-2xl">
+    <div className="bg-white dark:bg-gray-900/40 backdrop-blur-2xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden shadow-2xl">
       <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="flex flex-col mb-10 relative z-10">
          <h3 className="text-3xl md:text-4xl font-black mb-4 flex items-center gap-4 text-slate-900 dark:text-white tracking-tight leading-none">
-            <ShieldAlert className="w-10 h-10 text-indigo-400 shrink-0" />
+            <ShieldAlert className="w-10 h-10 text-indigo-500 dark:text-indigo-400 shrink-0" />
             Institutional KYC
          </h3>
          <p className="text-base md:text-lg text-slate-500 dark:text-gray-400 max-w-2xl leading-relaxed">
@@ -118,17 +118,17 @@ export function KYCPortal() {
       
       {/* Progress Stepper */}
       <div className="flex items-center gap-3 mb-12 relative z-10">
-         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= 1 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]' : 'bg-gray-700/50'}`}></div>
-         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]' : 'bg-gray-700/50'}`}></div>
-         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= 3 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]' : 'bg-gray-700/50'}`}></div>
+         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= 1 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]' : 'bg-slate-200 dark:bg-gray-700/50'}`}></div>
+         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]' : 'bg-slate-200 dark:bg-gray-700/50'}`}></div>
+         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= 3 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]' : 'bg-slate-200 dark:bg-gray-700/50'}`}></div>
       </div>
 
       {step === 1 && (
         <div className="space-y-4 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <input type="file" ref={idInputRef} onChange={handleIdUpload} accept="image/*" className="hidden" />
-          <div className="border border-dashed border-gray-600 bg-white dark:bg-gray-900/30 rounded-3xl p-12 text-center hover:border-indigo-500 hover:bg-indigo-500/5 transition-all duration-300 cursor-pointer group shadow-inner" onClick={() => idInputRef.current?.click()}>
-            <div className="w-20 h-20 bg-slate-100 dark:bg-gray-800 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 border border-slate-300 dark:border-gray-700 group-hover:border-indigo-500/50 group-hover:bg-indigo-500/10 shadow-xl">
-               <Upload className="w-10 h-10 text-slate-500 dark:text-gray-400 group-hover:text-indigo-400 transition-colors" />
+          <div className="border border-dashed border-slate-300 dark:border-gray-600 bg-slate-50 dark:bg-gray-900/30 rounded-3xl p-12 text-center hover:border-indigo-500 hover:bg-indigo-500/5 transition-all duration-300 cursor-pointer group shadow-inner" onClick={() => idInputRef.current?.click()}>
+            <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 border border-slate-200 dark:border-gray-700 group-hover:border-indigo-500/50 group-hover:bg-indigo-500/10 shadow-xl">
+               <Upload className="w-10 h-10 text-slate-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors" />
             </div>
             <p className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Upload Government Issued ID</p>
             <p className="text-sm text-slate-400 dark:text-gray-500 max-w-md mx-auto">Please provide a clear, glare-free photo of your Passport, Driver's License, or National Identity Card.</p>
@@ -139,7 +139,7 @@ export function KYCPortal() {
       {step === 2 && (
         <div className="space-y-4 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <input type="file" ref={selfieInputRef} onChange={handleSelfieUpload} accept="image/*" capture="user" className="hidden" />
-          <div className="border border-dashed border-gray-600 bg-white dark:bg-gray-900/30 rounded-3xl p-12 text-center hover:border-indigo-500 hover:bg-indigo-500/5 transition-all duration-300 cursor-pointer group shadow-inner" onClick={() => selfieInputRef.current?.click()}>
+          <div className="border border-dashed border-slate-300 dark:border-gray-600 bg-slate-50 dark:bg-gray-900/30 rounded-3xl p-12 text-center hover:border-indigo-500 hover:bg-indigo-500/5 transition-all duration-300 cursor-pointer group shadow-inner" onClick={() => selfieInputRef.current?.click()}>
             <div className="flex items-end justify-center gap-6 mb-8 group-hover:scale-105 transition-transform duration-500">
                 {idFront ? (
                   <img src={idFront} alt="ID Preview" className="h-24 w-auto rounded-xl border-4 border-slate-200 dark:border-gray-800 shadow-2xl opacity-60 rotate-[-5deg]" />
