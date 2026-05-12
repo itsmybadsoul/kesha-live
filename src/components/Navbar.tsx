@@ -1,0 +1,138 @@
+"use client";
+
+import { useState } from "react";
+import { useUser } from "@/context/UserContext";
+import { NotificationBell } from "@/components/NotificationBell";
+import { UsdtIcon } from "@/components/UsdtIcon";
+import { 
+  Wallet, LayoutDashboard, User, ArrowRightLeft, 
+  LogOut, Menu, X, BarChart3, Activity, BlocksIcon, ShieldCheck 
+} from "lucide-react";
+import { usePathname } from "next/navigation";
+
+export function Navbar() {
+  const { user, balance, logout } = useUser();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (path: string) => pathname === path;
+
+  return (
+    <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-0 z-50">
+      <div className="max-w-[1600px] mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shrink-0">
+            <BlocksIcon className="w-5 h-5 text-white" />
+          </div>
+          <a href="/" className="text-lg md:text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform whitespace-nowrap">
+            Stocks Indicators
+          </a>
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-6">
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-400">
+            <a href="/" className={`flex items-center gap-2 hover:text-white transition-colors ${isActive("/") ? "text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+              <LayoutDashboard className="w-4 h-4" /> Dashboard
+            </a>
+            <a href="/markets" className={`flex items-center gap-2 hover:text-white transition-colors ${isActive("/markets") ? "text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+              <BarChart3 className="w-4 h-4 text-cyan-400" /> Markets
+            </a>
+            <a href="/profile" className={`flex items-center gap-2 hover:text-white transition-colors ${isActive("/profile") ? "text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+              <User className="w-4 h-4" /> Profile
+            </a>
+            <a href="/deposit" className={`flex items-center gap-2 hover:text-white transition-colors ${isActive("/deposit") ? "text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+              <Wallet className="w-4 h-4 text-indigo-400" /> Deposit
+            </a>
+            <a href="/withdraw" className={`flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors font-bold ${isActive("/withdraw") ? "border-b-2 border-amber-500 pb-1 translate-y-[2px]" : ""}`}>
+              <ArrowRightLeft className="w-4 h-4" /> Withdraw
+            </a>
+            <a href="/futures" className={`flex items-center gap-2 text-indigo-400 font-black hover:text-indigo-300 transition-colors uppercase tracking-widest ${isActive("/futures") ? "border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+              <Activity className="w-4 h-4 animate-pulse" /> Pro Options
+            </a>
+          </nav>
+
+          <div className="flex items-center gap-2 md:gap-4 border-l border-gray-800 lg:pl-6 pl-2">
+            {user ? (
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="text-right hidden sm:block">
+                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Net Equity (USDT)</div>
+                  <div className="text-sm font-black text-emerald-400 flex items-center gap-1.5 ml-auto justify-end">
+                    <UsdtIcon className="w-3.5 h-3.5" />
+                    ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </div>
+                </div>
+                {/* Mobile Deposit / Withdraw */}
+                <a href="/deposit" className="hidden sm:block lg:hidden p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform" title="Deposit">
+                  <Wallet className="w-5 h-5" />
+                </a>
+                
+                <div className="relative group">
+                  <img src={user.avatar} alt="User" className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-900 border border-gray-700 transition-transform group-hover:scale-110 cursor-pointer shadow-lg" />
+                  <div className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 p-1 rounded-full border border-gray-900 shadow-lg" title="VIP Status">
+                    <ShieldCheck className="w-2.5 h-2.5 text-white" fill="currentColor" />
+                  </div>
+                  <a href="/admin" className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></a>
+                </div>
+
+                <NotificationBell />
+
+                <button onClick={logout} className="hidden md:block p-2 text-gray-500 hover:text-rose-400 transition-colors" title="Logout">
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <a href="/login" className="text-xs md:text-sm font-medium text-gray-400 hover:text-white transition-colors hidden sm:block">Login</a>
+                <a href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 active:scale-95">Register</a>
+              </div>
+            )}
+            
+            {/* Mobile Menu Toggle - Visible to everyone */}
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-1.5 md:p-2 text-gray-400 hover:text-white shrink-0">
+              {mobileMenuOpen ? <X className="w-6 h-6 md:w-7 md:h-7" /> : <Menu className="w-6 h-6 md:w-7 md:h-7" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Slide-out Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-gray-900 border-b border-gray-800 p-4 animate-in slide-in-from-top duration-300 absolute w-full left-0 z-40 shadow-2xl">
+          <div className="grid grid-cols-1 gap-3">
+            <a href="/" className="flex items-center gap-3 p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 font-bold">
+              <LayoutDashboard className="w-5 h-5" /> Home Dashboard
+            </a>
+            <a href="/markets" className="flex items-center gap-3 p-4 bg-cyan-500/10 rounded-2xl text-cyan-400 font-bold">
+              <BarChart3 className="w-5 h-5" /> Live Markets
+            </a>
+            <a href="/futures" className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 font-black uppercase tracking-widest overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 animate-translate-x"></div>
+              <Activity className="w-5 h-5 animate-pulse" /> Pro Options
+            </a>
+            
+            {user ? (
+              <>
+                <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
+                  <User className="w-5 h-5" /> My Personal Profile
+                </a>
+                <a href="/deposit" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
+                  <Wallet className="w-5 h-5" /> Funds & Deposits
+                </a>
+                <div className="border-t border-gray-800 my-2 pt-4">
+                  <button onClick={logout} className="flex items-center gap-3 p-4 text-rose-500 font-bold w-full">
+                    <LogOut className="w-5 h-5" /> Sign Out of Platform
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="border-t border-gray-800 my-2 pt-4 grid grid-cols-2 gap-3">
+                <a href="/login" className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all text-center">Login</a>
+                <a href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all text-center">Register</a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}

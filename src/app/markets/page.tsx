@@ -9,6 +9,8 @@ import {
   LayoutDashboard, Wallet, ArrowRightLeft, User, BlocksIcon
 } from "lucide-react";
 
+import { Navbar } from "@/components/Navbar";
+
 // ─── Static Company Data ─────────────────────────────────────────────────────
 
 const SECTORS = ["Tech", "Finance", "Energy", "Healthcare", "Retail", "Automotive", "Telecom", "Media", "Pharma", "Industrial"];
@@ -265,33 +267,9 @@ export default function MarketsPage() {
   return (
     <div className="min-h-screen bg-[#080810] text-white font-sans">
       {/* ── Navbar ── */}
-      <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#080810]/90 backdrop-blur-xl">
-        <div className="max-w-[1600px] mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shrink-0">
-              <BlocksIcon className="w-4 h-4 text-white" />
-            </div>
-            <a href="/" className="text-base font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent hidden sm:block">Stocks Indicators</a>
-          </div>
-          <div className="hidden lg:flex items-center gap-5 text-sm text-gray-400 font-medium">
-            <a href="/" className="flex items-center gap-1.5 hover:text-white transition-colors"><LayoutDashboard className="w-4 h-4" />Dashboard</a>
-            <a href="/markets" className="flex items-center gap-1.5 text-white border-b border-indigo-500 pb-0.5"><BarChart3 className="w-4 h-4 text-indigo-400" />Markets</a>
-            <a href="/profile" className="flex items-center gap-1.5 hover:text-white transition-colors"><User className="w-4 h-4" />Profile</a>
-            <a href="/deposit" className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors"><Wallet className="w-4 h-4" />Deposit</a>
-            <a href="/withdraw" className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors"><ArrowRightLeft className="w-4 h-4" />Withdraw</a>
-            <a href="/futures" className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-bold uppercase tracking-wide text-xs"><Activity className="w-4 h-4 animate-pulse" />Pro Options</a>
-          </div>
-          <div className="flex items-center gap-3">
-            {user && (
-              <div className="text-right hidden sm:block">
-                <div className="text-[10px] text-gray-500 uppercase tracking-tight">Balance</div>
-                <div className="text-sm font-black text-emerald-400">${fmt(balance)}</div>
-              </div>
-            )}
-            {!user && <a href="/login" className="text-sm bg-indigo-600 hover:bg-indigo-500 px-4 py-1.5 rounded-lg font-semibold transition-colors">Sign In</a>}
-          </div>
-        </div>
-      </nav>
+      <div className="sticky top-0 z-50 w-full flex flex-col">
+        <Navbar />
+      </div>
 
       <div className="max-w-[1600px] mx-auto px-3 sm:px-4 py-6 space-y-4">
         {/* ── Market Stats Bar ── */}

@@ -31,15 +31,18 @@ import { useUser } from "@/context/UserContext";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useState } from "react";
 
+import { Navbar } from "@/components/Navbar";
+import { useCrypto } from "@/context/CryptoContext";
+
 export default function Home() {
   const { user, balance, logout, activeTrades } = useUser();
+  const { prices } = useCrypto();
+  
   const totalEquity = balance + (activeTrades.reduce((acc, t) => acc + t.allocation, 0)) +
     Object.entries(user?.holdings || {}).reduce((acc, [symbol, amount]) => {
-      const prices: Record<string, number> = { BTC: 64230, ETH: 3450, SOL: 145, BNB: 580, XRP: 0.6, ADA: 0.4, DOGE: 0.1, TRX: 0.1 };
       return acc + (amount * (prices[symbol] || 0));
     }, 0);
   const [selectedAsset, setSelectedAsset] = useState("BTC");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
 
@@ -50,99 +53,7 @@ export default function Home() {
         <GlobalNewsWire />
         <LivePriceTicker />
         <TradeActivityToasts />
-        {/* Navbar */}
-        <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl">
-          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
-                <BlocksIcon className="w-5 h-5 text-white" />
-              </div>
-              <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent group cursor-pointer hover:scale-105 transition-transform">Stocks Indicators</a>
-            </div>
-
-            <div className="flex items-center gap-2 md:gap-6">
-              <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-400">
-                <a href="/" className="flex items-center gap-2 text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]"><LayoutDashboard className="w-4 h-4" /> Dashboard</a>
-                <a href="/markets" className="flex items-center gap-2 hover:text-white transition-colors"><BarChart3 className="w-4 h-4 text-cyan-400" /> Markets</a>
-                <a href="/profile" className="flex items-center gap-2 hover:text-white transition-colors"><User className="w-4 h-4" /> Profile</a>
-                <a href="/deposit" className="flex items-center gap-2 hover:text-white transition-colors"><Wallet className="w-4 h-4 text-indigo-400" /> Deposit</a>
-                <a href="/withdraw" className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors font-bold"><ArrowRightLeft className="w-4 h-4" /> Withdraw</a>
-                <a href="/futures" className="flex items-center gap-2 text-indigo-400 font-black hover:text-indigo-300 transition-colors uppercase tracking-widest"><Activity className="w-4 h-4 animate-pulse" /> Pro Options</a>
-              </nav>
-
-              <div className="flex items-center gap-2 md:gap-4 border-l border-gray-800 lg:pl-6">
-                {user ? (
-                  <div className="flex items-center gap-2 md:gap-4">
-                    <div className="text-right hidden sm:block">
-                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Net Equity (USDT)</div>
-                      <div className="text-sm font-black text-emerald-400 flex items-center gap-1.5 ml-auto justify-end">
-                        <UsdtIcon className="w-3.5 h-3.5" />
-                        ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </div>
-                    </div>
-                    {/* Mobile Deposit / Withdraw */}
-                    <a href="/deposit" className="lg:hidden p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform" title="Deposit">
-                      <Wallet className="w-5 h-5" />
-                    </a>
-                    <a href="/withdraw" className="lg:hidden p-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-300 active:scale-90 transition-transform" title="Withdraw">
-                      <ArrowRightLeft className="w-5 h-5" />
-                    </a>
-
-                    <div className="relative group">
-                      <img src={user.avatar} alt="User" className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gray-900 border border-gray-700 transition-transform group-hover:scale-110 cursor-pointer shadow-lg" />
-                      {/* VIP Badge */}
-                      <div className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 p-1 rounded-full border border-gray-900 shadow-lg" title="VIP Status">
-                        <ShieldCheck className="w-3 h-3 text-white" fill="currentColor" />
-                      </div>
-                      <a href="/admin" className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></a>
-                    </div>
-
-                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 text-gray-400 hover:text-white">
-                      {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                    </button>
-
-                    <NotificationBell />
-
-                    <button onClick={logout} className="hidden md:block p-2 text-gray-500 hover:text-rose-400 transition-colors" title="Logout">
-                      <LogOut className="w-5 h-5" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-4">
-                    <a href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Login</a>
-                    <a href="/register" className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 active:scale-95">Register</a>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Slide-out Menu */}
-          {mobileMenuOpen && (
-            <div className="lg:hidden bg-gray-900 border-b border-gray-800 p-4 animate-in slide-in-from-top duration-300">
-              <div className="grid grid-cols-1 gap-4">
-                <a href="/" className="flex items-center gap-3 p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 font-bold">
-                  <LayoutDashboard className="w-5 h-5" /> Home Dashboard
-                </a>
-                <a href="/futures" className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 font-black uppercase tracking-widest mt-2 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 animate-translate-x"></div>
-                  <Activity className="w-5 h-5 animate-pulse" /> Pro Options Trading
-                </a>
-                <a href="/profile" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
-                  <User className="w-5 h-5" /> My Personal Profile
-                </a>
-                <a href="/deposit" className="flex items-center gap-3 p-4 hover:bg-gray-800/50 rounded-2xl text-gray-300 font-bold transition-colors">
-                  <ArrowRightLeft className="w-5 h-5" /> Funds & Deposits
-                </a>
-                <div className="border-t border-gray-800 my-2 pt-4">
-                  <button onClick={logout} className="flex items-center gap-3 p-4 text-rose-500 font-bold w-full">
-                    <LogOut className="w-5 h-5" /> Sign Out of Platform
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </nav>
+        <Navbar />
       </div>
 
       {/* Main Content */}
@@ -256,7 +167,7 @@ export default function Home() {
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-black text-white">{amount.toFixed(6)}</div>
-                          <div className="text-[10px] text-emerald-400 font-bold">~${(amount * (symbol === "BTC" ? 64230 : (symbol === "ETH" ? 3450 : (symbol === "SOL" ? 145 : 1)))).toLocaleString()}</div>
+                          <div className="text-[10px] text-emerald-400 font-bold">~${(amount * (prices[symbol] || 0)).toLocaleString()}</div>
                         </div>
                       </div>
                     )

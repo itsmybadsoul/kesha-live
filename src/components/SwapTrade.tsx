@@ -4,39 +4,16 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { ArrowDownUp, Info, Wallet, RefreshCw, ChevronDown, TrendingUp } from "lucide-react";
+import { useCrypto } from "@/context/CryptoContext";
 
 export function SwapTrade() {
   const { balance, user, tradeAsset } = useUser();
+  const { prices: rates } = useCrypto();
   const { toast } = useToast();
   const [fromAsset, setFromAsset] = useState("USD");
   const [toAsset, setToAsset] = useState("BTC");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-  const [rates, setRates] = useState<Record<string, number>>({
-    BTC: 64230.50,
-    ETH: 3450.20,
-    BNB: 580.40,
-    SOL: 145.80,
-    XRP: 0.62,
-    ADA: 0.45,
-    DOGE: 0.16,
-    TRX: 0.12,
-    DOT: 7.20,
-    MATIC: 0.72,
-    AVAX: 36.40,
-    LINK: 18.10,
-    UNI: 7.80,
-    NEAR: 6.90,
-    LTC: 88.30,
-    SHIB: 0.000027,
-    DAI: 1.00,
-    BCH: 460.20,
-    ICP: 13.40,
-    FIL: 8.90,
-    APT: 12.10,
-    OP: 3.40,
-    ARB: 1.65,
-  });
 
   const availableAssets = ["USD", ...Object.keys(rates)].sort();
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useCryptoPrices } from "@/hooks/useCryptoPrices";
+import { useCrypto } from "@/context/CryptoContext";
 import { TrendingUp, Activity, ArrowUpRight, BarChart3 } from "lucide-react";
 
 export function MarketOverview() {
-  const { prices, loading } = useCryptoPrices();
+  const { rawPrices: prices, loading } = useCrypto();
 
   if (loading) return null;
 

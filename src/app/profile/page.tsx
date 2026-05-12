@@ -6,9 +6,12 @@ import { User, Wallet, TrendingUp, History, ArrowUpRight, ArrowDownRight, Award,
 import { KYCPortal } from "@/components/KYCPortal";
 import { DigitalMembershipCard } from "@/components/DigitalMembershipCard";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { Navbar } from "@/components/Navbar";
+import { useCrypto } from "@/context/CryptoContext";
 
 export default function ProfilePage() {
   const { user, balance, transactions, activeTrades, isLoading } = useUser();
+  const { prices } = useCrypto();
 
   if (isLoading) return <LoadingScreen />;
 
@@ -30,30 +33,16 @@ export default function ProfilePage() {
   }
 
   const totalProfit = activeTrades.reduce((acc, curr) => acc + (curr.isProfit ? 50 : -20), 0); // Mock profit calculation
-  const prices: Record<string, number> = { BTC: 64230.50, ETH: 3450.20, BNB: 580.40, SOL: 145.80, XRP: 0.62, ADA: 0.45, DOGE: 0.16, TRX: 0.12, DOT: 7.20, MATIC: 0.72, AVAX: 36.40, LINK: 18.10, UNI: 7.80, NEAR: 6.90, LTC: 88.30, SHIB: 0.000027 };
   const getPrice = (sym: string) => prices[sym] || 1;
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-indigo-500/30">
       <LivePriceTicker />
       
-      {/* Navbar - Simplified for Profile */}
-      <nav className="border-b border-gray-800 bg-[#0A0A0B]/80 backdrop-blur-xl sticky top-10 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
-              <Wallet className="w-5 h-5 text-white" />
-            </div>
-            <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
-          </a>
-          <div className="flex items-center gap-4 text-sm font-medium text-gray-400">
-            <a href="/" className="hover:text-white transition-colors">Dashboard</a>
-            <span className="text-gray-700">/</span>
-            <span className="text-white">Profile</span>
-          </div>
-        </div>
-      </nav>
-
+      {/* Navbar - Shared */}
+      <div className="sticky top-0 z-50 w-full flex flex-col">
+        <Navbar />
+      </div>
       <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           

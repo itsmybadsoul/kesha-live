@@ -7,21 +7,14 @@ import { TrendingUp, TrendingDown, Clock, Activity, AlertTriangle, ShieldCheck }
 import { OptionsChart } from "@/components/OptionsChart";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
-const ASSETS: Record<string, number> = {
-  BTC: 64230.50,
-  ETH: 3450.20,
-  SOL: 145.80,
-  BNB: 580.40,
-  XRP: 0.62,
-  ADA: 0.45,
-  DOGE: 0.16,
-  LINK: 18.10,
-  AVAX: 36.40,
-  MATIC: 0.72,
-};
+import { Navbar } from "@/components/Navbar";
+import { useCrypto } from "@/context/CryptoContext";
+
+const ASSET_SYMBOLS = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "LINK", "AVAX", "MATIC"];
 
 export default function FuturesOptions() {
   const { user, balance, placeOptionsTrade, resolveOptionsTrade, refreshUser, isLoading } = useUser();
+  const { prices: liveMarketPrices } = useCrypto();
 
   if (isLoading) return <LoadingScreen />;
 
@@ -31,12 +24,14 @@ export default function FuturesOptions() {
   const [duration, setDuration] = useState<number>(3);
   const [placing, setPlacing] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const [livePrice, setLivePrice] = useState(ASSETS["BTC"]);
+  const [livePrice, setLivePrice] = useState(liveMarketPrices["BTC"] || 64230);
 
   // Sync initial live price when asset changes
   useEffect(() => {
-    setLivePrice(ASSETS[selectedAsset]);
-  }, [selectedAsset]);
+    if (liveMarketPrices[selectedAsset]) {
+      setLivePrice(liveMarketPrices[selectedAsset]);
+    }
+  }, [selectedAsset, liveMarketPrices]);
 
   // Polling loop for active trade resolution & admin intercepts
   useEffect(() => {
@@ -58,7 +53,7 @@ export default function FuturesOptions() {
         const expiresAt = trade.startTime + trade.durationMinutes * 60 * 1000;
         if (currentTime >= expiresAt) {
           // Time expired! Resolve trade.
-          const basePrice = ASSETS[trade.asset] || 100;
+          const basePrice = liveMarketPrices[trade.asset] || 100;
           await resolveOptionsTrade(trade.id, basePrice);
         }
       }
@@ -87,24 +82,8 @@ export default function FuturesOptions() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white selection:bg-indigo-500/30 font-sans pb-20">
       
-      {/* Top Banner */}
-      <div className="bg-[#12141d] border-b border-gray-800/50 sticky top-0 z-50">
-        <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
-           <div className="flex items-center gap-4">
-              <a href="/" className="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Stocks Indicators</a>
-              <span className="text-gray-700">|</span>
-              <span className="text-sm font-black text-indigo-400 tracking-widest uppercase flex items-center gap-2">
-                <Activity className="w-4 h-4" /> Pro Options
-              </span>
-           </div>
-           <div className="flex items-center gap-6">
-              <div className="text-right">
-                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Available Margin</div>
-                 <div className="text-sm font-black text-white">${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-              </div>
-              <a href="/" className="text-xs font-bold text-gray-400 hover:text-white transition-colors bg-gray-800 px-4 py-2 rounded-xl">Dashboard</a>
-           </div>
-        </div>
+      <div className="sticky top-0 z-50 w-full flex flex-col">
+        <Navbar />
       </div>
 
       <div className="max-w-[1600px] mx-auto px-4 lg:px-6 py-8">
@@ -115,27 +94,30 @@ export default function FuturesOptions() {
                
                {/* Asset Strip */}
                <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-2 flex overflow-x-auto gap-2 scrollbar-none">
-                 {Object.entries(ASSETS).map(([sym, price]) => (
-                   <button 
-                     key={sym}
-                     onClick={() => setSelectedAsset(sym)}
-                     className={`flex-shrink-0 px-4 py-3 rounded-xl min-w-[120px] transition-all ${
-                       selectedAsset === sym ? "bg-indigo-600 border border-indigo-500 shadow-xl" : "bg-black/40 border border-gray-800 hover:border-gray-600"
-                     }`}
-                   >
-                     <div className="text-xs font-black text-white mb-1">{sym}/USD</div>
-                     <div className={`text-sm font-bold ${selectedAsset === sym ? "text-indigo-100" : "text-gray-400"}`}>
-                       ${selectedAsset === sym ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) : price.toLocaleString()}
-                     </div>
-                   </button>
-                 ))}
+                 {ASSET_SYMBOLS.map((sym) => {
+                   const price = liveMarketPrices[sym] || 0;
+                   return (
+                     <button 
+                       key={sym}
+                       onClick={() => setSelectedAsset(sym)}
+                       className={`flex-shrink-0 px-4 py-3 rounded-xl min-w-[120px] transition-all ${
+                         selectedAsset === sym ? "bg-indigo-600 border border-indigo-500 shadow-xl" : "bg-black/40 border border-gray-800 hover:border-gray-600"
+                       }`}
+                     >
+                       <div className="text-xs font-black text-white mb-1">{sym}/USD</div>
+                       <div className={`text-sm font-bold ${selectedAsset === sym ? "text-indigo-100" : "text-gray-400"}`}>
+                         ${selectedAsset === sym ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) : price.toLocaleString()}
+                       </div>
+                     </button>
+                   );
+                 })}
                </div>
 
                {/* Chart Container */}
                <div className="h-[500px] w-full bg-black/40 border border-gray-800 rounded-3xl p-1 relative shadow-2xl">
                   <OptionsChart 
                     asset={selectedAsset} 
-                    basePrice={ASSETS[selectedAsset]} 
+                    basePrice={liveMarketPrices[selectedAsset] || livePrice} 
                     activeTrade={activeTrade} 
                     onPriceUpdate={setLivePrice}
                   />
