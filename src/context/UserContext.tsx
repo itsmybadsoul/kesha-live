@@ -177,9 +177,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (user) {
       localStorage.setItem("ys_user", JSON.stringify(user));
-      refreshUser();
     } else {
       localStorage.removeItem("ys_user");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.email) {
+      refreshUser();
     }
   }, [user?.email]);
 

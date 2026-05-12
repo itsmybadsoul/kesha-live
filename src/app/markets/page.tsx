@@ -341,9 +341,9 @@ export default function MarketsPage() {
         </div>
 
         {/* ── Table ── */}
-        <div className="rounded-xl border border-white/5 overflow-hidden bg-white/[0.015]">
+        <div className="rounded-xl border border-white/5 overflow-x-auto bg-white/[0.015]">
           {/* Header */}
-          <div className="grid grid-cols-[2fr_3fr_1.2fr_1.2fr_1.2fr_1fr_1fr_auto] gap-2 px-4 py-2.5 bg-white/[0.025] border-b border-white/5 text-[10px] uppercase tracking-widest text-gray-500">
+          <div className="min-w-[800px] grid grid-cols-[2fr_3fr_1.2fr_1.2fr_1.2fr_1fr_1fr_auto] gap-2 px-4 py-2.5 bg-white/[0.025] border-b border-white/5 text-[10px] uppercase tracking-widest text-gray-500">
             {([["sym", "Symbol"], ["name", "Company"], ["price", "Price"], ["changePct", "Change %"], ["vol", "Volume"], ["cap", "Mkt Cap"], ["volatility", "Volatility"]] as [SortKey, string][]).map(([k, label]) => (
               <button key={k} onClick={() => toggleSort(k)} className="flex items-center gap-1 hover:text-gray-300 transition-colors">
                 {label}<SortIcon k={k} />
@@ -353,7 +353,7 @@ export default function MarketsPage() {
           </div>
 
           {/* Rows */}
-          <div className="divide-y divide-white/[0.03] max-h-[calc(100vh-340px)] overflow-y-auto">
+          <div className="min-w-[800px] divide-y divide-white/[0.03] max-h-[calc(100vh-340px)] overflow-y-auto">
             {visible.map(s => {
               const isUp = s.changePct >= 0;
               return (

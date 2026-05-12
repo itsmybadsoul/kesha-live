@@ -309,8 +309,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl">
+          <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
               <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
                 <th className="px-6 py-4">Context</th>
@@ -379,8 +379,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-10">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+          <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
               <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
                 <th className="px-6 py-4">User</th>
@@ -439,8 +439,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-10">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+          <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
               <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
                 <th className="px-6 py-4">User Identity</th>
@@ -516,8 +516,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-10">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-10">
+          <table className="w-full min-w-[800px] text-left border-collapse">
              <thead>
                <tr className="bg-gray-900 border-b border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-widest">
                  <th className="px-6 py-4">Symbol / Name</th>
@@ -595,8 +595,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/20 border border-gray-700/50 rounded-3xl overflow-hidden mb-20 opacity-80 hover:opacity-100 transition-opacity">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-gray-800/20 border border-gray-700/50 rounded-3xl overflow-x-auto mb-20 opacity-80 hover:opacity-100 transition-opacity">
+          <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
               <tr className="bg-gray-900 border-b border-gray-700 text-gray-500 text-[10px] font-black uppercase tracking-widest">
                 <th className="px-6 py-4">Settled At</th>
@@ -659,8 +659,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-2xl mb-20">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-x-auto shadow-2xl mb-20">
+          <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
               <tr className="bg-gray-900 border-b border-gray-700 text-gray-500 text-[10px] font-black uppercase tracking-widest">
                 <th className="px-6 py-4">Account Holder</th>
