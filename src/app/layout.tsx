@@ -21,6 +21,7 @@ import { UserProvider } from "@/context/UserContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { CryptoProvider } from "@/context/CryptoContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Footer } from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -33,7 +34,12 @@ export default function RootLayout({
         <ThemeProvider>
           <CryptoProvider>
             <UserProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <ToastProvider>
+                <div className="flex flex-col min-h-screen">
+                  <div className="flex-1">{children}</div>
+                  <Footer />
+                </div>
+              </ToastProvider>
             </UserProvider>
           </CryptoProvider>
         </ThemeProvider>

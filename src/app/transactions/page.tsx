@@ -135,16 +135,6 @@ export default function TransactionsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-slate-200 dark:border-gray-800 py-16 mt-32 bg-white/40 dark:bg-black/20">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-10 text-[10px] text-slate-400 dark:text-gray-600 font-black uppercase tracking-[0.25em]">
-          <span>© 2026 Kesha Institutional Infrastructure</span>
-          <div className="flex items-center gap-12">
-            <a href="/terms" className="hover:text-indigo-500 transition-colors">Framework</a>
-            <a href="/privacy" className="hover:text-indigo-500 transition-colors">Privacy</a>
-            <a href="/support" className="hover:text-indigo-500 transition-colors">Terminal</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
