@@ -15,6 +15,7 @@ export default function AdminPage() {
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [supportTickets, setSupportTickets] = useState<any[]>([]);
   const [customMarkets, setCustomMarkets] = useState<any[]>([]);
+  const [privateAssets, setPrivateAssets] = useState<any[]>([]);
   const [notifModal, setNotifModal] = useState<{ open: boolean; email: string; title: string; body: string }>({ open: false, email: "", title: "", body: "" });
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
@@ -35,7 +36,8 @@ export default function AdminPage() {
         fetch("/api/admin/kyc"),
         fetch("/api/admin/users"),
         fetch("/api/support"),
-        fetch("/api/admin/market")
+        fetch("/api/admin/market"),
+        fetch("/api/admin/private")
       ]);
       const depData = await depRes.json();
       const withData = await withRes.json();
@@ -45,6 +47,7 @@ export default function AdminPage() {
       const userData = await userRes.json();
       const supportData = await supRes.json();
       const marketData = await marketRes.json();
+      const privateData = await (await fetch("/api/admin/private")).json();
       
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);
@@ -54,6 +57,7 @@ export default function AdminPage() {
       if (userData.users) setAllUsers(userData.users);
       if (supportData.tickets) setSupportTickets(supportData.tickets);
       if (marketData.markets) setCustomMarkets(marketData.markets);
+      if (privateData.assets) setPrivateAssets(privateData.assets);
     } catch (e) {
       console.error(e);
     } finally {
@@ -244,6 +248,21 @@ export default function AdminPage() {
       fetchData();
     }
   }, [isAuthorized]);
+
+  const handlePrivateAssetUpdate = async (id: string, field: string, value: any) => {
+    const newAssets = privateAssets.map(a => a.id === id ? { ...a, [field]: value } : a);
+    setPrivateAssets(newAssets);
+    try {
+      await fetch("/api/admin/private", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assets: newAssets })
+      });
+      toast("Private protocol asset updated.", "success");
+    } catch (e) {
+      toast("Failed to update private asset.", "error");
+    }
+  };
 
   if (!isAuthorized) {
     return (
@@ -580,6 +599,83 @@ export default function AdminPage() {
                     );
                   })
                 )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="mt-20 mb-8 flex justify-between items-center px-4">
+          <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter uppercase italic text-amber-500">
+            Institutional <span className="text-slate-900 dark:text-white not-italic">Private Assets</span> <ShieldCheck className="w-8 h-8 text-amber-500" />
+          </h2>
+          <div className="px-5 py-2 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 shadow-lg">
+             Exclusive Synthetic Markets
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl mb-16">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1000px] text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em]">
+                  <th className="px-8 py-5">Asset Identity</th>
+                  <th className="px-8 py-5">Ticker Symbol</th>
+                  <th className="px-8 py-5">Price (USDT)</th>
+                  <th className="px-8 py-5">24h Change (%)</th>
+                  <th className="px-8 py-5">Volatility Score</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
+                {privateAssets.map((pa) => (
+                  <tr key={pa.id} className="hover:bg-amber-500/[0.02] transition-colors group">
+                    <td className="px-8 py-6">
+                       <input 
+                         type="text" 
+                         value={pa.name} 
+                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'name', e.target.value)}
+                         className="bg-transparent border-none text-slate-900 dark:text-white font-black text-sm w-full focus:ring-0"
+                       />
+                       <div className="text-[9px] text-slate-400 dark:text-gray-600 uppercase font-bold tracking-widest mt-1">Institutional_Asset_ID: {pa.id}</div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <input 
+                         type="text" 
+                         value={pa.sym} 
+                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'sym', e.target.value)}
+                         className="bg-transparent border-none text-indigo-500 font-black text-sm w-20 focus:ring-0 uppercase"
+                       />
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="flex items-center gap-2">
+                         <span className="text-slate-400">$</span>
+                         <input 
+                           type="number" 
+                           value={pa.price} 
+                           onChange={(e) => handlePrivateAssetUpdate(pa.id, 'price', parseFloat(e.target.value))}
+                           className="bg-transparent border-none text-slate-900 dark:text-white font-black text-lg w-32 focus:ring-0"
+                         />
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <input 
+                         type="number" 
+                         step="0.1"
+                         value={pa.change} 
+                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'change', parseFloat(e.target.value))}
+                         className={`bg-transparent border-none font-black text-sm w-20 focus:ring-0 ${pa.change >= 0 ? "text-emerald-500" : "text-rose-500"}`}
+                       />
+                    </td>
+                    <td className="px-8 py-6">
+                       <input 
+                         type="number" 
+                         step="0.1"
+                         value={pa.volatility} 
+                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'volatility', parseFloat(e.target.value))}
+                         className="bg-transparent border-none text-slate-400 dark:text-gray-500 font-black text-sm w-20 focus:ring-0"
+                       />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

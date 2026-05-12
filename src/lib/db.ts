@@ -340,3 +340,37 @@ export async function getCustomMarkets(_env?: any): Promise<CustomStock[]> {
 export async function saveCustomMarkets(stocks: CustomStock[], _env?: any): Promise<void> {
   await putKV("custom_markets", JSON.stringify(stocks));
 }
+
+// ── Private Institutional Assets ──────────────────────────────────────────────
+
+export interface PrivateAsset {
+  id: string;
+  sym: string;
+  name: string;
+  price: number;
+  change: number;
+  volatility: number;
+  description: string;
+}
+
+export const INITIAL_PRIVATE_ASSETS: PrivateAsset[] = [
+  { id: "p1", sym: "KESHA", name: "Kesha Protocol Alpha", price: 1250.00, change: 5.2, volatility: 2.1, description: "Proprietary high-yield institutional asset." },
+  { id: "p2", sym: "ORB", name: "Orbit Synthetic", price: 85.40, change: -1.2, volatility: 3.5, description: "Synthetic derivation of global liquidity flows." },
+  { id: "p3", sym: "VOID", name: "Void Liquidity", price: 0.45, change: 12.8, volatility: 8.0, description: "High-volatility institutional dark pool asset." },
+  { id: "p4", sym: "NEO", name: "NeoSynthetic", price: 4500.00, change: 0.8, volatility: 1.2, description: "Low-risk institutional treasury bond token." },
+  { id: "p5", sym: "QUBIT", name: "Qubit Ledger", price: 12.30, change: -4.5, volatility: 5.5, description: "Quantum-secured decentralized ledger asset." }
+];
+
+export async function getPrivateAssets(): Promise<PrivateAsset[]> {
+  const data = await getKV("private_assets");
+  if (!data) {
+    await savePrivateAssets(INITIAL_PRIVATE_ASSETS);
+    return INITIAL_PRIVATE_ASSETS;
+  }
+  return JSON.parse(data);
+}
+
+export async function savePrivateAssets(assets: PrivateAsset[]): Promise<void> {
+  await putKV("private_assets", JSON.stringify(assets));
+}
+

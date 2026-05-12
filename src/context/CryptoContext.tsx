@@ -136,6 +136,24 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
       }
 
+      // 3. Fetch Private Institutional Assets
+      const privateRes = await fetch("/api/admin/private").catch(() => null);
+      if (privateRes && privateRes.ok) {
+        const pData = await privateRes.json();
+        if (pData.assets) {
+          pData.assets.forEach((pa: any) => {
+            liveMap[pa.sym] = pa.price;
+            // Add to rawPrices if not already there (private assets are unique)
+            rawArr.push({
+              symbol: pa.sym,
+              rawPrice: pa.price,
+              price: pa.price.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+              change: pa.change
+            });
+          });
+        }
+      }
+
       setPrices(liveMap);
       setRawPrices(rawArr);
       setLoading(false);

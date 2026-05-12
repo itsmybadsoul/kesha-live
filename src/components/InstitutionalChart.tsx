@@ -54,14 +54,24 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     currentPriceRef.current = basePrice;
   }, [asset, basePrice > 0]); // Only re-init if asset changes or we finally get a price
 
-  // Live update
+  // Live update with smoothing
   useEffect(() => {
+    let smoothedPrice = basePrice;
+    
     const interval = setInterval(() => {
       if (basePrice === 0) return;
       
+      // Glide the smoothedPrice towards basePrice (10% of the gap per tick)
+      const diff = basePrice - smoothedPrice;
+      if (Math.abs(diff) > 0.0001) {
+        smoothedPrice += diff * 0.15;
+      } else {
+        smoothedPrice = basePrice;
+      }
+
       const nowSec = Math.floor(Date.now() / 1000);
       const noise = getNoise(nowSec);
-      const newPoint = basePrice + (noise * basePrice * 0.0005);
+      const newPoint = smoothedPrice + (noise * smoothedPrice * 0.0005);
       const newVol = Math.abs(noise) * 100 + Math.random() * 50;
 
       setDataPoints(prev => [...prev.slice(1), newPoint]);
@@ -70,7 +80,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [basePrice]);
+  }, [basePrice > 0]); // Only re-init if we go from no price to price
 
   const { min, max, range, adjustedMin, adjustedMax, adjustedRange } = useMemo(() => {
     if (dataPoints.length === 0) return { min: 0, max: 0, range: 0, adjustedMin: 0, adjustedMax: 0, adjustedRange: 1 };

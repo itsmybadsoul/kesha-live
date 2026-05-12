@@ -34,6 +34,7 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useCrypto } from "@/context/CryptoContext";
 import { InstitutionalChart } from "@/components/InstitutionalChart";
+import { AIPredictions } from "@/components/AIPredictions";
 
 export default function Home() {
   const { user, balance, logout, activeTrades } = useUser();
@@ -126,9 +127,11 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="relative z-10">
+          <div className="relative z-10 mb-20">
             <InstitutionalChart asset={selectedAsset} height={600} />
           </div>
+
+          <AIPredictions />
         </div>
 
         <div className="mb-10">
