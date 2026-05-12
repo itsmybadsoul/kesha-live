@@ -16,7 +16,10 @@ export default function CryptoOverviewPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const handleTrade = (sym: string, direction: "UP" | "DOWN") => {
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+
+  const handleTrade = (e: React.MouseEvent, sym: string, direction: "UP" | "DOWN") => {
+    e.stopPropagation(); // Prevent opening chart when clicking buttons
     if (!user) {
       router.push("/login");
       return;
@@ -79,7 +82,8 @@ export default function CryptoOverviewPage() {
           {visible.map((p) => (
             <div
               key={p.symbol}
-              className="bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 hover:border-indigo-500/40 dark:hover:border-indigo-500/30 transition-all rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col justify-between group"
+              onClick={() => setSelectedSymbol(p.symbol)}
+              className="bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 hover:border-indigo-500/40 dark:hover:border-indigo-500/30 transition-all rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col justify-between group cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800"
             >
               <div>
                 <div className="flex justify-between items-start mb-2">
@@ -91,20 +95,25 @@ export default function CryptoOverviewPage() {
                 <div className="text-base sm:text-xl font-black text-slate-900 dark:text-white tabular-nums truncate">
                   ${p.price}
                 </div>
-                <div className="flex items-center gap-1 mt-1 text-[9px] font-bold text-emerald-500/70">
-                  <ArrowUpRight className="w-2.5 h-2.5" /> LIVE
+                <div className="flex items-center justify-between mt-1">
+                   <div className="flex items-center gap-1 text-[9px] font-bold text-emerald-500/70">
+                     <ArrowUpRight className="w-2.5 h-2.5" /> LIVE
+                   </div>
+                   <div className={`text-[10px] font-black ${p.change >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                      {p.change >= 0 ? "+" : ""}{p.change.toFixed(2)}%
+                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mt-3 sm:mt-5">
                 <button
-                  onClick={() => handleTrade(p.symbol, "UP")}
+                  onClick={(e) => handleTrade(e, p.symbol, "UP")}
                   className="bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-0.5 sm:gap-1"
                 >
                   <TrendingUp className="w-3 h-3 shrink-0" /> CALL
                 </button>
                 <button
-                  onClick={() => handleTrade(p.symbol, "DOWN")}
+                  onClick={(e) => handleTrade(e, p.symbol, "DOWN")}
                   className="bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-500 text-red-600 dark:text-red-400 hover:text-white text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-0.5 sm:gap-1"
                 >
                   <TrendingDown className="w-3 h-3 shrink-0" /> PUT
@@ -113,6 +122,29 @@ export default function CryptoOverviewPage() {
             </div>
           ))}
         </div>
+
+        {/* Chart Modal */}
+        {selectedSymbol && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+             <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-sm" onClick={() => setSelectedSymbol(null)}></div>
+             <div className="relative bg-white dark:bg-gray-900 w-full max-w-5xl aspect-video rounded-3xl overflow-hidden border border-slate-300 dark:border-gray-800 shadow-2xl flex flex-col">
+                <div className="p-4 flex justify-between items-center border-b border-slate-200 dark:border-gray-800">
+                   <h3 className="font-black text-xl flex items-center gap-2">
+                     {selectedSymbol} <span className="text-slate-400 text-sm font-normal">/ USDT</span>
+                   </h3>
+                   <button onClick={() => setSelectedSymbol(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                     <Activity className="w-6 h-6 rotate-45" />
+                   </button>
+                </div>
+                <div className="flex-1 bg-gray-900">
+                   <iframe 
+                     src={`https://s.tradingview.com/widgetembed/?symbol=BINANCE:${selectedSymbol}USDT&theme=dark&interval=60&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en`}
+                     className="w-full h-full border-0"
+                   />
+                </div>
+             </div>
+          </div>
+        )}
 
         {/* Empty state */}
         {filtered.length === 0 && (

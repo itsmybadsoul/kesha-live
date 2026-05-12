@@ -5,6 +5,7 @@ export interface PriceData {
   symbol: string;
   price: string;
   rawPrice: number;
+  change: number;
 }
 
 export interface CryptoContextType {
@@ -44,8 +45,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const fetchData = async () => {
     try {
-      // 1. Fetch live Binance prices
-      const response = await fetch("https://api.binance.com/api/v3/ticker/price").catch(() => null);
+      // 1. Fetch live Binance prices (24h ticker for change percent)
+      const response = await fetch("https://api.binance.com/api/v3/ticker/24hr").catch(() => null);
       let liveMap: Record<string, number> = { ...FALLBACK };
       let rawArr: PriceData[] = [];
       
@@ -68,11 +69,12 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
         rawArr = filtered.map((p: any) => ({
             symbol: p.symbol.replace("USDT", ""),
-            price: parseFloat(p.price).toLocaleString(undefined, { 
-              minimumFractionDigits: p.price < 1 ? 4 : 2,
-              maximumFractionDigits: p.price < 1 ? 6 : 2
+            price: parseFloat(p.lastPrice).toLocaleString(undefined, { 
+              minimumFractionDigits: p.lastPrice < 1 ? 4 : 2,
+              maximumFractionDigits: p.lastPrice < 1 ? 6 : 2
             }),
-            rawPrice: parseFloat(p.price)
+            rawPrice: parseFloat(p.lastPrice),
+            change: parseFloat(p.priceChangePercent)
         }));
           
         rawArr.forEach(p => {
@@ -83,7 +85,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         rawArr = Object.entries(FALLBACK).map(([sym, val]) => ({
           symbol: sym,
           price: val.toLocaleString(),
-          rawPrice: val
+          rawPrice: val,
+          change: 0
         }));
       }
 
@@ -124,7 +127,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     rawArr.push({
                       symbol: m.sym,
                       rawPrice: finalPrice,
-                      price: finalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                      price: finalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                      change: 0
                     });
                  }
               }
