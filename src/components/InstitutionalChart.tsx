@@ -84,7 +84,6 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   }, [dataPoints]);
 
   const width = 1000;
-  const svgHeight = height;
 
   const pathData = useMemo(() => {
     return dataPoints.map((point, index) => {
