@@ -38,30 +38,40 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     return Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
   };
 
+  const hasInitRef = useRef<string | null>(null);
+
   // Initialize history with a realistic random walk
   useEffect(() => {
-    if (basePrice === 0) return;
+    if (basePrice === 0 || hasInitRef.current === asset) return;
     
     const initialPoints = [];
     const initialVolumes = [];
-    let walkingPrice = basePrice * (0.98 + Math.random() * 0.04); // Start slightly away
+    // Start history slightly offset to show movement, but ensure it ends at basePrice
+    let walkingPrice = basePrice * (0.97 + Math.random() * 0.06); 
     
     for (let i = 0; i < 80; i++) {
         const noise = getNoise(i);
         walkingPrice += (noise * walkingPrice * 0.001);
-        // Gradually pull towards basePrice at the end
-        const pull = (basePrice - walkingPrice) * (i / 80) * 0.1;
+        
+        // Progressively pull MUCH harder towards basePrice as we reach the end (i=79)
+        const pullStrength = Math.pow(i / 80, 2) * 0.3;
+        const pull = (basePrice - walkingPrice) * pullStrength;
         walkingPrice += pull;
         
         initialPoints.push(walkingPrice);
         initialVolumes.push(Math.abs(noise) * 100 + Math.random() * 50);
     }
     
+    // Force the last point to be exactly basePrice to eliminate the jump
+    initialPoints[initialPoints.length - 1] = basePrice;
+    
     setDataPoints(initialPoints);
     setVolumes(initialVolumes);
     currentPriceRef.current = basePrice;
     smoothedPriceRef.current = basePrice;
-  }, [asset]); // Only re-init if asset changes
+    hasInitRef.current = asset;
+  }, [asset, basePrice > 0]); 
+
 
   // Live update with sub-second micro-ticks for "breathing" effect
   useEffect(() => {
