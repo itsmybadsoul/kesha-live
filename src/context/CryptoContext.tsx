@@ -151,7 +151,10 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                const total = pa.targetEndTime - pa.targetStartTime;
                const elapsed = Date.now() - pa.targetStartTime;
                const progress = Math.max(0, Math.min(elapsed / total, 1));
-               basePrice = pa.targetStartPrice + (pa.targetPrice - pa.targetStartPrice) * progress;
+               
+               // Add organic zig-zag trend noise (10% amplitude of total move)
+               const zigZag = Math.sin(progress * Math.PI * 12) * (pa.targetPrice - pa.targetStartPrice) * 0.15;
+               basePrice = pa.targetStartPrice + (pa.targetPrice - pa.targetStartPrice) * progress + zigZag;
             } else if (hasTarget && isFinished) {
                basePrice = pa.targetPrice;
             }
@@ -160,7 +163,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             const vol = pa.volatility || 2.0;
             const seed = Date.now() / 10000;
             const drift = Math.sin(seed * 0.5) * 0.0002;
-            const noise = (Math.random() - 0.5) * (vol * 0.0005);
+            const noise = (Math.random() - 0.5) * (vol * 0.0008);
             const livePrice = basePrice * (1 + drift + noise);
 
             liveMap[pa.sym] = livePrice;
