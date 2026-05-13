@@ -29,7 +29,7 @@ import { SeedPhraseOnboarding } from "@/components/SeedPhraseOnboarding";
 import { GlobalNewsWire } from "@/components/GlobalNewsWire";
 import { useUser } from "@/context/UserContext";
 import { NotificationBell } from "@/components/NotificationBell";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Navbar } from "@/components/Navbar";
 import { useCrypto } from "@/context/CryptoContext";
