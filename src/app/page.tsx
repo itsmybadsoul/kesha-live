@@ -19,7 +19,7 @@ import { PlatformTransparency } from "@/components/PlatformTransparency";
 import { ReferralRewards } from "@/components/ReferralRewards";
 import { GlobalLeaderboard } from "@/components/GlobalLeaderboard";
 import { MarketSentiment } from "@/components/MarketSentiment";
-import { TradeActivityToasts } from "@/components/TradeActivityToasts";
+import { AIPredictions } from "@/components/AIPredictions";
 import { StakingWidget } from "@/components/StakingWidget";
 import { AISignals } from "@/components/AISignals";
 import { SwapTrade } from "@/components/SwapTrade";
@@ -54,7 +54,6 @@ export default function Home() {
       <div className="sticky top-0 z-[60] w-full flex flex-col">
         <GlobalNewsWire />
         <LivePriceTicker />
-        <TradeActivityToasts />
         <Navbar />
       </div>
 
