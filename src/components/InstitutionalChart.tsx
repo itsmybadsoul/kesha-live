@@ -15,6 +15,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   const [dataPoints, setDataPoints] = useState<number[]>([]);
   const [volumes, setVolumes] = useState<number[]>([]);
   const currentPriceRef = useRef(basePrice);
+  const smoothedPriceRef = useRef(basePrice);
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgHeight, setSvgHeight] = useState(height || 400);
   const [width, setWidth] = useState(1000);
@@ -37,45 +38,43 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     return Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
   };
 
-  // Initialize history
+  // Initialize history with a realistic random walk
   useEffect(() => {
     if (basePrice === 0) return;
     
     const initialPoints = [];
     const initialVolumes = [];
-    const nowSec = Math.floor(Date.now() / 1000);
+    let walkingPrice = basePrice * (0.98 + Math.random() * 0.04); // Start slightly away
     
-    // We want to reconstruct a look of a "live" chart
-    for (let i = 80; i >= 0; i--) {
-        const noise = getNoise(nowSec - i);
-        // We assume the basePrice was roughly the same in the last 80 seconds for history reconstruction
-        initialPoints.push(basePrice + (noise * basePrice * 0.0008));
+    for (let i = 0; i < 80; i++) {
+        const noise = getNoise(i);
+        walkingPrice += (noise * walkingPrice * 0.001);
+        // Gradually pull towards basePrice at the end
+        const pull = (basePrice - walkingPrice) * (i / 80) * 0.1;
+        walkingPrice += pull;
+        
+        initialPoints.push(walkingPrice);
         initialVolumes.push(Math.abs(noise) * 100 + Math.random() * 50);
     }
     
     setDataPoints(initialPoints);
     setVolumes(initialVolumes);
     currentPriceRef.current = basePrice;
-  }, [asset, basePrice > 0]); // Only re-init if asset changes or we finally get a price
+    smoothedPriceRef.current = basePrice;
+  }, [asset, basePrice > 0]);
 
   // Live update with smoothing
-  const smoothedPriceRef = useRef(basePrice);
-  
   useEffect(() => {
     if (basePrice === 0) return;
     
     const interval = setInterval(() => {
-      // Glide the smoothedPrice towards the latest basePrice (15% of the gap per tick)
       const diff = basePrice - smoothedPriceRef.current;
-      if (Math.abs(diff) > 0.0001) {
-        smoothedPriceRef.current += diff * 0.15;
-      } else {
-        smoothedPriceRef.current = basePrice;
-      }
+      // Smoother glide
+      smoothedPriceRef.current += diff * 0.05;
 
       const nowSec = Math.floor(Date.now() / 1000);
       const noise = getNoise(nowSec);
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0005);
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0003);
       const newVol = Math.abs(noise) * 100 + Math.random() * 50;
 
       setDataPoints(prev => [...prev.slice(1), newPoint]);
@@ -84,7 +83,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [basePrice]); // Re-sync interval whenever basePrice updates from context
+  }, [asset, basePrice > 0]); // Re-sync interval whenever basePrice updates from context
 
   const { min, max, range, adjustedMin, adjustedMax, adjustedRange } = useMemo(() => {
     if (dataPoints.length === 0) return { min: 0, max: 0, range: 0, adjustedMin: 0, adjustedMax: 0, adjustedRange: 1 };
@@ -227,20 +226,20 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       </div>
       
       {/* HUD Details */}
-      <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20 flex flex-wrap gap-4 md:gap-8">
+      <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20 flex flex-wrap gap-4 md:gap-10">
         <div className="space-y-0.5 md:space-y-1">
           <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">24h Vol</div>
           <div className="text-[9px] md:text-xs font-bold text-white/80">{(basePrice * 1245).toLocaleString()} USDT</div>
         </div>
         <div className="space-y-0.5 md:space-y-1">
           <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Liquidity</div>
-          <div className="text-[9px] md:text-xs font-bold text-emerald-500 flex items-center gap-1">
-             <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping"></div> DEEP
+          <div className="text-[9px] md:text-xs font-bold text-emerald-500 flex items-center gap-1.5">
+             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div> PRO_DEEP
           </div>
         </div>
         <div className="space-y-0.5 md:space-y-1">
           <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Source</div>
-          <div className="text-[9px] md:text-xs font-bold text-indigo-400">Institutional Aggregator</div>
+          <div className="text-[9px] md:text-xs font-bold text-indigo-400 group-hover:text-white transition-colors">STOCKS AI Infrastructure</div>
         </div>
       </div>
     </div>
