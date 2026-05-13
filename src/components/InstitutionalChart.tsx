@@ -68,23 +68,20 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     if (basePrice === 0) return;
     
     const interval = setInterval(() => {
-      const diff = basePrice - smoothedPriceRef.current;
-      
-      // If price jumps significantly (e.g. > 5%), instantly shift history to keep scale realistic
-      if (Math.abs(diff) / basePrice > 0.05) {
-        setDataPoints(prev => prev.map(p => p + diff));
-        smoothedPriceRef.current = basePrice;
-        return;
+      const now = Date.now();
+      const cycleTime = now % 2000; // 2 second cycle
+      const isMoving = cycleTime < 1000; // Move for the first second, stay for the second
+
+      if (isMoving) {
+        const diff = basePrice - smoothedPriceRef.current;
+        // Faster glide during the active window
+        smoothedPriceRef.current += diff * 0.1;
       }
 
-      // Much calmer organic glide
-      smoothedPriceRef.current += diff * 0.02;
-
-      const nowSec = Date.now() / 1000;
-      const noise = getNoise(nowSec);
+      const noise = getNoise(now / 1000);
       
-      // Extremely subtle micro-volatility
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00005);
+      // Still allow a tiny amount of jitter even when "staying" to look live, but no price progression
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00003);
       
       setDataPoints(prev => {
         const next = [...prev.slice(1), newPoint];
@@ -93,7 +90,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       
       setVolumes(prev => [...prev.slice(1), Math.abs(noise) * 100 + Math.random() * 50]);
       currentPriceRef.current = newPoint;
-    }, 100); // 10 ticks per second for fluid movement
+    }, 100); // Maintain high frequency for smooth path rendering, but logic is cyclic
 
     return () => clearInterval(interval);
   }, [asset, basePrice > 0]);
