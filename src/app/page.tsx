@@ -44,8 +44,17 @@ export default function Home() {
       return acc + (amount * (prices[symbol] || 0));
     }, 0);
   const [selectedAsset, setSelectedAsset] = useState("BTC");
-
   const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
+  const [chartHeight, setChartHeight] = useState(600);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setChartHeight(window.innerWidth < 640 ? 350 : 600);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30 flex flex-col">
@@ -126,7 +135,7 @@ export default function Home() {
           </div>
           
           <div className="relative z-10 mb-10 sm:mb-20">
-            <InstitutionalChart asset={selectedAsset} height={window?.innerWidth < 640 ? 350 : 600} />
+            <InstitutionalChart asset={selectedAsset} height={chartHeight} />
           </div>
 
           <AIPredictions />
