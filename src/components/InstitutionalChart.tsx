@@ -101,15 +101,26 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       const y = svgHeight - ((point - adjustedMin) / adjustedRange) * svgHeight;
       return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
     }).join(" ");
-  }, [dataPoints, adjustedMin, adjustedRange, svgHeight]);
+  }, [dataPoints, adjustedMin, adjustedRange, svgHeight, width]);
 
   const isUp = dataPoints[dataPoints.length - 1] >= dataPoints[0];
   const strokeColor = isUp ? "#10B981" : "#F43F5E";
 
-  if (basePrice === 0) {
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setWidth(containerRef.current.offsetWidth);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (width === 0 || dataPoints.length === 0) {
     return (
       <div className="w-full bg-[#0B0E14] flex items-center justify-center animate-pulse rounded-[2rem] border border-white/5" style={{ height: height || '100%' }}>
-        <div className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Connecting to Liquidity Protocol...</div>
+        <div className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs text-center px-4">Connecting to Liquidity Protocol...</div>
       </div>
     );
   }
@@ -122,10 +133,10 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       </div>
 
       {/* Price Labels */}
-      <div className="absolute right-4 top-0 bottom-0 flex flex-col justify-between py-10 z-20 pointer-events-none">
-        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
-        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
-        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+      <div className="absolute right-2 md:right-4 top-0 bottom-0 flex flex-col justify-between py-10 z-20 pointer-events-none">
+        <div className="text-[8px] md:text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[8px] md:text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[8px] md:text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
       </div>
 
       {/* Main SVG */}
@@ -195,21 +206,21 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       </svg>
 
       {/* Floating Info */}
-      <div className="absolute top-8 left-8 z-20 flex items-start gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl font-black text-white shadow-2xl shadow-indigo-500/20">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20 flex items-start gap-3 md:gap-4 max-w-[80%]">
+        <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-lg md:text-xl font-black text-white shadow-2xl shadow-indigo-500/20 shrink-0">
           {asset[0]}
         </div>
         <div>
-          <div className="text-3xl font-black text-white tracking-tighter tabular-nums flex items-center gap-3">
+          <div className="text-xl md:text-3xl font-black text-white tracking-tighter tabular-nums flex flex-wrap items-center gap-2 md:gap-3">
             ${basePrice.toLocaleString(undefined, { 
               minimumFractionDigits: basePrice < 0.01 ? 6 : (basePrice < 1 ? 4 : 2),
               maximumFractionDigits: basePrice < 0.01 ? 8 : (basePrice < 1 ? 6 : 2)
             })}
-            <span className={`text-xs px-2 py-1 rounded-lg ${isUp ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
+            <span className={`text-[8px] md:text-xs px-2 py-0.5 md:py-1 rounded-lg ${isUp ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
               {isUp ? "▲" : "▼"} LIVE
             </span>
           </div>
-          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">{asset} / Tether Perpetual Institutional Feed</div>
+          <div className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1 line-clamp-1">{asset} / Institutional Feed</div>
         </div>
       </div>
       
