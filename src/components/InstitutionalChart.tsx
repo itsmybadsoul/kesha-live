@@ -61,29 +61,42 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     setVolumes(initialVolumes);
     currentPriceRef.current = basePrice;
     smoothedPriceRef.current = basePrice;
-  }, [asset, basePrice > 0]);
+  }, [asset]); // Only re-init if asset changes
 
-  // Live update with smoothing
+  // Live update with sub-second micro-ticks for "breathing" effect
   useEffect(() => {
     if (basePrice === 0) return;
     
     const interval = setInterval(() => {
       const diff = basePrice - smoothedPriceRef.current;
-      // Smoother glide
-      smoothedPriceRef.current += diff * 0.05;
+      
+      // If price jumps significantly (e.g. > 5%), instantly shift history to keep scale realistic
+      if (Math.abs(diff) / basePrice > 0.05) {
+        setDataPoints(prev => prev.map(p => p + diff));
+        smoothedPriceRef.current = basePrice;
+        return;
+      }
 
-      const nowSec = Math.floor(Date.now() / 1000);
+      // Smooth organic glide
+      smoothedPriceRef.current += diff * 0.08;
+
+      const nowSec = Date.now() / 1000;
       const noise = getNoise(nowSec);
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0003);
-      const newVol = Math.abs(noise) * 100 + Math.random() * 50;
-
-      setDataPoints(prev => [...prev.slice(1), newPoint]);
-      setVolumes(prev => [...prev.slice(1), newVol]);
+      
+      // High-frequency micro-volatility
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00015);
+      
+      setDataPoints(prev => {
+        const next = [...prev.slice(1), newPoint];
+        return next;
+      });
+      
+      setVolumes(prev => [...prev.slice(1), Math.abs(noise) * 100 + Math.random() * 50]);
       currentPriceRef.current = newPoint;
-    }, 1000);
+    }, 100); // 10 ticks per second for fluid movement
 
     return () => clearInterval(interval);
-  }, [asset, basePrice > 0]); // Re-sync interval whenever basePrice updates from context
+  }, [asset, basePrice > 0]);
 
   const { min, max, range, adjustedMin, adjustedMax, adjustedRange } = useMemo(() => {
     if (dataPoints.length === 0) return { min: 0, max: 0, range: 0, adjustedMin: 0, adjustedMax: 0, adjustedRange: 1 };
@@ -178,10 +191,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
           d={pathData} 
           fill="none" 
           stroke={strokeColor} 
-          strokeWidth="3" 
+          strokeWidth="2.5" 
           strokeLinecap="round" 
           strokeLinejoin="round" 
-          style={{ filter: 'drop-shadow(0 0 8px ' + strokeColor + '44)' }}
+          className="transition-all duration-300 ease-linear"
+          style={{ 
+            filter: 'drop-shadow(0 0 12px ' + strokeColor + '66)',
+            vectorEffect: 'non-scaling-stroke'
+          }}
         />
 
         {/* Current Price Dot */}
