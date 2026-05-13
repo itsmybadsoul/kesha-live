@@ -77,14 +77,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         return;
       }
 
-      // Smooth organic glide
-      smoothedPriceRef.current += diff * 0.08;
+      // Much calmer organic glide
+      smoothedPriceRef.current += diff * 0.02;
 
       const nowSec = Date.now() / 1000;
       const noise = getNoise(nowSec);
       
-      // High-frequency micro-volatility
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00015);
+      // Extremely subtle micro-volatility
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00005);
       
       setDataPoints(prev => {
         const next = [...prev.slice(1), newPoint];
