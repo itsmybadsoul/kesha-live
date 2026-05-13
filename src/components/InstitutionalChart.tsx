@@ -17,10 +17,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   const currentPriceRef = useRef(basePrice);
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgHeight, setSvgHeight] = useState(height || 400);
+  const [width, setWidth] = useState(1000);
 
   useEffect(() => {
     if (!height && containerRef.current) {
       setSvgHeight(containerRef.current.clientHeight);
+    }
+    if (containerRef.current) {
+      setWidth(containerRef.current.offsetWidth);
     }
   }, [height]);
 
@@ -93,8 +97,6 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     return { min, max, range, adjustedMin, adjustedMax, adjustedRange: adjustedMax - adjustedMin };
   }, [dataPoints]);
 
-  const width = 1000;
-
   const pathData = useMemo(() => {
     return dataPoints.map((point, index) => {
       const x = (index / (dataPoints.length - 1)) * width;
@@ -133,10 +135,10 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       </div>
 
       {/* Price Labels */}
-      <div className="absolute right-2 md:right-4 top-0 bottom-0 flex flex-col justify-between py-10 z-20 pointer-events-none">
-        <div className="text-[8px] md:text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
-        <div className="text-[8px] md:text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
-        <div className="text-[8px] md:text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+      <div className="absolute right-1 md:right-4 top-0 bottom-0 flex flex-col justify-between py-12 md:py-20 z-20 pointer-events-none opacity-40 sm:opacity-100">
+        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
       </div>
 
       {/* Main SVG */}
@@ -206,37 +208,39 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       </svg>
 
       {/* Floating Info */}
-      <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20 flex items-start gap-3 md:gap-4 max-w-[80%]">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20 flex items-start gap-3 md:gap-4 max-w-[90%]">
         <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-lg md:text-xl font-black text-white shadow-2xl shadow-indigo-500/20 shrink-0">
           {asset[0]}
         </div>
         <div>
-          <div className="text-xl md:text-3xl font-black text-white tracking-tighter tabular-nums flex flex-wrap items-center gap-2 md:gap-3">
+          <div className="text-xl md:text-3xl font-black text-white tracking-tighter tabular-nums flex items-center gap-2 md:gap-3">
             ${basePrice.toLocaleString(undefined, { 
-              minimumFractionDigits: basePrice < 0.01 ? 6 : (basePrice < 1 ? 4 : 2),
-              maximumFractionDigits: basePrice < 0.01 ? 8 : (basePrice < 1 ? 6 : 2)
+              minimumFractionDigits: basePrice < 0.001 ? 6 : (basePrice < 1 ? 4 : 2),
+              maximumFractionDigits: basePrice < 0.001 ? 8 : (basePrice < 1 ? 6 : 2)
             })}
-            <span className={`text-[8px] md:text-xs px-2 py-0.5 md:py-1 rounded-lg ${isUp ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
-              {isUp ? "▲" : "▼"} LIVE
-            </span>
+            <div className={`text-[7px] md:text-[9px] px-1.5 md:px-2 py-0.5 md:py-1 rounded-md md:rounded-lg font-black uppercase tracking-widest flex items-center gap-1 ${isUp ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/20 text-rose-400 border border-rose-500/20"}`}>
+              <div className={`w-1 h-1 rounded-full ${isUp ? "bg-emerald-400 animate-pulse" : "bg-rose-400 animate-pulse"}`}></div> LIVE
+            </div>
           </div>
-          <div className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1 line-clamp-1">{asset} / Institutional Feed</div>
+          <div className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-0.5 md:mt-1">{asset} / Institutional Feed</div>
         </div>
       </div>
       
       {/* HUD Details */}
-      <div className="absolute bottom-8 left-8 z-20 flex gap-8">
-        <div className="space-y-1">
-          <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">24h Vol</div>
-          <div className="text-xs font-bold text-white/80">{(basePrice * 1245).toLocaleString()} USDT</div>
+      <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20 flex flex-wrap gap-4 md:gap-8">
+        <div className="space-y-0.5 md:space-y-1">
+          <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">24h Vol</div>
+          <div className="text-[9px] md:text-xs font-bold text-white/80">{(basePrice * 1245).toLocaleString()} USDT</div>
         </div>
-        <div className="space-y-1">
-          <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Liquidity</div>
-          <div className="text-xs font-bold text-emerald-500">DEEP</div>
+        <div className="space-y-0.5 md:space-y-1">
+          <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Liquidity</div>
+          <div className="text-[9px] md:text-xs font-bold text-emerald-500 flex items-center gap-1">
+             <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping"></div> DEEP
+          </div>
         </div>
-        <div className="space-y-1">
-          <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Source</div>
-          <div className="text-xs font-bold text-indigo-400">Institutional Aggregator</div>
+        <div className="space-y-0.5 md:space-y-1">
+          <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Source</div>
+          <div className="text-[9px] md:text-xs font-bold text-indigo-400">Institutional Aggregator</div>
         </div>
       </div>
     </div>
