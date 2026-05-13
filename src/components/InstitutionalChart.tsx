@@ -84,14 +84,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
 
       if (isMoving) {
         const diff = basePrice - smoothedPriceRef.current;
-        // Faster glide during the active pulse window
-        smoothedPriceRef.current += diff * 0.15;
+        // Calm, deliberate glide during the pulse
+        smoothedPriceRef.current += diff * 0.05;
       }
 
       const noise = getNoise(now / 1000);
       
-      // Still allow a tiny amount of jitter even when "staying" to look live, but no price progression
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00003);
+      // Near-zero jitter for a rock-solid institutional look
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00002);
       
       setDataPoints(prev => {
         const next = [...prev.slice(1), newPoint];
