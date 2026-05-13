@@ -29,13 +29,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     }
   }, [height]);
 
-  // Generate deterministic noise based on price and time
+  // Generate realistic fractal noise for market simulation
   const getNoise = (timeSec: number) => {
-    const t1 = timeSec * 0.05;
-    const t2 = timeSec * 0.015;
-    const t3 = timeSec * 0.11;
-    const jagged = (Math.sin(timeSec * 12.9898) * 43758.5453) % 1;
-    return Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
+    // Multi-layered sine waves + random jaggedness
+    const t1 = timeSec * 0.8;
+    const t2 = timeSec * 2.4;
+    const t3 = timeSec * 5.1;
+    const rand = (Math.sin(timeSec * 123.456) * 43758.5453) % 1;
+    return (Math.sin(t1) * 0.5 + Math.sin(t2) * 0.25 + Math.sin(t3) * 0.15 + (rand - 0.5) * 0.3);
   };
 
   const hasInitRef = useRef<string | null>(null);
@@ -79,36 +80,32 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     
     const interval = setInterval(() => {
       const now = Date.now();
-      const cycleTime = now % 5000; // 5 second pulse cycle
-      const isMoving = cycleTime < 1000; // Pulse for 1 second, stay for 4
+      const cycleTime = now % 5000;
+      const isMoving = cycleTime < 1200; // Slightly longer pulse
 
       const diff = basePrice - smoothedPriceRef.current;
       
-      // Critical fix: If price discrepancy is too large (>2%), instantly shift history to stay 'real'
-      if (Math.abs(diff) / (basePrice || 1) > 0.02) {
+      // If price discrepancy is too large, shift history
+      if (Math.abs(diff) / (basePrice || 1) > 0.03) {
         setDataPoints(prev => prev.map(p => p + diff));
         smoothedPriceRef.current = basePrice;
       }
 
       if (isMoving) {
-        // Dynamic glide: Faster if further away, but still professional
-        const catchUpFactor = Math.abs(diff) > 500 ? 0.05 : 0.01;
-        smoothedPriceRef.current += diff * catchUpFactor;
+        // More organic movement factor
+        smoothedPriceRef.current += diff * 0.06;
       }
 
-      const noise = getNoise(now / 1000);
+      const nowSec = now / 1000;
+      const noise = getNoise(nowSec);
       
-      // Near-zero jitter
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00001);
+      // Add 'Real' market jitter
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0002);
       
-      setDataPoints(prev => {
-        const next = [...prev.slice(1), newPoint];
-        return next;
-      });
-      
-      setVolumes(prev => [...prev.slice(1), Math.abs(noise) * 100 + Math.random() * 50]);
+      setDataPoints(prev => [...prev.slice(1), newPoint]);
+      setVolumes(prev => [...prev.slice(1), 50 + Math.abs(noise) * 200 + Math.random() * 100]);
       currentPriceRef.current = newPoint;
-    }, 1000); // 10x slower update frequency (1 second ticks)
+    }, 400); // 400ms update frequency for 'Real' but stable feel
 
     return () => clearInterval(interval);
   }, [asset, basePrice > 0]);
@@ -201,6 +198,40 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         {/* Area */}
         <path d={`${pathData} L ${width} ${svgHeight} L 0 ${svgHeight} Z`} fill="url(#chartGradient)" />
 
+        {/* Current Price Line */}
+        {dataPoints.length > 0 && (
+          <g>
+            <line 
+              x1="0" 
+              y1={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
+              x2={width} 
+              y2={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
+              stroke={strokeColor} 
+              strokeWidth="1" 
+              strokeDasharray="4,4" 
+              opacity="0.3"
+            />
+            <rect 
+              x={width - 80} 
+              y={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight - 10} 
+              width="80" 
+              height="20" 
+              fill={strokeColor} 
+              rx="4"
+            />
+            <text 
+              x={width - 40} 
+              y={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight + 5} 
+              fill="black" 
+              fontSize="10" 
+              fontWeight="bold" 
+              textAnchor="middle"
+            >
+              {dataPoints[dataPoints.length - 1].toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </text>
+          </g>
+        )}
+
         {/* Path */}
         <path 
           d={pathData} 
@@ -222,17 +253,9 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
             <circle 
               cx={width} 
               cy={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
-              r="6" 
+              r="4" 
               fill={strokeColor} 
               className="animate-pulse"
-            />
-            <circle 
-              cx={width} 
-              cy={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
-              r="12" 
-              fill={strokeColor} 
-              opacity="0.2"
-              className="animate-ping"
             />
           </g>
         )}
