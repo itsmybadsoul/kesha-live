@@ -69,13 +69,13 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     
     const interval = setInterval(() => {
       const now = Date.now();
-      const cycleTime = now % 2000; // 2 second cycle
-      const isMoving = cycleTime < 1000; // Move for the first second, stay for the second
+      const cycleTime = now % 5000; // 5 second pulse cycle
+      const isMoving = cycleTime < 1000; // Pulse for 1 second, stay for 4
 
       if (isMoving) {
         const diff = basePrice - smoothedPriceRef.current;
-        // Faster glide during the active window
-        smoothedPriceRef.current += diff * 0.1;
+        // Faster glide during the active pulse window
+        smoothedPriceRef.current += diff * 0.15;
       }
 
       const noise = getNoise(now / 1000);
