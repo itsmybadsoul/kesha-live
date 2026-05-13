@@ -123,9 +123,9 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
 
       {/* Price Labels */}
       <div className="absolute right-4 top-0 bottom-0 flex flex-col justify-between py-10 z-20 pointer-events-none">
-        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString()}</div>
-        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString()}</div>
-        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString()}</div>
+        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[10px] font-black text-white/40 bg-black/40 px-2 py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
       </div>
 
       {/* Main SVG */}
@@ -201,7 +201,10 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         </div>
         <div>
           <div className="text-3xl font-black text-white tracking-tighter tabular-nums flex items-center gap-3">
-            ${basePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            ${basePrice.toLocaleString(undefined, { 
+              minimumFractionDigits: basePrice < 0.01 ? 6 : (basePrice < 1 ? 4 : 2),
+              maximumFractionDigits: basePrice < 0.01 ? 8 : (basePrice < 1 ? 6 : 2)
+            })}
             <span className={`text-xs px-2 py-1 rounded-lg ${isUp ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
               {isUp ? "▲" : "▼"} LIVE
             </span>

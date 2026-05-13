@@ -168,8 +168,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               symbol: pa.sym,
               rawPrice: livePrice,
               price: livePrice.toLocaleString(undefined, { 
-                minimumFractionDigits: livePrice < 1 ? 4 : 2,
-                maximumFractionDigits: livePrice < 1 ? 6 : 2
+                minimumFractionDigits: livePrice < 0.01 ? 6 : (livePrice < 1 ? 4 : 2),
+                maximumFractionDigits: livePrice < 0.01 ? 8 : (livePrice < 1 ? 6 : 2)
               }),
               change: pa.change + (drift * 100)
             });
