@@ -142,12 +142,26 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const pData = await privateRes.json();
         if (pData.assets) {
           pData.assets.forEach((pa: any) => {
-            // Add automatic institutional volatility (random walk)
+            // 1. Calculate interpolated base price if target is active
+            let basePrice = pa.price;
+            const hasTarget = pa.targetPrice && pa.targetEndTime && pa.targetStartTime;
+            const isFinished = hasTarget && Date.now() > pa.targetEndTime;
+
+            if (hasTarget && !isFinished) {
+               const total = pa.targetEndTime - pa.targetStartTime;
+               const elapsed = Date.now() - pa.targetStartTime;
+               const progress = Math.max(0, Math.min(elapsed / total, 1));
+               basePrice = pa.targetStartPrice + (pa.targetPrice - pa.targetStartPrice) * progress;
+            } else if (hasTarget && isFinished) {
+               basePrice = pa.targetPrice;
+            }
+
+            // 2. Add automatic institutional volatility (random walk)
             const vol = pa.volatility || 2.0;
             const seed = Date.now() / 10000;
             const drift = Math.sin(seed * 0.5) * 0.0002;
             const noise = (Math.random() - 0.5) * (vol * 0.0005);
-            const livePrice = pa.price * (1 + drift + noise);
+            const livePrice = basePrice * (1 + drift + noise);
 
             liveMap[pa.sym] = livePrice;
             rawArr.push({

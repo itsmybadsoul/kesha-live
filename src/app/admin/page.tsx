@@ -264,6 +264,38 @@ export default function AdminPage() {
     }
   };
 
+  const handlePrivateMarketAction = async (action: string, id: string) => {
+    let price = 0;
+    let duration = 0;
+    
+    if (action !== "clear") {
+      const p = prompt("Enter target price:");
+      if (!p || isNaN(Number(p))) return;
+      price = Number(p);
+      
+      if (action === "target") {
+        const d = prompt("Enter duration in minutes:");
+        if (!d || isNaN(Number(d))) return;
+        duration = Number(d);
+      }
+    }
+
+    try {
+      const res = await fetch("/api/admin/private", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, id, price, durationMinutes: duration })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(`Private market ${action} deployed.`, "success");
+        fetchData();
+      }
+    } catch (e) {
+      toast("Failed to deploy private manipulation.", "error");
+    }
+  };
+
   if (!isAuthorized) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0B] flex items-center justify-center p-6 bg-[url(https://www.transparenttextures.com/patterns/carbon-fibre.png)]">
@@ -619,63 +651,94 @@ export default function AdminPage() {
               <thead>
                 <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em]">
                   <th className="px-8 py-5">Asset Identity</th>
-                  <th className="px-8 py-5">Ticker Symbol</th>
-                  <th className="px-8 py-5">Price (USDT)</th>
-                  <th className="px-8 py-5">24h Change (%)</th>
-                  <th className="px-8 py-5">Volatility Score</th>
+                  <th className="px-8 py-5">Trajectory Path</th>
+                  <th className="px-8 py-5">Basis Price / Vol</th>
+                  <th className="px-8 py-5 text-right">Synthetic Market Overrides</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
-                {privateAssets.map((pa) => (
-                  <tr key={pa.id} className="hover:bg-amber-500/[0.02] transition-colors group">
-                    <td className="px-8 py-6">
-                       <input 
-                         type="text" 
-                         value={pa.name} 
-                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'name', e.target.value)}
-                         className="bg-transparent border-none text-slate-900 dark:text-white font-black text-sm w-full focus:ring-0"
-                       />
-                       <div className="text-[9px] text-slate-400 dark:text-gray-600 uppercase font-bold tracking-widest mt-1">Institutional_Asset_ID: {pa.id}</div>
-                    </td>
-                    <td className="px-8 py-6">
-                       <input 
-                         type="text" 
-                         value={pa.sym} 
-                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'sym', e.target.value)}
-                         className="bg-transparent border-none text-indigo-500 font-black text-sm w-20 focus:ring-0 uppercase"
-                       />
-                    </td>
-                    <td className="px-8 py-6">
-                       <div className="flex items-center gap-2">
-                         <span className="text-slate-400">$</span>
-                         <input 
-                           type="number" 
-                           value={pa.price} 
-                           onChange={(e) => handlePrivateAssetUpdate(pa.id, 'price', parseFloat(e.target.value))}
-                           className="bg-transparent border-none text-slate-900 dark:text-white font-black text-lg w-32 focus:ring-0"
-                         />
-                       </div>
-                    </td>
-                    <td className="px-8 py-6">
-                       <input 
-                         type="number" 
-                         step="0.1"
-                         value={pa.change} 
-                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'change', parseFloat(e.target.value))}
-                         className={`bg-transparent border-none font-black text-sm w-20 focus:ring-0 ${pa.change >= 0 ? "text-emerald-500" : "text-rose-500"}`}
-                       />
-                    </td>
-                    <td className="px-8 py-6">
-                       <input 
-                         type="number" 
-                         step="0.1"
-                         value={pa.volatility} 
-                         onChange={(e) => handlePrivateAssetUpdate(pa.id, 'volatility', parseFloat(e.target.value))}
-                         className="bg-transparent border-none text-slate-400 dark:text-gray-500 font-black text-sm w-20 focus:ring-0"
-                       />
-                    </td>
-                  </tr>
-                ))}
+                {privateAssets.map((pa) => {
+                  const hasTarget = pa.targetPrice && pa.targetEndTime && pa.targetStartTime;
+                  const isFinished = hasTarget && Date.now() > pa.targetEndTime;
+                  const timeLeftMs = hasTarget && !isFinished ? pa.targetEndTime - Date.now() : 0;
+                  const mins = Math.ceil(timeLeftMs / 60000);
+
+                  return (
+                    <tr key={pa.id} className="hover:bg-amber-500/[0.02] transition-colors group">
+                      <td className="px-8 py-8">
+                         <div className="flex flex-col gap-1">
+                           <div className="font-black text-xl text-slate-900 dark:text-white flex items-center gap-3 tracking-tighter">
+                             <input 
+                               type="text" 
+                               value={pa.sym} 
+                               onChange={(e) => handlePrivateAssetUpdate(pa.id, 'sym', e.target.value)}
+                               className="bg-transparent border-none text-indigo-500 font-black text-xl w-24 focus:ring-0 uppercase p-0"
+                             />
+                             {hasTarget && !isFinished && <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>}
+                           </div>
+                           <input 
+                             type="text" 
+                             value={pa.name} 
+                             onChange={(e) => handlePrivateAssetUpdate(pa.id, 'name', e.target.value)}
+                             className="bg-transparent border-none text-[9px] text-slate-400 dark:text-gray-600 font-black uppercase tracking-widest focus:ring-0 p-0 w-full"
+                           />
+                         </div>
+                      </td>
+                      <td className="px-8 py-8">
+                        {hasTarget ? (
+                          isFinished ? (
+                            <span className="text-[9px] px-3 py-1.5 bg-slate-100 dark:bg-gray-800 text-slate-400 dark:text-gray-600 rounded-xl uppercase font-black tracking-widest border border-slate-200 dark:border-gray-700">PATH_COMPLETED</span>
+                          ) : (
+                            <div className="flex flex-col gap-1">
+                              <div className="text-base font-black text-amber-500 tracking-tighter tabular-nums">TARGET: ${pa.targetPrice.toFixed(pa.targetPrice < 1 ? 4 : 2)}</div>
+                              <div className="text-[9px] text-slate-400 dark:text-gray-600 font-black uppercase tracking-widest animate-pulse">Converging in ~{mins}m</div>
+                            </div>
+                          )
+                        ) : (
+                          <span className="text-[9px] px-3 py-1.5 bg-white dark:bg-gray-900 text-slate-300 dark:text-gray-700 rounded-xl uppercase font-black tracking-widest border border-slate-100 dark:border-gray-800 opacity-40">Static_Trajectory</span>
+                        )}
+                      </td>
+                      <td className="px-8 py-8">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-widest opacity-60">Basis_Price_v_Vol</div>
+                          <div className="flex items-center gap-2 font-mono font-bold text-amber-400 text-base tabular-nums tracking-tighter">
+                            $
+                            <input 
+                              type="number" 
+                              value={pa.price} 
+                              onChange={(e) => handlePrivateAssetUpdate(pa.id, 'price', parseFloat(e.target.value))}
+                              className="bg-transparent border-none text-amber-400 font-bold p-0 w-24 focus:ring-0"
+                            />
+                            <span className="text-slate-300 dark:text-gray-800 ml-1">V_INDEX:
+                              <input 
+                                type="number" 
+                                value={pa.volatility} 
+                                step="0.1"
+                                onChange={(e) => handlePrivateAssetUpdate(pa.id, 'volatility', parseFloat(e.target.value))}
+                                className="bg-transparent border-none text-slate-400 w-12 p-0 focus:ring-0 ml-1"
+                              />
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-8 text-right">
+                        <div className="flex justify-end gap-3">
+                          {hasTarget && !isFinished && (
+                             <button onClick={() => handlePrivateMarketAction('clear', pa.id)} className="p-4 bg-white dark:bg-gray-900 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white border-2 border-slate-200 dark:border-gray-800 hover:border-rose-500 transition-all shadow-xl active:scale-95" title="Abort Path Injection">
+                               <XCircle className="w-5 h-5" />
+                             </button>
+                          )}
+                          <button onClick={() => handlePrivateMarketAction('jump', pa.id)} className="px-6 py-4 bg-white dark:bg-gray-900 text-indigo-500 rounded-2xl hover:bg-indigo-500 hover:text-white border-2 border-slate-200 dark:border-gray-800 hover:border-indigo-500 transition-all shadow-xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center gap-3 group/btn active:scale-95">
+                            <Zap className="w-4 h-4 group-hover/btn:animate-pulse" /> Instant_Shift
+                          </button>
+                          <button onClick={() => handlePrivateMarketAction('target', pa.id)} className="px-6 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-all shadow-xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center gap-3 group/btn active:scale-95">
+                            <Target className="w-4 h-4 group-hover/btn:animate-bounce" /> Path_Injection
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

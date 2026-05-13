@@ -351,6 +351,10 @@ export interface PrivateAsset {
   change: number;
   volatility: number;
   description: string;
+  targetPrice?: number;
+  targetStartTime?: number;
+  targetEndTime?: number;
+  targetStartPrice?: number;
 }
 
 export const INITIAL_PRIVATE_ASSETS: PrivateAsset[] = [
