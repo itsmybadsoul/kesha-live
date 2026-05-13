@@ -106,7 +106,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   const isUp = dataPoints[dataPoints.length - 1] >= dataPoints[0];
   const strokeColor = isUp ? "#10B981" : "#F43F5E";
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         setWidth(containerRef.current.offsetWidth);
