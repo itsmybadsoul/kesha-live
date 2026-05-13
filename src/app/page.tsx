@@ -34,7 +34,6 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useCrypto } from "@/context/CryptoContext";
 import { InstitutionalChart } from "@/components/InstitutionalChart";
-import { AIPredictions } from "@/components/AIPredictions";
 
 export default function Home() {
   const { user, balance, logout, activeTrades } = useUser();
