@@ -56,7 +56,7 @@ export function DigitalMembershipCard() {
       <div className="relative z-10 flex justify-between items-start">
         <div className="space-y-1">
           <h3 className="text-xl font-black text-white tracking-tighter uppercase italic">
-            Kesha <span className="text-white/40 not-italic">Institutional</span>
+            Stocks <span className="text-white/40 not-italic">Institutional</span>
           </h3>
           <div className="h-0.5 w-12 bg-gradient-to-r from-white/60 to-transparent"></div>
         </div>

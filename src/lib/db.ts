@@ -358,7 +358,7 @@ export interface PrivateAsset {
 }
 
 export const INITIAL_PRIVATE_ASSETS: PrivateAsset[] = [
-  { id: "p1", sym: "KESHA", name: "Kesha Protocol Alpha", price: 1250.00, change: 5.2, volatility: 2.1, description: "Proprietary high-yield institutional asset." },
+  { id: "p1", sym: "STOCKS", name: "Stocks Protocol Alpha", price: 1250.00, change: 5.2, volatility: 2.1, description: "Proprietary high-yield institutional asset." },
   { id: "p2", sym: "ORB", name: "Orbit Synthetic", price: 85.40, change: -1.2, volatility: 3.5, description: "Synthetic derivation of global liquidity flows." },
   { id: "p3", sym: "VOID", name: "Void Liquidity", price: 0.45, change: 12.8, volatility: 8.0, description: "High-volatility institutional dark pool asset." },
   { id: "p4", sym: "NEO", name: "NeoSynthetic", price: 4500.00, change: 0.8, volatility: 1.2, description: "Low-risk institutional treasury bond token." },

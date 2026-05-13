@@ -134,7 +134,7 @@ export function SwapTrade() {
          <div className="flex gap-4 p-5 bg-indigo-500/5 border border-indigo-500/10 rounded-[1.5rem] shadow-inner">
             <Info className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
             <p className="text-[9px] text-slate-400 dark:text-gray-500 font-bold leading-relaxed uppercase tracking-tight">
-              Liquidity provided by Kesha Institutional global nodes. Exchange protocol v4.2 active. All trades are final and irreversibly hashed to the secure ledger.
+              Liquidity provided by Stocks Institutional global nodes. Exchange protocol v4.2 active. All trades are final and irreversibly hashed to the secure ledger.
             </p>
          </div>
       </div>

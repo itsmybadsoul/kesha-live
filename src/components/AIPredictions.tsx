@@ -14,33 +14,33 @@ export function AIPredictions() {
   const insights = [
     { title: "Institutional Accumulation", value: "84%", trend: "up", detail: "Significant whale activity detected in BTC/USDT clusters." },
     { title: "Market Volatility Index", value: "Medium", trend: "stable", detail: "Volatility suppressed by major liquidity providers." },
-    { title: "AI Price Projection", value: "Bullish", trend: "up", detail: "Kesha AI predicts a 4.2% upside in the next 12 hours." }
+    { title: "AI Price Projection", value: "Bullish", trend: "up", detail: "Stocks AI predicts a 4.2% upside in the next 12 hours." }
   ];
 
   return (
-    <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group">
+    <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-10 shadow-2xl relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/10 transition-all duration-1000"></div>
       
-      <div className="flex items-center justify-between mb-10">
-        <div className="flex items-center gap-5">
-           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/20">
-              <BrainCircuit className="w-8 h-8 text-white" />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
+        <div className="flex items-center gap-4 sm:gap-5">
+           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 shrink-0">
+              <BrainCircuit className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
            </div>
            <div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">Kesha <span className="text-indigo-500 not-italic">AI Intelligence</span></h3>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">Stocks <span className="text-indigo-500 not-italic">AI Intelligence</span></h3>
               <div className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.3em] mt-1 flex items-center gap-2">
                  <Activity className="w-3 h-3 text-emerald-500 animate-pulse" /> Live_Analysis_Active
               </div>
            </div>
         </div>
-        <div className="px-5 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">
+        <div className="px-5 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 whitespace-nowrap">
            Enterprise Tier Feed
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {insights.map((item, i) => (
-          <div key={i} className="bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-gray-800 p-8 rounded-[2rem] hover:border-indigo-500/30 transition-all hover:-translate-y-1 relative group/card">
+          <div key={i} className="bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-gray-800 p-6 sm:p-8 rounded-3xl sm:rounded-[2rem] hover:border-indigo-500/30 transition-all hover:-translate-y-1 relative group/card">
             <div className="absolute top-4 right-6 opacity-10 group-hover/card:opacity-30 transition-opacity">
                <Zap className="w-10 h-10 text-indigo-500" />
             </div>
