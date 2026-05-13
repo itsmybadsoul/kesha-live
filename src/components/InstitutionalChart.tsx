@@ -84,14 +84,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
 
       if (isMoving) {
         const diff = basePrice - smoothedPriceRef.current;
-        // Calm, deliberate glide during the pulse
-        smoothedPriceRef.current += diff * 0.05;
+        // 10x slower glide factor for rock-solid stability
+        smoothedPriceRef.current += diff * 0.005;
       }
 
       const noise = getNoise(now / 1000);
       
-      // Near-zero jitter for a rock-solid institutional look
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00002);
+      // Near-zero jitter
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.00001);
       
       setDataPoints(prev => {
         const next = [...prev.slice(1), newPoint];
@@ -100,7 +100,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       
       setVolumes(prev => [...prev.slice(1), Math.abs(noise) * 100 + Math.random() * 50]);
       currentPriceRef.current = newPoint;
-    }, 100); // Maintain high frequency for smooth path rendering, but logic is cyclic
+    }, 1000); // 10x slower update frequency (1 second ticks)
 
     return () => clearInterval(interval);
   }, [asset, basePrice > 0]);
