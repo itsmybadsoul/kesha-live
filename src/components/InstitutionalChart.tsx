@@ -82,10 +82,18 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       const cycleTime = now % 5000; // 5 second pulse cycle
       const isMoving = cycleTime < 1000; // Pulse for 1 second, stay for 4
 
+      const diff = basePrice - smoothedPriceRef.current;
+      
+      // Critical fix: If price discrepancy is too large (>2%), instantly shift history to stay 'real'
+      if (Math.abs(diff) / (basePrice || 1) > 0.02) {
+        setDataPoints(prev => prev.map(p => p + diff));
+        smoothedPriceRef.current = basePrice;
+      }
+
       if (isMoving) {
-        const diff = basePrice - smoothedPriceRef.current;
-        // 10x slower glide factor for rock-solid stability
-        smoothedPriceRef.current += diff * 0.005;
+        // Dynamic glide: Faster if further away, but still professional
+        const catchUpFactor = Math.abs(diff) > 500 ? 0.05 : 0.01;
+        smoothedPriceRef.current += diff * catchUpFactor;
       }
 
       const noise = getNoise(now / 1000);
