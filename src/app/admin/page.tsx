@@ -28,7 +28,7 @@ export default function AdminPage() {
     if (!isAuthorized) return;
     setLoading(true);
     try {
-      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes, marketRes] = await Promise.all([
+      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes, marketRes, privateRes] = await Promise.all([
         fetch("/api/admin/deposits"),
         fetch("/api/admin/withdrawals"),
         fetch("/api/admin/options"),
@@ -47,7 +47,7 @@ export default function AdminPage() {
       const userData = await userRes.json();
       const supportData = await supRes.json();
       const marketData = await marketRes.json();
-      const privateData = await (await fetch("/api/admin/private")).json();
+      const privateData = await privateRes.json();
       
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);

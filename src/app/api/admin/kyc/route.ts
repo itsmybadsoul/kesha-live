@@ -4,7 +4,7 @@ import { getUser, saveUser, getPendingKYCs, untrackPendingKYC } from "@/lib/db";
 export async function GET() {
   try {
     const users = await getPendingKYCs();
-    return NextResponse.json({ success: true, users });
+    return NextResponse.json({ success: true, pendingKyc: users });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
