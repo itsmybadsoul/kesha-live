@@ -46,6 +46,16 @@ export default function Home() {
   const [selectedAsset, setSelectedAsset] = useState("BTC");
   const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
   const [chartHeight, setChartHeight] = useState(600);
+  const [chartVisible, setChartVisible] = useState(false);
+
+  useEffect(() => {
+    // Hide chart for 120 seconds on every fresh mount/refresh
+    const timer = setTimeout(() => {
+      setChartVisible(true);
+    }, 120000); 
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -134,8 +144,47 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="relative z-10 mb-10 sm:mb-20">
-            <InstitutionalChart asset={selectedAsset} height={chartHeight} />
+          <div className="relative z-10 mb-10">
+            {chartVisible ? (
+              <InstitutionalChart asset={selectedAsset} height={chartHeight} />
+            ) : (
+              <div className="w-full bg-[#0B0E14] rounded-[2.5rem] border border-white/5 flex flex-col items-center justify-center relative overflow-hidden" style={{ height: chartHeight }}>
+                {/* Cyber Matrix Background */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(79, 70, 229, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 70, 229, 0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+                </div>
+                
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-20 h-20 mb-8 relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin"></div>
+                    <div className="absolute inset-2 rounded-full border-4 border-emerald-500/20 border-b-emerald-500 animate-spin-slow"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <ShieldCheck className="w-8 h-8 text-indigo-400 animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  <div className="text-center space-y-3">
+                    <h4 className="text-xl font-black text-white tracking-[0.2em] uppercase">Initializing Neural Link</h4>
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((i) => (
+                          <div key={i} className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }}></div>
+                        ))}
+                      </div>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Establishing Secure Liquidity Node...</span>
+                    </div>
+                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest max-w-xs mx-auto leading-relaxed mt-4">
+                      Institutional-grade verification in progress. Access to high-frequency market data will be granted shortly.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Progress Bar Background */}
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600 animate-progress"></div>
+                </div>
+              </div>
+            )}
           </div>
 
           <AIPredictions />
