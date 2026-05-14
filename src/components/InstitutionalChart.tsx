@@ -37,9 +37,11 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     return Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
   };
 
+  const hasInitRef = useRef<string | null>(null);
+
   // Initialize history
   useEffect(() => {
-    if (basePrice === 0) return;
+    if (basePrice <= 0 || hasInitRef.current === asset) return;
     
     const initialPoints = [];
     const initialVolumes = [];
@@ -48,7 +50,6 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     // We want to reconstruct a look of a "live" chart
     for (let i = 80; i >= 0; i--) {
         const noise = getNoise(nowSec - i);
-        // We assume the basePrice was roughly the same in the last 80 seconds for history reconstruction
         initialPoints.push(basePrice + (noise * basePrice * 0.0008));
         initialVolumes.push(Math.abs(noise) * 100 + Math.random() * 50);
     }
@@ -56,7 +57,9 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     setDataPoints(initialPoints);
     setVolumes(initialVolumes);
     currentPriceRef.current = basePrice;
-  }, [asset, basePrice > 0]); // Only re-init if asset changes or we finally get a price
+    smoothedPriceRef.current = basePrice;
+    hasInitRef.current = asset;
+  }, [asset, basePrice]); // Run whenever basePrice updates, but controlled by hasInitRef
 
   // Live update with smoothing
   const smoothedPriceRef = useRef(basePrice);
@@ -65,8 +68,15 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     if (basePrice === 0) return;
     
     const interval = setInterval(() => {
-      // Glide the smoothedPrice towards the latest basePrice (15% of the gap per tick)
       const diff = basePrice - smoothedPriceRef.current;
+      
+      // Critical: If the gap is huge (>3%), the history was likely initialized wrong. Re-base instantly.
+      if (Math.abs(diff) / (basePrice || 1) > 0.03) {
+        setDataPoints(prev => prev.map(p => p + diff));
+        smoothedPriceRef.current = basePrice;
+      }
+
+      // Glide the smoothedPrice towards the latest basePrice (15% of the gap per tick)
       if (Math.abs(diff) > 0.0001) {
         smoothedPriceRef.current += diff * 0.15;
       } else {
