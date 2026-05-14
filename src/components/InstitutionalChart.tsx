@@ -15,7 +15,6 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   const [dataPoints, setDataPoints] = useState<number[]>([]);
   const [volumes, setVolumes] = useState<number[]>([]);
   const currentPriceRef = useRef(basePrice);
-  const smoothedPriceRef = useRef(basePrice);
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgHeight, setSvgHeight] = useState(height || 400);
   const [width, setWidth] = useState(1000);
@@ -29,86 +28,63 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     }
   }, [height]);
 
-  // Generate realistic fractal noise for market simulation
+  // Generate deterministic noise based on price and time
   const getNoise = (timeSec: number) => {
-    // Multi-layered sine waves + random jaggedness
-    const t1 = timeSec * 0.8;
-    const t2 = timeSec * 2.4;
-    const t3 = timeSec * 5.1;
-    const rand = (Math.sin(timeSec * 123.456) * 43758.5453) % 1;
-    return (Math.sin(t1) * 0.5 + Math.sin(t2) * 0.25 + Math.sin(t3) * 0.15 + (rand - 0.5) * 0.3);
+    const t1 = timeSec * 0.05;
+    const t2 = timeSec * 0.015;
+    const t3 = timeSec * 0.11;
+    const jagged = (Math.sin(timeSec * 12.9898) * 43758.5453) % 1;
+    return Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
   };
 
-  const hasInitRef = useRef<string | null>(null);
-
-  // Initialize history with a realistic random walk
+  // Initialize history
   useEffect(() => {
-    if (basePrice === 0 || hasInitRef.current === asset) return;
+    if (basePrice === 0) return;
     
     const initialPoints = [];
     const initialVolumes = [];
-    // Start history slightly offset to show movement, but ensure it ends at basePrice
-    let walkingPrice = basePrice * (0.97 + Math.random() * 0.06); 
+    const nowSec = Math.floor(Date.now() / 1000);
     
-    for (let i = 0; i < 80; i++) {
-        const noise = getNoise(i);
-        walkingPrice += (noise * walkingPrice * 0.001);
-        
-        // Progressively pull MUCH harder towards basePrice as we reach the end (i=79)
-        const pullStrength = Math.pow(i / 80, 2) * 0.3;
-        const pull = (basePrice - walkingPrice) * pullStrength;
-        walkingPrice += pull;
-        
-        initialPoints.push(walkingPrice);
+    // We want to reconstruct a look of a "live" chart
+    for (let i = 80; i >= 0; i--) {
+        const noise = getNoise(nowSec - i);
+        // We assume the basePrice was roughly the same in the last 80 seconds for history reconstruction
+        initialPoints.push(basePrice + (noise * basePrice * 0.0008));
         initialVolumes.push(Math.abs(noise) * 100 + Math.random() * 50);
     }
-    
-    // Force the last point to be exactly basePrice to eliminate the jump
-    initialPoints[initialPoints.length - 1] = basePrice;
     
     setDataPoints(initialPoints);
     setVolumes(initialVolumes);
     currentPriceRef.current = basePrice;
-    smoothedPriceRef.current = basePrice;
-    hasInitRef.current = asset;
-  }, [asset, basePrice > 0]); 
+  }, [asset, basePrice > 0]); // Only re-init if asset changes or we finally get a price
 
-
-  // Live update with sub-second micro-ticks for "breathing" effect
+  // Live update with smoothing
+  const smoothedPriceRef = useRef(basePrice);
+  
   useEffect(() => {
     if (basePrice === 0) return;
     
     const interval = setInterval(() => {
-      const now = Date.now();
-      const cycleTime = now % 5000;
-      const isMoving = cycleTime < 1200; // Slightly longer pulse
-
+      // Glide the smoothedPrice towards the latest basePrice (15% of the gap per tick)
       const diff = basePrice - smoothedPriceRef.current;
-      
-      // If price discrepancy is too large, shift history
-      if (Math.abs(diff) / (basePrice || 1) > 0.03) {
-        setDataPoints(prev => prev.map(p => p + diff));
+      if (Math.abs(diff) > 0.0001) {
+        smoothedPriceRef.current += diff * 0.15;
+      } else {
         smoothedPriceRef.current = basePrice;
       }
 
-      if (isMoving) {
-        // More organic movement factor
-        smoothedPriceRef.current += diff * 0.06;
-      }
-
-      const nowSec = now / 1000;
+      const nowSec = Math.floor(Date.now() / 1000);
       const noise = getNoise(nowSec);
-      
-      // Add 'Real' market jitter
-      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0002);
-      
+      const newPoint = smoothedPriceRef.current + (noise * smoothedPriceRef.current * 0.0005);
+      const newVol = Math.abs(noise) * 100 + Math.random() * 50;
+
       setDataPoints(prev => [...prev.slice(1), newPoint]);
-      setVolumes(prev => [...prev.slice(1), 50 + Math.abs(noise) * 200 + Math.random() * 100]);
+      setVolumes(prev => [...prev.slice(1), newVol]);
       currentPriceRef.current = newPoint;
-    }, 400); // 400ms update frequency for 'Real' but stable feel
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [asset, basePrice > 0]);
+  }, [basePrice]); // Re-sync interval whenever basePrice updates from context
 
   const { min, max, range, adjustedMin, adjustedMax, adjustedRange } = useMemo(() => {
     if (dataPoints.length === 0) return { min: 0, max: 0, range: 0, adjustedMin: 0, adjustedMax: 0, adjustedRange: 1 };
@@ -132,21 +108,10 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   const isUp = dataPoints[dataPoints.length - 1] >= dataPoints[0];
   const strokeColor = isUp ? "#10B981" : "#F43F5E";
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        setWidth(containerRef.current.offsetWidth);
-      }
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  if (width === 0 || dataPoints.length === 0) {
+  if (basePrice === 0) {
     return (
       <div className="w-full bg-[#0B0E14] flex items-center justify-center animate-pulse rounded-[2rem] border border-white/5" style={{ height: height || '100%' }}>
-        <div className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs text-center px-4">Connecting to Liquidity Protocol...</div>
+        <div className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs text-center px-4">Connecting to Liquidity Protocol...</div>
       </div>
     );
   }
@@ -198,53 +163,15 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         {/* Area */}
         <path d={`${pathData} L ${width} ${svgHeight} L 0 ${svgHeight} Z`} fill="url(#chartGradient)" />
 
-        {/* Current Price Line */}
-        {dataPoints.length > 0 && (
-          <g>
-            <line 
-              x1="0" 
-              y1={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
-              x2={width} 
-              y2={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
-              stroke={strokeColor} 
-              strokeWidth="1" 
-              strokeDasharray="4,4" 
-              opacity="0.3"
-            />
-            <rect 
-              x={width - 80} 
-              y={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight - 10} 
-              width="80" 
-              height="20" 
-              fill={strokeColor} 
-              rx="4"
-            />
-            <text 
-              x={width - 40} 
-              y={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight + 5} 
-              fill="black" 
-              fontSize="10" 
-              fontWeight="bold" 
-              textAnchor="middle"
-            >
-              {dataPoints[dataPoints.length - 1].toLocaleString(undefined, { maximumFractionDigits: 2 })}
-            </text>
-          </g>
-        )}
-
         {/* Path */}
         <path 
           d={pathData} 
           fill="none" 
           stroke={strokeColor} 
-          strokeWidth="2.5" 
+          strokeWidth="3" 
           strokeLinecap="round" 
           strokeLinejoin="round" 
-          className="transition-all duration-300 ease-linear"
-          style={{ 
-            filter: 'drop-shadow(0 0 12px ' + strokeColor + '66)',
-            vectorEffect: 'non-scaling-stroke'
-          }}
+          style={{ filter: 'drop-shadow(0 0 8px ' + strokeColor + '44)' }}
         />
 
         {/* Current Price Dot */}
@@ -253,9 +180,17 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
             <circle 
               cx={width} 
               cy={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
-              r="4" 
+              r="6" 
               fill={strokeColor} 
               className="animate-pulse"
+            />
+            <circle 
+              cx={width} 
+              cy={svgHeight - ((dataPoints[dataPoints.length - 1] - adjustedMin) / adjustedRange) * svgHeight} 
+              r="12" 
+              fill={strokeColor} 
+              opacity="0.2"
+              className="animate-ping"
             />
           </g>
         )}
@@ -269,14 +204,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         <div>
           <div className="text-xl md:text-3xl font-black text-white tracking-tighter tabular-nums flex items-center gap-2 md:gap-3">
             ${basePrice.toLocaleString(undefined, { 
-              minimumFractionDigits: basePrice < 0.001 ? 6 : (basePrice < 1 ? 4 : 2),
-              maximumFractionDigits: basePrice < 0.001 ? 8 : (basePrice < 1 ? 6 : 2)
+              minimumFractionDigits: basePrice < 0.01 ? 6 : (basePrice < 1 ? 4 : 2),
+              maximumFractionDigits: basePrice < 0.01 ? 8 : (basePrice < 1 ? 6 : 2)
             })}
             <div className={`text-[7px] md:text-[9px] px-1.5 md:px-2 py-0.5 md:py-1 rounded-md md:rounded-lg font-black uppercase tracking-widest flex items-center gap-1 ${isUp ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/20 text-rose-400 border border-rose-500/20"}`}>
               <div className={`w-1 h-1 rounded-full ${isUp ? "bg-emerald-400 animate-pulse" : "bg-rose-400 animate-pulse"}`}></div> LIVE
             </div>
           </div>
-          <div className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-0.5 md:mt-1">{asset} / Institutional Feed</div>
+          <div className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-0.5 md:mt-1">{asset} / Stocks AI Institutional Feed</div>
         </div>
       </div>
       
@@ -294,7 +229,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         </div>
         <div className="space-y-0.5 md:space-y-1">
           <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Source</div>
-          <div className="text-[9px] md:text-xs font-bold text-indigo-400 group-hover:text-white transition-colors">STOCKS AI Infrastructure</div>
+          <div className="text-[9px] md:text-xs font-bold text-indigo-400">Stocks Institutional Aggregator</div>
         </div>
       </div>
     </div>
