@@ -118,6 +118,7 @@ interface UserContextType {
   addNotification: (n: Omit<Notification, 'id' | 'read' | 'timestamp'>) => void;
   markAllRead: () => void;
   clearNotification: (id: string) => void;
+  sessionStartTime: number;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -136,6 +137,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [manualTradeCount, setManualTradeCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionStartTime] = useState(Date.now());
   
   const notifications = user?.notifications || [];
 
@@ -482,6 +484,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addNotification,
         markAllRead,
         clearNotification,
+        sessionStartTime,
       }}
     >
       {children}

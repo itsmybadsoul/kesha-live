@@ -36,7 +36,7 @@ import { useCrypto } from "@/context/CryptoContext";
 import { InstitutionalChart } from "@/components/InstitutionalChart";
 
 export default function Home() {
-  const { user, balance, logout, activeTrades } = useUser();
+  const { user, balance, logout, activeTrades, sessionStartTime } = useUser();
   const { prices } = useCrypto();
   
   const totalEquity = balance + (activeTrades.reduce((acc, t) => acc + t.allocation, 0)) +
@@ -46,16 +46,21 @@ export default function Home() {
   const [selectedAsset, setSelectedAsset] = useState("BTC");
   const chartAssets = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "AVAX"];
   const [chartHeight, setChartHeight] = useState(600);
+  const [remainingTime, setRemainingTime] = useState(120000);
   const [chartVisible, setChartVisible] = useState(false);
 
   useEffect(() => {
-    // Hide chart for 120 seconds on every fresh mount/refresh
-    const timer = setTimeout(() => {
-      setChartVisible(true);
-    }, 120000); 
-    
-    return () => clearTimeout(timer);
-  }, []);
+    const updateTimer = () => {
+      const elapsed = Date.now() - sessionStartTime;
+      const remaining = Math.max(0, 120000 - elapsed);
+      setRemainingTime(remaining);
+      setChartVisible(remaining <= 0);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [sessionStartTime]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -171,7 +176,7 @@ export default function Home() {
                           <div key={i} className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }}></div>
                         ))}
                       </div>
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Establishing Secure Liquidity Node...</span>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Establishing Secure Liquidity Node... {Math.ceil(remainingTime / 1000)}s</span>
                     </div>
                     <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest max-w-xs mx-auto leading-relaxed mt-4">
                       Institutional-grade verification in progress. Access to high-frequency market data will be granted shortly.
@@ -181,7 +186,10 @@ export default function Home() {
 
                 {/* Progress Bar Background */}
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600 animate-progress"></div>
+                  <div 
+                    className="h-full bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600 transition-all duration-1000 ease-linear"
+                    style={{ width: `${((120000 - remainingTime) / 120000) * 100}%` }}
+                  ></div>
                 </div>
               </div>
             )}
