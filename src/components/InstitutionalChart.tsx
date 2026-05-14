@@ -46,8 +46,6 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     return Math.sin(t1) * 0.4 + Math.sin(t2) * 0.3 + Math.sin(t3) * 0.2 + (jagged - 0.5) * 0.2;
   };
 
-  const hasInitRef = useRef<string | null>(null);
-
   // Initialize history
   useEffect(() => {
     if (basePrice <= 0 || hasInitRef.current === asset) return;
@@ -77,8 +75,9 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
     const interval = setInterval(() => {
       const diff = basePrice - smoothedPriceRef.current;
       
-      // Critical: If the gap is huge (>5%) or asset just changed, re-base instantly
-      if (Math.abs(diff) / (basePrice || 1) > 0.05) {
+      // Critical: If the gap is huge (>1%) or asset just changed, re-base instantly
+      // This prevents the "static price" issue where history is at the wrong level
+      if (Math.abs(diff) / (basePrice || 1) > 0.01) {
         setDataPoints(prev => prev.map(p => p + diff));
         smoothedPriceRef.current = basePrice;
       }
