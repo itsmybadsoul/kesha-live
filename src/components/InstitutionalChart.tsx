@@ -11,13 +11,22 @@ interface InstitutionalChartProps {
 export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   const { prices } = useCrypto();
   const basePrice = prices[asset] || 0;
-  
+
   const [dataPoints, setDataPoints] = useState<number[]>([]);
   const [volumes, setVolumes] = useState<number[]>([]);
   const currentPriceRef = useRef(basePrice);
+  const smoothedPriceRef = useRef(basePrice);
+  const hasInitRef = useRef<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgHeight, setSvgHeight] = useState(height || 400);
   const [width, setWidth] = useState(1000);
+
+  // Hard reset smoothing ref when asset changes to prevent cross-asset spikes
+  useEffect(() => {
+    smoothedPriceRef.current = basePrice;
+    hasInitRef.current = null; // Allow re-initialization of history
+    setDataPoints([]); // Clear old points to prevent visual blending
+  }, [asset]);
 
   useEffect(() => {
     if (!height && containerRef.current) {
@@ -62,16 +71,14 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
   }, [asset, basePrice]); // Run whenever basePrice updates, but controlled by hasInitRef
 
   // Live update with smoothing
-  const smoothedPriceRef = useRef(basePrice);
-  
   useEffect(() => {
     if (basePrice === 0) return;
     
     const interval = setInterval(() => {
       const diff = basePrice - smoothedPriceRef.current;
       
-      // Critical: If the gap is huge (>3%), the history was likely initialized wrong. Re-base instantly.
-      if (Math.abs(diff) / (basePrice || 1) > 0.03) {
+      // Critical: If the gap is huge (>5%) or asset just changed, re-base instantly
+      if (Math.abs(diff) / (basePrice || 1) > 0.05) {
         setDataPoints(prev => prev.map(p => p + diff));
         smoothedPriceRef.current = basePrice;
       }
