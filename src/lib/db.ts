@@ -378,3 +378,50 @@ export async function savePrivateAssets(assets: PrivateAsset[]): Promise<void> {
   await putKV("private_assets", JSON.stringify(assets));
 }
 
+// ── P2P System ──────────────────────────────────────────────────────────────
+
+export interface P2PRequest {
+  id: string;
+  email: string;
+  type: "BUY" | "SELL";
+  amount: number; // USD amount
+  status: "PENDING" | "APPROVED" | "COMPLETED";
+  createdAt: number;
+  sellerName?: string;
+  usdPrice?: number;
+  banks?: string;
+  trustRate?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: "USER" | "ADMIN";
+  text: string;
+  image?: string; // base64
+  timestamp: number;
+}
+
+export async function getP2PRequests(_env?: any): Promise<P2PRequest[]> {
+  const list = await getKV("p2p_requests");
+  if (!list) return [];
+  return JSON.parse(list);
+}
+
+export async function saveP2PRequests(requests: P2PRequest[], _env?: any): Promise<void> {
+  await putKV("p2p_requests", JSON.stringify(requests));
+}
+
+export async function getP2PChat(requestId: string, _env?: any): Promise<ChatMessage[]> {
+  const list = await getKV(`p2p_chat:${requestId}`);
+  if (!list) return [];
+  return JSON.parse(list);
+}
+
+export async function saveP2PChat(requestId: string, messages: ChatMessage[], _env?: any): Promise<void> {
+  await putKV(`p2p_chat:${requestId}`, JSON.stringify(messages));
+}
+
+export async function deleteP2PChat(requestId: string, _env?: any): Promise<void> {
+  await putKV(`p2p_chat:${requestId}`, JSON.stringify([]));
+}
+

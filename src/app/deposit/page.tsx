@@ -5,9 +5,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
-import { Wallet, Copy, CheckCircle2, ArrowLeft, Info } from "lucide-react";
+import { Wallet, Copy, CheckCircle2, ArrowLeft, Info, ArrowRightLeft } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navbar } from "@/components/Navbar";
+import { P2PInterface } from "@/components/P2PInterface";
 
 export default function DepositPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function DepositPage() {
   const [txid, setTxid] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mainTab, setMainTab] = useState<"CRYPTO" | "P2P">("CRYPTO");
 
   const address = "TBVNCbZkHMxYT2A8hgY5j3SarjQmipTjny";
 
@@ -90,70 +92,96 @@ export default function DepositPage() {
             </div>
           )}
 
-          <h1 className="text-3xl md:text-4xl font-black mb-3 flex items-center gap-4 text-slate-900 dark:text-white tracking-tight">
-            Deposit USDT <Wallet className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+          <h1 className="text-3xl md:text-4xl font-black mb-6 flex items-center gap-4 text-slate-900 dark:text-white tracking-tight">
+            Deposit Funds <Wallet className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
           </h1>
-          <p className="text-slate-500 dark:text-gray-400 mb-10 text-base">Send USDT (TRC20) to the address below. Your funds will be credited after verification.</p>
 
-          <div className="bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 md:p-8 mb-10 shadow-inner">
-            <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4">Network: TRON (TRC20)</label>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="flex-1 w-full bg-white dark:bg-gray-800/50 px-5 py-4 rounded-2xl font-mono text-sm break-all border border-slate-200 dark:border-gray-700/50 text-indigo-500 dark:text-indigo-400 shadow-sm">
-                {address}
-              </div>
-              <button
-                onClick={handleCopy}
-                className="w-full sm:w-auto p-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl transition-all active:scale-95 shrink-0 shadow-lg shadow-indigo-600/20 flex items-center justify-center"
-              >
-                {copied ? <CheckCircle2 className="w-6 h-6 text-white" /> : <Copy className="w-6 h-6 text-white" />}
-              </button>
-            </div>
-            {copied && <p className="text-xs text-emerald-500 mt-3 font-bold flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Address copied to clipboard!</p>}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-            <div className="p-5 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl flex gap-4">
-              <Info className="w-6 h-6 text-indigo-400 shrink-0" />
-              <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Minimum deposit is <span className="text-slate-900 dark:text-white font-bold">$10 USDT</span>. Smaller amounts may be lost during transmission.</p>
-            </div>
-            <div className="p-5 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex gap-4">
-              <Info className="w-6 h-6 text-amber-400 shrink-0" />
-              <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Average network confirmation time: <span className="text-slate-900 dark:text-white font-bold">5-15 minutes</span> depending on load.</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-            <div>
-              <label className="block text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.15em] mb-3 ml-1">Deposit Amount (USDT)</label>
-              <input
-                type="number"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-gray-700 shadow-sm"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.15em] mb-3 ml-1">Transaction ID (TXID)</label>
-              <input
-                type="text"
-                placeholder="Paste your TRC20 transaction hash here"
-                value={txid}
-                onChange={(e) => setTxid(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-gray-700 shadow-sm"
-                required
-              />
-            </div>
-
+          <div className="flex bg-slate-100 dark:bg-gray-800/50 p-1 rounded-2xl mb-8">
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-lg py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] flex items-center justify-center gap-3"
+              onClick={() => setMainTab("CRYPTO")}
+              className={`flex-1 py-3 text-sm font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${
+                mainTab === "CRYPTO" ? "bg-white dark:bg-gray-900 text-indigo-500 shadow-md" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
+              }`}
             >
-              {loading ? <span className="animate-pulse">Verifying Transaction...</span> : "Confirm Payment Submission"}
+              <Wallet className="w-4 h-4" /> Crypto
             </button>
-          </form>
+            <button
+              onClick={() => setMainTab("P2P")}
+              className={`flex-1 py-3 text-sm font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${
+                mainTab === "P2P" ? "bg-white dark:bg-gray-900 text-indigo-500 shadow-md" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
+              }`}
+            >
+              <ArrowRightLeft className="w-4 h-4" /> P2P Network
+            </button>
+          </div>
+
+          {mainTab === "CRYPTO" ? (
+            <>
+              <p className="text-slate-500 dark:text-gray-400 mb-10 text-base">Send USDT (TRC20) to the address below. Your funds will be credited after verification.</p>
+
+              <div className="bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 md:p-8 mb-10 shadow-inner">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4">Network: TRON (TRC20)</label>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="flex-1 w-full bg-white dark:bg-gray-800/50 px-5 py-4 rounded-2xl font-mono text-sm break-all border border-slate-200 dark:border-gray-700/50 text-indigo-500 dark:text-indigo-400 shadow-sm">
+                    {address}
+                  </div>
+                  <button
+                    onClick={handleCopy}
+                    className="w-full sm:w-auto p-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl transition-all active:scale-95 shrink-0 shadow-lg shadow-indigo-600/20 flex items-center justify-center"
+                  >
+                    {copied ? <CheckCircle2 className="w-6 h-6 text-white" /> : <Copy className="w-6 h-6 text-white" />}
+                  </button>
+                </div>
+                {copied && <p className="text-xs text-emerald-500 mt-3 font-bold flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Address copied to clipboard!</p>}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                <div className="p-5 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl flex gap-4">
+                  <Info className="w-6 h-6 text-indigo-400 shrink-0" />
+                  <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Minimum deposit is <span className="text-slate-900 dark:text-white font-bold">$10 USDT</span>. Smaller amounts may be lost during transmission.</p>
+                </div>
+                <div className="p-5 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex gap-4">
+                  <Info className="w-6 h-6 text-amber-400 shrink-0" />
+                  <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Average network confirmation time: <span className="text-slate-900 dark:text-white font-bold">5-15 minutes</span> depending on load.</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                <div>
+                  <label className="block text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.15em] mb-3 ml-1">Deposit Amount (USDT)</label>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-gray-700 shadow-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.15em] mb-3 ml-1">Transaction ID (TXID)</label>
+                  <input
+                    type="text"
+                    placeholder="Paste your TRC20 transaction hash here"
+                    value={txid}
+                    onChange={(e) => setTxid(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 focus:border-indigo-500 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-gray-700 shadow-sm"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-lg py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  {loading ? <span className="animate-pulse">Verifying Transaction...</span> : "Confirm Payment Submission"}
+                </button>
+              </form>
+            </>
+          ) : (
+            <P2PInterface />
+          )}
         </div>
       </div>
     </div>

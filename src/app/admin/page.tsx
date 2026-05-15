@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
 import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw, Zap } from "lucide-react";
 import { useCrypto } from "@/context/CryptoContext";
+import { P2PAdminTable } from "@/components/P2PAdminTable";
 
 export default function AdminPage() {
   const { prices } = useCrypto();
@@ -1138,6 +1139,9 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      <P2PAdminTable />
+
       </div>
     </div>
   );
