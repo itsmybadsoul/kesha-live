@@ -87,7 +87,7 @@ export default function ProfilePage() {
                      type="text" 
                      value={searchId}
                      onChange={(e) => setSearchId(e.target.value)}
-                     placeholder="Enter User ID (e.g. A7X9B2Q1)"
+                     placeholder="Enter User ID"
                      className="flex-1 bg-slate-50 dark:bg-gray-950/50 border-2 border-slate-100 dark:border-gray-800 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-amber-500 transition-colors placeholder:text-slate-400 font-mono font-medium"
                    />
                    <button 
