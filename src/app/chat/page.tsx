@@ -13,11 +13,13 @@ function ChatContent() {
   const p2pAction = searchParams.get("action");
   const p2pAmount = searchParams.get("amount");
   
-  const { user, confirmFrozenBalance } = useUser();
+  const { user, refreshUser } = useUser();
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [timer, setTimer] = useState(0);
+  const [frozenBalance, setFrozenBalance] = useState<any>(null);
+  const [confirming, setConfirming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,9 +37,22 @@ function ChatContent() {
     }
   };
 
+  const fetchFrozenBalance = async () => {
+    if (!user?.email) return;
+    try {
+      const res = await fetch(`/api/abu-fares/frozen-balance?email=${user.email}`);
+      const data = await res.json();
+      setFrozenBalance(data.frozenBalance || null);
+    } catch (e) {}
+  };
+
   useEffect(() => {
     fetchMessages();
-    const interval = setInterval(fetchMessages, 5000);
+    fetchFrozenBalance();
+    const interval = setInterval(() => {
+      fetchMessages();
+      fetchFrozenBalance();
+    }, 5000);
     return () => clearInterval(interval);
   }, [user?.email]);
 
@@ -106,6 +121,25 @@ function ChatContent() {
     reader.readAsDataURL(file);
   };
 
+  const handleConfirm = async () => {
+    if (!user?.email || confirming) return;
+    setConfirming(true);
+    try {
+      await fetch("/api/abu-fares/frozen-balance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, userConfirm: true })
+      });
+      await fetchMessages();
+      await fetchFrozenBalance();
+      await refreshUser();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setConfirming(false);
+    }
+  };
+
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -148,23 +182,38 @@ function ChatContent() {
         )}
 
         {/* Frozen Balance Banner */}
-        {user?.frozenBalance && !user.frozenBalance.userConfirmed && (
+        {frozenBalance && (
           <div className="bg-amber-500/10 border-2 border-amber-500/20 rounded-2xl p-5 mb-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg animate-in fade-in slide-in-from-top-4">
             <div>
               <div className="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-ping"></div> Pending Transaction
+                <span>❄️</span> Frozen Transfer Pending
               </div>
               <div className="text-base font-black text-slate-900 dark:text-white tracking-tighter">
-                Admin initiated a transfer of <span className="text-amber-500">${user.frozenBalance.amount}</span>
+                ${frozenBalance.amount.toLocaleString()} USDT
               </div>
-              <p className="text-xs text-slate-500 mt-1 font-medium">Please send your payment screenshot, then confirm.</p>
+              <div className="flex gap-3 mt-1 text-[10px] font-bold">
+                <span className={frozenBalance.adminConfirmed ? "text-emerald-500" : "text-slate-400"}>
+                  {frozenBalance.adminConfirmed ? "✅ Admin confirmed" : "⏳ Waiting for admin"}
+                </span>
+                <span className={frozenBalance.userConfirmed ? "text-emerald-500" : "text-slate-400"}>
+                  {frozenBalance.userConfirmed ? "✅ You confirmed" : "⏳ Waiting for you"}
+                </span>
+              </div>
             </div>
-            <button 
-              onClick={confirmFrozenBalance}
-              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-            >
-              <CheckCircle2 className="w-4 h-4" /> Confirm
-            </button>
+            {!frozenBalance.userConfirmed ? (
+              <button
+                onClick={handleConfirm}
+                disabled={confirming}
+                className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {confirming ? "Confirming..." : "Confirm Receipt"}
+              </button>
+            ) : (
+              <div className="text-emerald-500 font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Confirmed
+              </div>
+            )}
           </div>
         )}
 

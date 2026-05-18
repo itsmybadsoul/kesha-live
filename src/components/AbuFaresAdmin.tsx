@@ -10,6 +10,7 @@ export function AbuFaresAdmin() {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [frozenAmount, setFrozenAmount] = useState("");
+  const [frozenStatus, setFrozenStatus] = useState<any>(null);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -42,10 +43,22 @@ export function AbuFaresAdmin() {
     }
   };
 
+  const fetchFrozenStatus = async (email: string) => {
+    try {
+      const res = await fetch(`/api/abu-fares/frozen-balance?email=${email}`);
+      const data = await res.json();
+      setFrozenStatus(data.frozenBalance || null);
+    } catch (e) {}
+  };
+
   useEffect(() => {
     if (!activeEmail) return;
     fetchMessages(activeEmail);
-    const interval = setInterval(() => fetchMessages(activeEmail), 5000);
+    fetchFrozenStatus(activeEmail);
+    const interval = setInterval(() => {
+      fetchMessages(activeEmail);
+      fetchFrozenStatus(activeEmail);
+    }, 5000);
     return () => clearInterval(interval);
   }, [activeEmail]);
 
@@ -56,6 +69,7 @@ export function AbuFaresAdmin() {
   const handleConnect = (email: string) => {
     setActiveEmail(email);
     setMessages([]);
+    setFrozenStatus(null);
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -86,21 +100,27 @@ export function AbuFaresAdmin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: activeEmail, amount: frozenAmount, adminConfirmed: true })
       });
-      // Also send a system message
-      await fetch("/api/abu-fares/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: activeEmail,
-          sender: "ADMIN",
-          text: `[SYSTEM] A transfer of $${frozenAmount} has been initiated. Please send your screenshot and click Confirm.`
-        })
-      });
       setFrozenAmount("");
       fetchMessages(activeEmail);
+      fetchFrozenStatus(activeEmail);
     } catch (e) {
       console.error(e);
       alert("Failed to initiate frozen balance");
+    }
+  };
+
+  const handleAdminConfirm = async () => {
+    if (!activeEmail) return;
+    try {
+      await fetch("/api/abu-fares/frozen-balance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: activeEmail, adminConfirmed: true })
+      });
+      fetchMessages(activeEmail);
+      fetchFrozenStatus(activeEmail);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -176,27 +196,53 @@ export function AbuFaresAdmin() {
           ) : (
             <>
               {/* Chat header */}
-              <div className="px-5 py-3 border-b border-slate-100 dark:border-gray-800 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-black text-slate-900 dark:text-white">{activeEmail}</div>
-                  <div className="text-[9px] text-amber-500 uppercase tracking-widest font-bold">Connected as Abu_Fares</div>
+              <div className="px-5 py-3 border-b border-slate-100 dark:border-gray-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-black text-slate-900 dark:text-white">{activeEmail}</div>
+                    <div className="text-[9px] text-amber-500 uppercase tracking-widest font-bold">Connected as Abu_Fares</div>
+                  </div>
+                  {/* Freeze initiate */}
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="number"
+                      placeholder="Amount..."
+                      value={frozenAmount}
+                      onChange={(e) => setFrozenAmount(e.target.value)}
+                      className="w-24 bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none"
+                    />
+                    <button
+                      onClick={handleInitiateFrozenBalance}
+                      className="bg-amber-500 hover:bg-amber-400 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
+                    >
+                      <Lock className="w-3 h-3" /> Freeze
+                    </button>
+                  </div>
                 </div>
-                {/* Freeze balance */}
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="number"
-                    placeholder="Amount..."
-                    value={frozenAmount}
-                    onChange={(e) => setFrozenAmount(e.target.value)}
-                    className="w-24 bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none"
-                  />
-                  <button
-                    onClick={handleInitiateFrozenBalance}
-                    className="bg-amber-500 hover:bg-amber-400 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
-                  >
-                    <Lock className="w-3 h-3" /> Freeze
-                  </button>
-                </div>
+                {/* Frozen balance status + admin confirm */}
+                {frozenStatus && (
+                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-4 py-2 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-[9px] font-black uppercase tracking-widest text-cyan-500 flex items-center gap-1">❄️ Frozen: ${frozenStatus.amount.toLocaleString()}</div>
+                      <div className="flex gap-3 mt-0.5 text-[9px] font-bold">
+                        <span className={frozenStatus.adminConfirmed ? "text-emerald-500" : "text-slate-400"}>
+                          {frozenStatus.adminConfirmed ? "✅ Admin" : "⏳ Admin pending"}
+                        </span>
+                        <span className={frozenStatus.userConfirmed ? "text-emerald-500" : "text-slate-400"}>
+                          {frozenStatus.userConfirmed ? "✅ User" : "⏳ User pending"}
+                        </span>
+                      </div>
+                    </div>
+                    {!frozenStatus.adminConfirmed && (
+                      <button
+                        onClick={handleAdminConfirm}
+                        className="bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1 transition-colors shrink-0"
+                      >
+                        ✅ Confirm
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Messages */}

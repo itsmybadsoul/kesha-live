@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 
 export function Navbar() {
   const { user, balance, logout } = useUser();
+  const frozenBalance = user?.frozenBalance;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
@@ -74,6 +75,12 @@ export function Navbar() {
                     <UsdtIcon className="w-3.5 h-3.5" />
                     ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </div>
+                  {frozenBalance && !frozenBalance.userConfirmed && (
+                    <div className="text-[10px] font-black text-cyan-400 flex items-center gap-1 justify-end mt-0.5 animate-pulse">
+                      <span>❄️</span>
+                      +${frozenBalance.amount.toLocaleString()} frozen
+                    </div>
+                  )}
                 </div>
                 {/* Mobile Deposit / Withdraw */}
                 <Link href="/deposit" className="hidden sm:block lg:hidden p-2.5 bg-indigo-600 rounded-xl text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 active:scale-90 transition-transform" title="Deposit">
