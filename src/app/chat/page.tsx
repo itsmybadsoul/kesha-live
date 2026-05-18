@@ -6,7 +6,7 @@ import { Send, Image as ImageIcon, XCircle, ArrowLeft, ShieldCheck, Clock, Check
 import { useUser } from "@/context/UserContext";
 import { Navbar } from "@/components/Navbar";
 
-export default function ChatPage() {
+function ChatContent() {
   const searchParams = useSearchParams();
   const userName = searchParams.get("user") || "User";
   const isP2P = searchParams.get("type") === "p2p";
@@ -240,5 +240,13 @@ export default function ChatPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-white">Loading chat...</div>}>
+      <ChatContent />
+    </React.Suspense>
   );
 }
