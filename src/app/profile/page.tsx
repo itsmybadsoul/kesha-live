@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [p2pModalOpen, setP2pModalOpen] = useState(false);
   const [p2pAction, setP2pAction] = useState<"BUY" | "SELL">("BUY");
   const [p2pAmount, setP2pAmount] = useState("");
+  const [p2pCurrency, setP2pCurrency] = useState("SAR");
 
   const handleSearch = () => {
     if (searchId.trim() === "A7X9B2Q1") {
@@ -284,7 +285,7 @@ export default function ProfilePage() {
           <div className="relative bg-white dark:bg-gray-900/80 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 w-full max-w-sm rounded-[3rem] p-8 shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-300">
             <h3 className="text-2xl font-black mb-6 tracking-tighter uppercase italic text-center">P2P <span className="text-blue-500 not-italic">Trade</span></h3>
             
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div className="flex bg-slate-50 dark:bg-gray-950/50 p-1.5 rounded-2xl border-2 border-slate-100 dark:border-gray-800">
                 <button 
                   onClick={() => setP2pAction("BUY")}
@@ -301,7 +302,42 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 ml-1">Trade Amount (USD)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 ml-1">Currency</label>
+                <select
+                  value={p2pCurrency}
+                  onChange={(e) => setP2pCurrency(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-gray-950/50 border-2 border-slate-100 dark:border-gray-800 rounded-2xl px-5 py-3.5 text-sm focus:outline-none focus:border-blue-500 transition-colors font-bold text-slate-900 dark:text-white appearance-none cursor-pointer"
+                >
+                  <option value="SAR">🇸🇦 SAR — Saudi Riyal</option>
+                  <option value="AED">🇦🇪 AED — UAE Dirham</option>
+                  <option value="KWD">🇰🇼 KWD — Kuwaiti Dinar</option>
+                  <option value="QAR">🇶🇦 QAR — Qatari Riyal</option>
+                  <option value="BHD">🇧🇭 BHD — Bahraini Dinar</option>
+                  <option value="OMR">🇴🇲 OMR — Omani Rial</option>
+                  <option value="JOD">🇯🇴 JOD — Jordanian Dinar</option>
+                  <option value="EGP">🇪🇬 EGP — Egyptian Pound</option>
+                  <option value="USD">🇺🇸 USD — US Dollar</option>
+                  <option value="EUR">🇪🇺 EUR — Euro</option>
+                  <option value="GBP">🇬🇧 GBP — British Pound</option>
+                  <option value="CHF">🇨🇭 CHF — Swiss Franc</option>
+                  <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+                  <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+                  <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+                  <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+                  <option value="INR">🇮🇳 INR — Indian Rupee</option>
+                  <option value="TRY">🇹🇷 TRY — Turkish Lira</option>
+                  <option value="RUB">🇷🇺 RUB — Russian Ruble</option>
+                  <option value="BRL">🇧🇷 BRL — Brazilian Real</option>
+                  <option value="MXN">🇲🇽 MXN — Mexican Peso</option>
+                  <option value="ZAR">🇿🇦 ZAR — South African Rand</option>
+                  <option value="NGN">🇳🇬 NGN — Nigerian Naira</option>
+                  <option value="PKR">🇵🇰 PKR — Pakistani Rupee</option>
+                  <option value="IDR">🇮🇩 IDR — Indonesian Rupiah</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 ml-1">Trade Amount ({p2pCurrency})</label>
                 <input 
                   type="number"
                   value={p2pAmount}
@@ -312,7 +348,7 @@ export default function ProfilePage() {
               </div>
 
               <button 
-                onClick={() => window.location.href = `/chat?user=${searchResult?.name}&type=p2p&action=${p2pAction}&amount=${p2pAmount}`}
+                onClick={() => window.location.href = `/chat?user=${searchResult?.name}&type=p2p&action=${p2pAction}&amount=${p2pAmount}&currency=${p2pCurrency}`}
                 disabled={!p2pAmount}
                 className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95"
               >

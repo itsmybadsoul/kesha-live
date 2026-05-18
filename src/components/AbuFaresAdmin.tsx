@@ -12,6 +12,8 @@ export function AbuFaresAdmin() {
   const [frozenAmount, setFrozenAmount] = useState("");
   const [frozenStatus, setFrozenStatus] = useState<any>(null);
   const [loadingSessions, setLoadingSessions] = useState(true);
+  const [greeting, setGreeting] = useState("");
+  const [greetingEditing, setGreetingEditing] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Load all active sessions on mount
@@ -29,9 +31,31 @@ export function AbuFaresAdmin() {
 
   useEffect(() => {
     fetchSessions();
+    fetchGreeting();
     const interval = setInterval(fetchSessions, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const fetchGreeting = async () => {
+    try {
+      const res = await fetch("/api/abu-fares/greeting");
+      const data = await res.json();
+      if (data.greeting) setGreeting(data.greeting);
+    } catch (e) {}
+  };
+
+  const handleSaveGreeting = async () => {
+    try {
+      await fetch("/api/abu-fares/greeting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ greeting })
+      });
+      setGreetingEditing(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const fetchMessages = async (email: string) => {
     try {
@@ -98,7 +122,7 @@ export function AbuFaresAdmin() {
       await fetch("/api/abu-fares/frozen-balance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: activeEmail, amount: frozenAmount, adminConfirmed: true })
+        body: JSON.stringify({ email: activeEmail, amount: frozenAmount })
       });
       setFrozenAmount("");
       fetchMessages(activeEmail);
@@ -109,14 +133,16 @@ export function AbuFaresAdmin() {
     }
   };
 
-  const handleAdminConfirm = async () => {
+  const handleAdminRelease = async () => {
     if (!activeEmail) return;
     try {
-      await fetch("/api/abu-fares/frozen-balance", {
+      const res = await fetch("/api/abu-fares/frozen-balance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: activeEmail, adminConfirmed: true })
+        body: JSON.stringify({ email: activeEmail, adminRelease: true })
       });
+      const data = await res.json();
+      if (data.error) { alert(data.error); return; }
       fetchMessages(activeEmail);
       fetchFrozenStatus(activeEmail);
     } catch (e) {
@@ -127,11 +153,40 @@ export function AbuFaresAdmin() {
   return (
     <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100 dark:border-gray-800">
-        <ShieldAlert className="w-5 h-5 text-amber-500" />
-        <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-          Direct Node Routing <span className="text-xs text-slate-400 font-normal">(Abu_Fares)</span>
-        </h2>
+      <div className="px-6 py-5 border-b border-slate-100 dark:border-gray-800 space-y-3">
+        <div className="flex items-center gap-3">
+          <ShieldAlert className="w-5 h-5 text-amber-500" />
+          <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+            Direct Node Routing <span className="text-xs text-slate-400 font-normal">(Abu_Fares)</span>
+          </h2>
+        </div>
+        {/* Greeting Editor */}
+        <div className="bg-slate-50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Welcome Message (Arabic)</span>
+            {!greetingEditing ? (
+              <button onClick={() => setGreetingEditing(true)} className="text-[9px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-400">
+                Edit
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button onClick={handleSaveGreeting} className="text-[9px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-400">Save</button>
+                <button onClick={() => setGreetingEditing(false)} className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600">Cancel</button>
+              </div>
+            )}
+          </div>
+          {greetingEditing ? (
+            <textarea
+              value={greeting}
+              onChange={(e) => setGreeting(e.target.value)}
+              className="w-full bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 resize-none font-medium leading-relaxed"
+              rows={3}
+              dir="rtl"
+            />
+          ) : (
+            <p className="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed truncate" dir="rtl">{greeting}</p>
+          )}
+        </div>
       </div>
 
       <div className="flex h-[580px]">
@@ -219,28 +274,35 @@ export function AbuFaresAdmin() {
                     </button>
                   </div>
                 </div>
-                {/* Frozen balance status + admin confirm */}
+                {/* Frozen balance status — 3-step flow */}
                 {frozenStatus && (
-                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-4 py-2 flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-[9px] font-black uppercase tracking-widest text-cyan-500 flex items-center gap-1">❄️ Frozen: ${frozenStatus.amount.toLocaleString()}</div>
-                      <div className="flex gap-3 mt-0.5 text-[9px] font-bold">
-                        <span className={frozenStatus.adminConfirmed ? "text-emerald-500" : "text-slate-400"}>
-                          {frozenStatus.adminConfirmed ? "✅ Admin" : "⏳ Admin pending"}
-                        </span>
-                        <span className={frozenStatus.userConfirmed ? "text-emerald-500" : "text-slate-400"}>
-                          {frozenStatus.userConfirmed ? "✅ User" : "⏳ User pending"}
-                        </span>
-                      </div>
+                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-4 py-2 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-cyan-500">❄️ Frozen: ${frozenStatus.amount.toLocaleString()}</div>
+                      {/* Show Release button ONLY after user confirmed */}
+                      {frozenStatus.userConfirmed && !frozenStatus.adminConfirmed && (
+                        <button
+                          onClick={handleAdminRelease}
+                          className="bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1 transition-colors shrink-0 animate-pulse"
+                        >
+                          🚀 Release Funds
+                        </button>
+                      )}
+                      {frozenStatus.adminConfirmed && (
+                        <span className="text-emerald-500 text-[9px] font-black uppercase tracking-widest">✅ Released</span>
+                      )}
                     </div>
-                    {!frozenStatus.adminConfirmed && (
-                      <button
-                        onClick={handleAdminConfirm}
-                        className="bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1 transition-colors shrink-0"
-                      >
-                        ✅ Confirm
-                      </button>
-                    )}
+                    <div className="flex gap-4 text-[9px] font-bold">
+                      <span className="text-slate-400">Step 1 (Freeze): <span className="text-emerald-500">✅ Done</span></span>
+                      <span className={frozenStatus.userConfirmed ? "text-slate-400" : "text-slate-400"}>
+                        Step 2 (User): <span className={frozenStatus.userConfirmed ? "text-emerald-500" : "text-amber-400"}>
+                          {frozenStatus.userConfirmed ? "✅ Confirmed" : "⏳ Waiting"}
+                        </span>
+                      </span>
+                      <span className="text-slate-400">Step 3 (Release): <span className={frozenStatus.adminConfirmed ? "text-emerald-500" : "text-slate-500"}>{
+                        frozenStatus.adminConfirmed ? "✅ Done" : "Pending"
+                      }</span></span>
+                    </div>
                   </div>
                 )}
               </div>

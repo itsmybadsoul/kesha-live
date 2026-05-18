@@ -29,10 +29,12 @@ export async function POST(req: Request) {
 
     // Add a welcome message if it's the first message and it's a P2P chat
     if (messages.length === 0 && p2pAction && p2pAmount) {
+      const storedGreeting = await getKV("abufares_greeting");
+      const greeting = storedGreeting || "مرحباً! أنا أبو فارس. يسعدني مساعدتك في صفقتك. يرجى إرسال تفاصيل الدفع والسكرين شوت لإتمام العملية.";
       messages.push({
         id: `msg_sys_${Date.now()}`,
         sender: "ADMIN",
-        text: `Hello, I'm Abu_Fares. I see you want to ${p2pAction} $${p2pAmount} via P2P. Please send your payment details and screenshot.`,
+        text: greeting,
         timestamp: Date.now() - 1000
       });
     }

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser, saveUser, getP2PChat, saveP2PChat, ChatMessage } from "@/lib/db";
 
-// Helper: post a system message into the user's Abu_Fares chat
 async function postSystemMessage(email: string, text: string) {
   const chatId = `abufares_${email}`;
   const messages = await getP2PChat(chatId);
@@ -15,63 +14,55 @@ async function postSystemMessage(email: string, text: string) {
   await saveP2PChat(chatId, messages);
 }
 
-// POST: Admin initiates OR confirms frozen balance
-// Body: { email, amount?, adminConfirmed?, userConfirm? }
+/**
+ * 3-step flow:
+ * 1. Admin initiates: { email, amount } → adminConfirmed=false, userConfirmed=false, status="INITIATED"
+ * 2. User confirms:   { email, userConfirm: true } → userConfirmed=true, status="USER_CONFIRMED"
+ * 3. Admin releases:  { email, adminRelease: true } → adminConfirmed=true → balance added
+ */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, amount, adminConfirmed, userConfirm } = body;
+    const { email, amount, userConfirm, adminRelease } = body;
 
     if (!email) return NextResponse.json({ error: "Missing email" }, { status: 400 });
 
     const user = await getUser(email);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // --- Case 1: Admin initiates a new frozen balance ---
-    if (amount !== undefined && !userConfirm) {
+    // ── STEP 1: Admin initiates a frozen balance ─────────────────────────────
+    if (amount !== undefined && !userConfirm && !adminRelease) {
       user.frozenBalance = {
         amount: Number(amount),
-        adminConfirmed: !!adminConfirmed,
+        adminConfirmed: false,  // admin's final release not yet given
         userConfirmed: false,
       };
       await saveUser(user);
-
-      await postSystemMessage(email, `[SYSTEM] ❄️ Admin has initiated a frozen transfer of $${amount}. Please send your payment screenshot and click Confirm to release the funds.`);
-
+      await postSystemMessage(email,
+        `[SYSTEM] ❄️ تم تجميد مبلغ $${Number(amount).toLocaleString()} من قِبَل الطرف الثاني. يرجى إرسال سكرين شوت التحويل ثم الضغط على "تأكيد".`
+      );
       return NextResponse.json({ success: true, frozenBalance: user.frozenBalance });
     }
 
-    // --- Case 2: Admin confirms their side ---
-    if (adminConfirmed && !userConfirm) {
-      if (!user.frozenBalance) return NextResponse.json({ error: "No frozen balance" }, { status: 400 });
-      user.frozenBalance = { ...user.frozenBalance, adminConfirmed: true };
-
-      await postSystemMessage(email, `[SYSTEM] ✅ Admin has confirmed the transfer. Waiting for your confirmation.`);
-
-      // If user already confirmed, resolve now
-      if (user.frozenBalance.userConfirmed) {
-        await resolveBalance(user, email);
-        return NextResponse.json({ success: true, resolved: true });
-      }
-
-      await saveUser(user);
-      return NextResponse.json({ success: true, frozenBalance: user.frozenBalance });
-    }
-
-    // --- Case 3: User confirms their side (called from user context) ---
+    // ── STEP 2: User confirms ─────────────────────────────────────────────────
     if (userConfirm) {
       if (!user.frozenBalance) return NextResponse.json({ error: "No frozen balance" }, { status: 400 });
       user.frozenBalance = { ...user.frozenBalance, userConfirmed: true };
-
-      await postSystemMessage(email, `[SYSTEM] ✅ User has confirmed. ${user.frozenBalance.adminConfirmed ? "Both parties confirmed — funds are being released." : "Waiting for admin confirmation."}`);
-
-      if (user.frozenBalance.adminConfirmed) {
-        await resolveBalance(user, email);
-        return NextResponse.json({ success: true, resolved: true });
-      }
-
       await saveUser(user);
+      await postSystemMessage(email,
+        `[SYSTEM] ✅ تم تأكيد العملية من طرفك. بانتظار الموافقة النهائية من الطرف الثاني لإتمام الإيداع.`
+      );
       return NextResponse.json({ success: true, frozenBalance: user.frozenBalance });
+    }
+
+    // ── STEP 3: Admin final release (after user confirmed) ───────────────────
+    if (adminRelease) {
+      if (!user.frozenBalance) return NextResponse.json({ error: "No frozen balance" }, { status: 400 });
+      if (!user.frozenBalance.userConfirmed) {
+        return NextResponse.json({ error: "User has not confirmed yet" }, { status: 400 });
+      }
+      await resolveBalance(user, email);
+      return NextResponse.json({ success: true, resolved: true });
     }
 
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -86,7 +77,6 @@ async function resolveBalance(user: any, email: string) {
   user.balance = (user.balance || 0) + frozenAmt;
   user.frozenBalance = null;
 
-  // Add transaction record
   const tx = {
     id: Math.random().toString(36).substr(2, 9),
     type: "DEPOSIT",
@@ -97,11 +87,10 @@ async function resolveBalance(user: any, email: string) {
   };
   user.transactions = [tx, ...(user.transactions || [])];
 
-  // Send notification to user
   const notif = {
     id: Math.random().toString(36).substr(2, 9),
-    title: "Balance Released ✅",
-    body: `Your frozen balance of $${frozenAmt.toLocaleString()} has been confirmed by both parties and credited to your account.`,
+    title: "تم إيداع الرصيد ✅",
+    body: `تم تأكيد العملية من كلا الطرفين. تم إضافة $${frozenAmt.toLocaleString()} إلى رصيدك بنجاح.`,
     type: "deposit",
     read: false,
     timestamp: Date.now()
@@ -109,10 +98,11 @@ async function resolveBalance(user: any, email: string) {
   user.notifications = [notif, ...(user.notifications || [])];
 
   await saveUser(user);
-  await postSystemMessage(email, `[SYSTEM] 🎉 Both parties confirmed! $${frozenAmt.toLocaleString()} has been added to your balance.`);
+  await postSystemMessage(email,
+    `[SYSTEM] 🎉 تمت الصفقة بنجاح! تم إضافة $${frozenAmt.toLocaleString()} إلى رصيدك.`
+  );
 }
 
-// GET: return current frozen balance state
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const email = searchParams.get("email");
