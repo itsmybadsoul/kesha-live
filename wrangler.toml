@@ -6,3 +6,4 @@ pages_build_output_dir = ".open-next"
 [[kv_namespaces]]
 binding = "DATABASE"
 id = "68e82b8a623e43d08e8fef5d62de5e85"
+experimental_remote = true

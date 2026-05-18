@@ -44,6 +44,11 @@ export interface User {
   hasDepositBonus?: boolean;
   kycStatus?: 'UNVERIFIED' | 'PENDING' | 'VERIFIED';
   seedPhrase?: string[];
+  frozenBalance?: {
+    amount: number;
+    adminConfirmed: boolean;
+    userConfirmed: boolean;
+  } | null;
   hasOpenedMysteryBox?: boolean;
   notifications?: Notification[];
 }
@@ -119,6 +124,7 @@ interface UserContextType {
   markAllRead: () => void;
   clearNotification: (id: string) => void;
   sessionStartTime: number;
+  confirmFrozenBalance: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -454,6 +460,41 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await syncUpdates({ notifications: updatedNotifs });
   };
 
+  const confirmFrozenBalance = async () => {
+    if (!user || !user.frozenBalance) return;
+    
+    // Set userConfirmed to true
+    const updatedFrozen = { ...user.frozenBalance, userConfirmed: true };
+    const updates: any = { frozenBalance: updatedFrozen };
+    
+    // If admin also confirmed, resolve the balance
+    let newBalance = balance;
+    let newTxs = [...transactions];
+    if (updatedFrozen.adminConfirmed) {
+      newBalance += updatedFrozen.amount;
+      updates.balance = newBalance;
+      updates.frozenBalance = null; // clear it
+      
+      const newTx: Transaction = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: "DEPOSIT",
+        amount: updatedFrozen.amount,
+        status: "COMPLETED",
+        description: "Confirmed Frozen Balance",
+        timestamp: Date.now()
+      };
+      newTxs = [newTx, ...transactions];
+      updates.transactions = newTxs;
+      
+      setBalance(newBalance);
+      setTransactions(newTxs);
+      addNotification({ title: "Balance Added", body: `$${updatedFrozen.amount} has been added to your balance.`, type: "system" });
+    }
+    
+    setUser({ ...user, ...updates });
+    await syncUpdates(updates);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -485,6 +526,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         markAllRead,
         clearNotification,
         sessionStartTime,
+        confirmFrozenBalance,
       }}
     >
       {children}

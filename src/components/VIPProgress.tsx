@@ -66,8 +66,8 @@ export function VIPProgress() {
 
       <div className="relative z-10">
         <div className="flex justify-between text-xs font-medium text-slate-500 dark:text-gray-400 mb-2">
-          <span>${balance.toLocaleString()} USDT</span>
-          <span>${target.toLocaleString()} USDT</span>
+          <span>${balance.toLocaleString('en-US')} USDT</span>
+          <span>${target.toLocaleString('en-US')} USDT</span>
         </div>
         
         <div className="h-3 w-full bg-white dark:bg-gray-900 rounded-full overflow-hidden border border-slate-300 dark:border-gray-700">
@@ -81,7 +81,7 @@ export function VIPProgress() {
         
         {remaining > 0 ? (
           <p className="text-sm text-slate-500 dark:text-gray-400 mt-4 text-center">
-            Deposit <span className="text-emerald-400 font-bold">${remaining.toLocaleString()}</span> more to unlock {nextTier} Tier (+{bonus} Bonus)
+            Deposit <span className="text-emerald-400 font-bold">${remaining.toLocaleString('en-US')}</span> more to unlock {nextTier} Tier (+{bonus} Bonus)
           </p>
         ) : (
           <p className="text-sm text-emerald-400 mt-4 text-center font-bold">

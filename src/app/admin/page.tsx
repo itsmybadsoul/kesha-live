@@ -5,6 +5,7 @@ import { useToast } from "@/context/ToastContext";
 import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw, Zap } from "lucide-react";
 import { useCrypto } from "@/context/CryptoContext";
 import { P2PAdminTable } from "@/components/P2PAdminTable";
+import { AbuFaresAdmin } from "@/components/AbuFaresAdmin";
 
 export default function AdminPage() {
   const { prices } = useCrypto();
@@ -1048,7 +1049,7 @@ export default function AdminPage() {
                          </div>
                       </td>
                       <td className="px-8 py-8">
-                         <div className="text-2xl font-black text-indigo-500 tabular-nums tracking-tighter">${u.balance.toLocaleString()}</div>
+                         <div className="text-2xl font-black text-indigo-500 tabular-nums tracking-tighter">${u.balance.toLocaleString('en-US')}</div>
                          <div className="text-[9px] text-slate-400 dark:text-gray-600 font-black uppercase tracking-widest mt-1 opacity-60">Liquid_Capital</div>
                       </td>
                       <td className="px-8 py-8">
@@ -1064,7 +1065,7 @@ export default function AdminPage() {
                       <td className="px-8 py-8">
                          <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${
                            u.kycStatus === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                           u.kycStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-600 border-slate-200 dark:border-gray-700'
+                           u.kycStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_100px_rgba(245,158,11,0.2)]' : 'bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-600 border-slate-200 dark:border-gray-700'
                          }`}>
                            {u.kycStatus || 'UNVERIFIED'}
                          </span>
@@ -1087,6 +1088,63 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Support Inquiries Inbox */}
+        <div className="mt-16 mb-8 flex justify-between items-center px-4">
+          <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter uppercase italic">
+            Support <span className="text-indigo-500 not-italic">Inquiries</span> <MessageSquare className="w-8 h-8 text-indigo-500" />
+          </h2>
+          <div className="px-5 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 shadow-lg">
+             {supportTickets.length} Pending Transmissions
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl mb-16">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1000px] text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em]">
+                  <th className="px-8 py-5">Registrant Entity</th>
+                  <th className="px-8 py-5">Subject Payload</th>
+                  <th className="px-8 py-5">Message Content</th>
+                  <th className="px-8 py-5 text-right">Node Controls</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
+                {loading ? (
+                  <tr><td colSpan={4} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-[0.4em]">Synchronizing Authority Node...</td></tr>
+                ) : supportTickets.length === 0 ? (
+                  <tr><td colSpan={4} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 italic text-xs font-medium tracking-widest">INBOX_EMPTY: No pending support transmissions detected.</td></tr>
+                ) : (
+                  supportTickets.map((t) => (
+                    <tr key={t.id} className="hover:bg-indigo-500/[0.02] transition-colors group">
+                      <td className="px-8 py-8 font-black text-sm text-slate-900 dark:text-white">
+                         <div className="flex flex-col gap-2">
+                           <span className="bg-indigo-500/10 text-indigo-500 px-3 py-1 rounded-lg text-[9px] uppercase tracking-widest font-black border border-indigo-500/20 w-max">External_Comms</span>
+                           {t.email}
+                           <span className="text-slate-400 dark:text-gray-500 text-[10px] font-mono tracking-tighter opacity-60 font-medium">{new Date(t.timestamp).toLocaleString('en-US')}</span>
+                         </div>
+                      </td>
+                      <td className="px-8 py-8">
+                         <div className="text-base font-black text-slate-900 dark:text-white tracking-tighter uppercase">{t.subject}</div>
+                      </td>
+                      <td className="px-8 py-8">
+                         <div className="text-xs text-slate-500 dark:text-gray-400 max-w-md bg-slate-50 dark:bg-gray-950/50 p-4 rounded-xl border border-slate-200 dark:border-gray-800 font-medium leading-relaxed italic">
+                           "{t.message}"
+                         </div>
+                      </td>
+                      <td className="px-8 py-8 text-right">
+                        <div className="flex justify-end gap-3">
+                          <button onClick={() => setNotifModal({ open: true, email: t.email, title: `RE: ${t.subject}`, body: "" })} className="p-4 bg-indigo-600 text-white rounded-2xl hover:scale-110 hover:rotate-3 transition-all shadow-xl shadow-indigo-600/20 active:scale-95" title="Reply via System Notification"><Send className="w-6 h-6" /></button>
+                          <button onClick={() => handleClearTicket(t.id)} className="p-4 bg-white dark:bg-gray-900 text-slate-400 dark:text-gray-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-2xl border border-slate-200 dark:border-gray-800 hover:bg-rose-500/5 hover:border-rose-500/20 transition-all active:scale-95" title="Purge Transmission"><Trash2 className="w-6 h-6" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       {/* Notification Modal */}
@@ -1140,7 +1198,13 @@ export default function AdminPage() {
         </div>
       )}
 
-      <P2PAdminTable />
+      <div className="mt-8">
+        <AbuFaresAdmin />
+      </div>
+
+      <div className="mt-8">
+        <P2PAdminTable />
+      </div>
 
       </div>
     </div>

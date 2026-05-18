@@ -141,9 +141,9 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
 
       {/* Price Labels */}
       <div className="absolute right-1 md:right-4 top-0 bottom-0 flex flex-col justify-between py-12 md:py-20 z-20 pointer-events-none opacity-40 sm:opacity-100">
-        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
-        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
-        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString(undefined, { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMax.toLocaleString('en-US', { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${((adjustedMax + adjustedMin) / 2).toLocaleString('en-US', { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
+        <div className="text-[7px] md:text-[10px] font-black text-white/40 bg-black/40 px-1 md:px-2 py-0.5 md:py-1 rounded border border-white/5 backdrop-blur-md">${adjustedMin.toLocaleString('en-US', { maximumFractionDigits: adjustedMax < 1 ? 6 : 2 })}</div>
       </div>
 
       {/* Main SVG */}
@@ -177,18 +177,20 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         })}
 
         {/* Area */}
-        <path d={`${pathData} L ${width} ${svgHeight} L 0 ${svgHeight} Z`} fill="url(#chartGradient)" />
+        {pathData && <path d={`${pathData} L ${width} ${svgHeight} L 0 ${svgHeight} Z`} fill="url(#chartGradient)" />}
 
         {/* Path */}
-        <path 
-          d={pathData} 
-          fill="none" 
-          stroke={strokeColor} 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          style={{ filter: 'drop-shadow(0 0 8px ' + strokeColor + '44)' }}
-        />
+        {pathData && (
+          <path 
+            d={pathData} 
+            fill="none" 
+            stroke={strokeColor} 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            style={{ filter: 'drop-shadow(0 0 8px ' + strokeColor + '44)' }}
+          />
+        )}
 
         {/* Current Price Dot */}
         {dataPoints.length > 0 && (
@@ -219,7 +221,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
         </div>
         <div>
           <div className="text-xl md:text-3xl font-black text-white tracking-tighter tabular-nums flex items-center gap-2 md:gap-3">
-            ${basePrice.toLocaleString(undefined, { 
+            ${basePrice.toLocaleString('en-US', { 
               minimumFractionDigits: basePrice < 0.01 ? 6 : (basePrice < 1 ? 4 : 2),
               maximumFractionDigits: basePrice < 0.01 ? 8 : (basePrice < 1 ? 6 : 2)
             })}
@@ -235,7 +237,7 @@ export function InstitutionalChart({ asset, height }: InstitutionalChartProps) {
       <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20 flex flex-wrap gap-4 md:gap-10">
         <div className="space-y-0.5 md:space-y-1">
           <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">24h Vol</div>
-          <div className="text-[9px] md:text-xs font-bold text-white/80">{(basePrice * 1245).toLocaleString()} USDT</div>
+          <div className="text-[9px] md:text-xs font-bold text-white/80">{(basePrice * 1245).toLocaleString('en-US')} USDT</div>
         </div>
         <div className="space-y-0.5 md:space-y-1">
           <div className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Liquidity</div>

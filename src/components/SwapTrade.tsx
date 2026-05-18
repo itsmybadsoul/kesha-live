@@ -67,7 +67,7 @@ export function SwapTrade() {
            <div className="flex justify-between items-center mb-4">
               <span className="text-[10px] font-black text-slate-400 dark:text-gray-600 uppercase tracking-[0.2em]">Source_Asset</span>
               <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest opacity-60">
-                Avail: {fromAsset === "USD" ? `$${balance.toLocaleString()}` : `${(user?.holdings?.[fromAsset] || 0).toFixed(4)} ${fromAsset}`}
+                Avail: {fromAsset === "USD" ? `$${balance.toLocaleString('en-US')}` : `${(user?.holdings?.[fromAsset] || 0).toFixed(4)} ${fromAsset}`}
               </span>
            </div>
            <div className="flex items-center gap-6">

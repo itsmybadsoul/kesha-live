@@ -4,8 +4,11 @@ import { getUser, trackUserRegistration } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
+    console.log("LOGIN ATTEMPT:", email, password);
 
     const user = await getUser(email);
+    console.log("USER FOUND:", user);
+
     if (!user || user.password !== password) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }

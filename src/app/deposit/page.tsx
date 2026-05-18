@@ -8,8 +8,6 @@ import { useToast } from "@/context/ToastContext";
 import { Wallet, Copy, CheckCircle2, ArrowLeft, Info, ArrowRightLeft } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navbar } from "@/components/Navbar";
-import { P2PInterface } from "@/components/P2PInterface";
-
 export default function DepositPage() {
   const router = useRouter();
   const { requestDeposit, user, addNotification, isLoading } = useUser();
@@ -18,7 +16,6 @@ export default function DepositPage() {
   const [txid, setTxid] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [mainTab, setMainTab] = useState<"CRYPTO" | "P2P">("CRYPTO");
 
   const address = "TBVNCbZkHMxYT2A8hgY5j3SarjQmipTjny";
 
@@ -96,27 +93,7 @@ export default function DepositPage() {
             Deposit Funds <Wallet className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
           </h1>
 
-          <div className="flex bg-slate-100 dark:bg-gray-800/50 p-1 rounded-2xl mb-8">
-            <button
-              onClick={() => setMainTab("CRYPTO")}
-              className={`flex-1 py-3 text-sm font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${
-                mainTab === "CRYPTO" ? "bg-white dark:bg-gray-900 text-indigo-500 shadow-md" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
-              }`}
-            >
-              <Wallet className="w-4 h-4" /> Crypto
-            </button>
-            <button
-              onClick={() => setMainTab("P2P")}
-              className={`flex-1 py-3 text-sm font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${
-                mainTab === "P2P" ? "bg-white dark:bg-gray-900 text-indigo-500 shadow-md" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
-              }`}
-            >
-              <ArrowRightLeft className="w-4 h-4" /> P2P Network
-            </button>
-          </div>
-
-          {mainTab === "CRYPTO" ? (
-            <>
+          <>
               <p className="text-slate-500 dark:text-gray-400 mb-10 text-base">Send USDT (TRC20) to the address below. Your funds will be credited after verification.</p>
 
               <div className="bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 md:p-8 mb-10 shadow-inner">
@@ -179,9 +156,6 @@ export default function DepositPage() {
                 </button>
               </form>
             </>
-          ) : (
-            <P2PInterface />
-          )}
         </div>
       </div>
     </div>

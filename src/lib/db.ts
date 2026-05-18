@@ -57,6 +57,11 @@ export interface UserData {
     timestamp: number;
   };
   notifications?: Notification[];
+  frozenBalance?: {
+    amount: number;
+    adminConfirmed: boolean;
+    userConfirmed: boolean;
+  } | null;
 }
 
 export interface SupportTicket {
@@ -67,8 +72,7 @@ export interface SupportTicket {
   timestamp: number;
 }
 
-// Local in-memory fallback for development
-const mockDB: Record<string, string> = {};
+
 
 /**
  * Get the Cloudflare KV binding from context.
@@ -94,7 +98,7 @@ export async function getKV(key: string): Promise<string | null> {
   } catch (err) {
     console.error(`KV Get Error for ${key}:`, err);
   }
-  return mockDB[key] ?? null;
+  return null;
 }
 
 export async function putKV(key: string, value: string): Promise<void> {
@@ -107,7 +111,6 @@ export async function putKV(key: string, value: string): Promise<void> {
   } catch (err) {
     console.error(`KV Put Error for ${key}:`, err);
   }
-  mockDB[key] = value;
 }
 
 // ── User helpers ────────────────────────────────────────────────────────────
