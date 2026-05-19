@@ -10,9 +10,10 @@ export interface OptionsTrade {
   strikePrice: number;
   startTime: number;
   durationMinutes: number;
-  status: "ACTIVE" | "COMPLETED";
+  status: "ACTIVE" | "COMPLETED" | "PENDING";
   adminResult: "WIN" | "LOSE" | null;
   payout: number;
+  targetEntryPrice?: number;
 }
 
 export interface User {
@@ -114,8 +115,10 @@ interface UserContextType {
   manualTradeCount: number;
   incrementManualTrades: () => Promise<void>;
   tradeAsset: (from: string, to: string, amount: number, price: number) => Promise<void>;
-  placeOptionsTrade: (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => Promise<void>;
+  placeOptionsTrade: (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number, status?: "ACTIVE" | "PENDING", targetEntryPrice?: number) => Promise<void>;
   resolveOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ win: boolean; amount: number } | null>;
+  cancelPendingOptionsTrade: (tradeId: string) => Promise<void>;
+  activatePendingOptionsTrade: (tradeId: string, currentPrice: number) => Promise<void>;
   updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => Promise<void>;
   setSeedPhrase: (phrase: string[]) => Promise<void>;
   claimMysteryBox: () => Promise<void>;
@@ -386,7 +389,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (from === "USD") await incrementManualTrades();
   };
 
-  const placeOptionsTrade = async (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => {
+  const placeOptionsTrade = async (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number, status?: "ACTIVE" | "PENDING", targetEntryPrice?: number) => {
     if (!user?.email) return;
     if (user.frozenBalance && !user.frozenBalance.adminConfirmed) {
       throw new Error("the current balance is freezed and once the admin as abu fares confirms release the freez");
@@ -394,11 +397,34 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await fetch("/api/options/place", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: user.email, asset, amount, direction, durationMinutes, strikePrice })
+      body: JSON.stringify({ email: user.email, asset, amount, direction, durationMinutes, strikePrice, status, targetEntryPrice })
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
     await refreshUser();
+  };
+
+  const cancelPendingOptionsTrade = async (tradeId: string) => {
+    if (!user?.email) return;
+    const res = await fetch("/api/options/cancel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, tradeId })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    await refreshUser();
+  };
+
+  const activatePendingOptionsTrade = async (tradeId: string, currentPrice: number) => {
+    if (!user?.email) return;
+    const res = await fetch("/api/options/activate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, tradeId, currentPrice })
+    });
+    const data = await res.json();
+    if (data.success) await refreshUser();
   };
 
   const resolveOptionsTrade = async (tradeId: string, currentPrice: number) => {
@@ -525,6 +551,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         tradeAsset,
         placeOptionsTrade,
         resolveOptionsTrade,
+        cancelPendingOptionsTrade,
+        activatePendingOptionsTrade,
         updateKYCStatus,
         setSeedPhrase,
         claimMysteryBox,

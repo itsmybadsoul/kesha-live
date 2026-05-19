@@ -27,6 +27,11 @@ export default function FuturesOptions() {
   const [placing, setPlacing] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [livePrice, setLivePrice] = useState(liveMarketPrices["BTC"] || 64230);
+  
+  // Entry popup state
+  const [showEntryPopup, setShowEntryPopup] = useState(false);
+  const [pendingDirection, setPendingDirection] = useState<"UP" | "DOWN" | null>(null);
+  const [entryPriceInput, setEntryPriceInput] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -57,6 +62,26 @@ export default function FuturesOptions() {
     return () => clearInterval(timer);
   }, [user]);
 
+  const { activatePendingOptionsTrade, cancelPendingOptionsTrade } = useUser();
+
+  // Check pending trades against live market prices
+  useEffect(() => {
+    if (!user?.options) return;
+    user.options.forEach(async (trade) => {
+      if (trade.status === "PENDING" && trade.targetEntryPrice) {
+        const currentPrice = liveMarketPrices[trade.asset] || 0;
+        let triggered = false;
+        if (trade.direction === "UP" && currentPrice <= trade.targetEntryPrice) triggered = true;
+        if (trade.direction === "DOWN" && currentPrice >= trade.targetEntryPrice) triggered = true;
+        
+        if (triggered) {
+          await activatePendingOptionsTrade(trade.id, currentPrice);
+          toast(`Pending trade for ${trade.asset} triggered at $${currentPrice.toLocaleString()}!`, "success");
+        }
+      }
+    });
+  }, [liveMarketPrices, user?.options, activatePendingOptionsTrade, toast]);
+
   // Handle resolutions locally
   useEffect(() => {
     if (!user?.options) return;
@@ -72,14 +97,50 @@ export default function FuturesOptions() {
     });
   }, [currentTime, user?.options, resolveOptionsTrade]);
 
-  const handlePlaceTrade = async (direction: "UP" | "DOWN") => {
-    if (!amount || parseFloat(amount) <= 0) return;
+  const handleInitialClick = (direction: "UP" | "DOWN") => {
+    if (!amount || parseFloat(amount) <= 0) {
+      toast("Please enter a valid amount", "error");
+      return;
+    }
+    if (parseFloat(amount) > balance) {
+      toast("Insufficient balance", "error");
+      return;
+    }
+    setPendingDirection(direction);
+    setEntryPriceInput(livePrice.toString());
+    setShowEntryPopup(true);
+  };
+
+  const handlePlaceTrade = async () => {
+    if (!amount || parseFloat(amount) <= 0 || !pendingDirection) return;
     setPlacing(true);
     try {
-      const strike = livePrice;
-      await placeOptionsTrade(selectedAsset, amount, direction, duration, strike);
+      const targetPrice = parseFloat(entryPriceInput);
+      if (isNaN(targetPrice) || targetPrice <= 0) {
+        throw new Error("Invalid entry price");
+      }
+
+      let status: "ACTIVE" | "PENDING" = "ACTIVE";
+      if (pendingDirection === "UP" && targetPrice < livePrice) {
+        status = "PENDING";
+      } else if (pendingDirection === "DOWN" && targetPrice > livePrice) {
+        status = "PENDING";
+      }
+
+      const strikeToUse = status === "ACTIVE" ? livePrice : targetPrice;
+
+      await placeOptionsTrade(selectedAsset, amount, pendingDirection, duration, strikeToUse, status, status === "PENDING" ? targetPrice : undefined);
+      
       setAmount("");
-      toast(`Trade placed! ${selectedAsset} ${direction} at $${strike.toLocaleString()}`, "success");
+      setShowEntryPopup(false);
+      setPendingDirection(null);
+      setEntryPriceInput("");
+      
+      if (status === "PENDING") {
+        toast(`Pending trade placed! Waiting for ${selectedAsset} to reach $${targetPrice.toLocaleString()}`, "success");
+      } else {
+        toast(`Trade placed! ${selectedAsset} ${pendingDirection} at $${strikeToUse.toLocaleString()}`, "success");
+      }
     } catch (e: any) {
       toast(e.message || "Failed to place trade", "error");
     } finally {
@@ -88,7 +149,7 @@ export default function FuturesOptions() {
   };
 
   const activeTrade = user?.options?.find(o => o.status === "ACTIVE" && o.asset === selectedAsset);
-  const allActiveTrades = user?.options?.filter(o => o.status === "ACTIVE") || [];
+  const allActiveTrades = user?.options?.filter(o => o.status === "ACTIVE" || o.status === "PENDING") || [];
   const historyTrades = user?.options?.filter(o => o.status === "COMPLETED") || [];
 
   return (
@@ -192,7 +253,7 @@ export default function FuturesOptions() {
                  {/* Action Buttons */}
                  <div className="grid grid-cols-2 gap-4 mb-6 relative z-10">
                     <button 
-                      onClick={() => handlePlaceTrade("UP")}
+                      onClick={() => handleInitialClick("UP")}
                       disabled={placing}
                       className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-600/20 active:scale-[0.98] transition-all flex flex-col items-center justify-center gap-1.5 group"
                     >
@@ -201,7 +262,7 @@ export default function FuturesOptions() {
                       <span className="text-emerald-200/60 text-[8px] font-bold">85% Payout</span>
                     </button>
                     <button 
-                      onClick={() => handlePlaceTrade("DOWN")}
+                      onClick={() => handleInitialClick("DOWN")}
                       disabled={placing}
                       className="bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl shadow-xl shadow-rose-600/20 active:scale-[0.98] transition-all flex flex-col items-center justify-center gap-1.5 group"
                     >
@@ -256,16 +317,26 @@ export default function FuturesOptions() {
                                  <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-0.5">Stake</div>
                                  <div className="text-base font-black text-slate-900 dark:text-white tabular-nums">${trade.amount.toLocaleString()}</div>
                                </div>
-                               <div className="text-right">
-                                 <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-1.5">Trade Status</div>
-                                 {trade.adminResult ? (
-                                   <div className="text-[9px] font-black text-indigo-500 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
-                                      <Activity className="w-3 h-3" /> Oracle Syncing
-                                   </div>
-                                 ) : (
-                                   <div className="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/5 px-2 py-1 rounded-lg border border-emerald-500/20">Active Position</div>
-                                 )}
-                               </div>
+                                 <div className="text-right">
+                                   <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-1.5">Trade Status</div>
+                                   {trade.status === "PENDING" ? (
+                                      <div className="flex flex-col items-end gap-1">
+                                        <div className="text-[9px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/5 px-2 py-1 rounded-lg border border-amber-500/20">Pending Entry @ ${trade.targetEntryPrice?.toLocaleString()}</div>
+                                        <button 
+                                          onClick={() => cancelPendingOptionsTrade(trade.id)}
+                                          className="text-[8px] font-bold text-rose-500 hover:text-rose-400 uppercase"
+                                        >
+                                          Cancel Order
+                                        </button>
+                                      </div>
+                                   ) : trade.adminResult ? (
+                                     <div className="text-[9px] font-black text-indigo-500 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
+                                        <Activity className="w-3 h-3" /> Oracle Syncing
+                                     </div>
+                                   ) : (
+                                     <div className="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/5 px-2 py-1 rounded-lg border border-emerald-500/20">Active Position</div>
+                                   )}
+                                 </div>
                              </div>
                           </div>
                         )
@@ -316,6 +387,57 @@ export default function FuturesOptions() {
             </div>
          </div>
       </div>
+
+      {/* Entry Price Popup */}
+      {showEntryPopup && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-in fade-in">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white text-center mb-1 uppercase tracking-tight">Confirm Entry Point</h3>
+            <p className="text-xs text-slate-500 dark:text-gray-400 text-center mb-6 font-bold uppercase tracking-widest">
+              Current Price: <span className="text-indigo-500">${livePrice.toLocaleString()}</span>
+            </p>
+            
+            <div className="mb-6">
+              <label className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest block mb-2">Target Price</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">$</span>
+                <input
+                  type="number"
+                  value={entryPriceInput}
+                  onChange={(e) => setEntryPriceInput(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-2xl py-4 pl-8 pr-4 text-lg font-black outline-none focus:border-indigo-500 transition-colors tabular-nums"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="text-[9px] text-slate-400 mt-2 font-medium">
+                {pendingDirection === "UP" 
+                  ? "If price is lower than current, order will pend until it drops."
+                  : "If price is higher than current, order will pend until it rises."
+                }
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button 
+                onClick={() => {
+                  setShowEntryPopup(false);
+                  setPendingDirection(null);
+                }} 
+                className="flex-1 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 text-slate-900 dark:text-white px-4 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handlePlaceTrade} 
+                disabled={placing}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+              >
+                {placing ? "Confirming..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -75,7 +75,7 @@ export function Navbar() {
                     <UsdtIcon className="w-3.5 h-3.5" />
                     ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </div>
-                  {frozenBalance && !frozenBalance.userConfirmed && (
+                  {frozenBalance && (
                     <div className="text-[10px] font-black text-cyan-400 flex items-center gap-1 justify-end mt-0.5 animate-pulse">
                       <span>❄️</span>
                       +${frozenBalance.amount.toLocaleString()} frozen

@@ -12,9 +12,10 @@ export interface OptionsTrade {
   strikePrice: number;
   startTime: number;
   durationMinutes: number;
-  status: "ACTIVE" | "COMPLETED";
+  status: "ACTIVE" | "COMPLETED" | "PENDING";
   adminResult: "WIN" | "LOSE" | null;
   payout: number;
+  targetEntryPrice?: number;
 }
 
 export interface Notification {

@@ -3,7 +3,7 @@ import { getUser, saveUser, trackActiveOptionsUser, OptionsTrade } from "@/lib/d
 
 export async function POST(req: Request) {
   try {
-    const { email, asset, amount, direction, durationMinutes, strikePrice } = await req.json();
+    const { email, asset, amount, direction, durationMinutes, strikePrice, status, targetEntryPrice } = await req.json();
 
     const user = await getUser(email);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -23,9 +23,10 @@ export async function POST(req: Request) {
       strikePrice,
       startTime: Date.now(),
       durationMinutes,
-      status: "ACTIVE",
+      status: status || "ACTIVE",
       adminResult: null,
       payout: tradeAmount * 1.85,
+      targetEntryPrice: targetEntryPrice || undefined,
     };
 
     if (!user.options) user.options = [];
