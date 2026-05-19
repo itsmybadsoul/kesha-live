@@ -163,7 +163,7 @@ export function AbuFaresAdmin() {
         {/* Greeting Editor */}
         <div className="bg-slate-50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-xl p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Welcome Message (Arabic)</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Welcome Message</span>
             {!greetingEditing ? (
               <button onClick={() => setGreetingEditing(true)} className="text-[9px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-400">
                 Edit
@@ -181,10 +181,9 @@ export function AbuFaresAdmin() {
               onChange={(e) => setGreeting(e.target.value)}
               className="w-full bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 resize-none font-medium leading-relaxed"
               rows={3}
-              dir="rtl"
             />
           ) : (
-            <p className="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed truncate" dir="rtl">{greeting}</p>
+            <p className="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed truncate">{greeting}</p>
           )}
         </div>
       </div>

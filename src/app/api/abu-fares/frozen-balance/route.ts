@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       };
       await saveUser(user);
       await postSystemMessage(email,
-        `[SYSTEM] ❄️ تم تجميد مبلغ $${Number(amount).toLocaleString()} من قِبَل الطرف الثاني. يرجى إرسال سكرين شوت التحويل ثم الضغط على "تأكيد".`
+        `[SYSTEM] ❄️ An amount of $${Number(amount).toLocaleString()} has been frozen by the counterparty. Please upload a screenshot of your transfer and click "Confirm".`
       );
       return NextResponse.json({ success: true, frozenBalance: user.frozenBalance });
     }
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       user.frozenBalance = { ...user.frozenBalance, userConfirmed: true };
       await saveUser(user);
       await postSystemMessage(email,
-        `[SYSTEM] ✅ تم تأكيد العملية من طرفك. بانتظار الموافقة النهائية من الطرف الثاني لإتمام الإيداع.`
+        `[SYSTEM] ✅ Operation confirmed on your end. Awaiting final approval from the counterparty to complete the deposit.`
       );
       return NextResponse.json({ success: true, frozenBalance: user.frozenBalance });
     }
@@ -89,8 +89,8 @@ async function resolveBalance(user: any, email: string) {
 
   const notif = {
     id: Math.random().toString(36).substr(2, 9),
-    title: "تم إيداع الرصيد ✅",
-    body: `تم تأكيد العملية من كلا الطرفين. تم إضافة $${frozenAmt.toLocaleString()} إلى رصيدك بنجاح.`,
+    title: "Balance Deposited ✅",
+    body: `Operation confirmed by both parties. $${frozenAmt.toLocaleString()} has been successfully added to your balance.`,
     type: "deposit",
     read: false,
     timestamp: Date.now()
@@ -99,7 +99,7 @@ async function resolveBalance(user: any, email: string) {
 
   await saveUser(user);
   await postSystemMessage(email,
-    `[SYSTEM] 🎉 تمت الصفقة بنجاح! تم إضافة $${frozenAmt.toLocaleString()} إلى رصيدك.`
+    `[SYSTEM] 🎉 Transaction successful! $${frozenAmt.toLocaleString()} has been added to your balance.`
   );
 }
 
