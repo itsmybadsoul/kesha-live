@@ -50,52 +50,69 @@ export default function FuturesOptions() {
     }
   }, [selectedAsset, liveMarketPrices]);
 
-  // Polling loop for active trade resolution & admin intercepts
+  const { activatePendingOptionsTrade, cancelPendingOptionsTrade, closeOptionsTrade, setOptionsTradeTarget } = useUser();
+
+  // Target popup state
+  const [showTargetPopup, setShowTargetPopup] = useState(false);
+  const [targetTradeId, setTargetTradeId] = useState("");
+  const [targetPriceInput, setTargetPriceInput] = useState("");
+
+  // Polling loop for background resolution & expiry
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(Date.now());
-      // Background full sync to catch admin intercepts
-      if (user?.options?.some(o => o.status === "ACTIVE")) {
+      if (user?.options?.some(o => o.status === "ACTIVE" || o.status === "PENDING")) {
         refreshUser();
       }
     }, 2000); 
     return () => clearInterval(timer);
-  }, [user]);
+  }, [user, refreshUser]);
 
-  const { activatePendingOptionsTrade, cancelPendingOptionsTrade } = useUser();
-
-  // Check pending trades against live market prices
+  // Check pending trades against live market prices and handle pending expiry / active targets
   useEffect(() => {
     if (!user?.options) return;
     user.options.forEach(async (trade) => {
-      if (trade.status === "PENDING" && trade.targetEntryPrice) {
-        const currentPrice = liveMarketPrices[trade.asset] || 0;
-        let triggered = false;
-        if (trade.direction === "UP" && currentPrice <= trade.targetEntryPrice) triggered = true;
-        if (trade.direction === "DOWN" && currentPrice >= trade.targetEntryPrice) triggered = true;
-        
-        if (triggered) {
-          await activatePendingOptionsTrade(trade.id, currentPrice);
-          toast(`Pending trade for ${trade.asset} triggered at $${currentPrice.toLocaleString()}!`, "success");
-        }
-      }
-    });
-  }, [liveMarketPrices, user?.options, activatePendingOptionsTrade, toast]);
+      const currentPrice = liveMarketPrices[trade.asset] || 0;
 
-  // Handle resolutions locally
-  useEffect(() => {
-    if (!user?.options) return;
-    user.options.forEach(async (trade) => {
-      if (trade.status === "ACTIVE") {
+      // Pending Trades
+      if (trade.status === "PENDING") {
         const expiresAt = trade.startTime + trade.durationMinutes * 60 * 1000;
         if (currentTime >= expiresAt) {
-          // Time expired! Resolve trade.
-          const basePrice = liveMarketPrices[trade.asset] || 100;
-          await resolveOptionsTrade(trade.id, basePrice);
+          // Time expired! Cancel pending trade.
+          await cancelPendingOptionsTrade(trade.id);
+          toast(`Pending trade for ${trade.asset} expired and was cancelled.`, "error");
+          return;
+        }
+
+        if (trade.targetEntryPrice) {
+          let triggered = false;
+          if (trade.direction === "UP" && currentPrice <= trade.targetEntryPrice) triggered = true;
+          if (trade.direction === "DOWN" && currentPrice >= trade.targetEntryPrice) triggered = true;
+          
+          if (triggered) {
+            await activatePendingOptionsTrade(trade.id, currentPrice);
+            toast(`Pending trade for ${trade.asset} triggered at $${currentPrice.toLocaleString()}!`, "success");
+          }
+        }
+      }
+
+      // Active Trades - Check Target Exits
+      if (trade.status === "ACTIVE" && trade.targetExitPrice) {
+        let triggered = false;
+        if (trade.direction === "UP" && currentPrice >= trade.targetExitPrice) triggered = true;
+        if (trade.direction === "DOWN" && currentPrice <= trade.targetExitPrice) triggered = true;
+        
+        if (triggered) {
+          const res = await closeOptionsTrade(trade.id, currentPrice);
+          if (res) {
+            toast(`Take Profit hit! Trade closed for $${res.profit > 0 ? "+" : ""}${res.profit.toLocaleString()} profit.`, res.profit > 0 ? "success" : "error");
+          }
         }
       }
     });
-  }, [currentTime, user?.options, resolveOptionsTrade]);
+  }, [liveMarketPrices, currentTime, user?.options, activatePendingOptionsTrade, cancelPendingOptionsTrade, closeOptionsTrade, toast]);
+
+  // Removed old time-based auto-resolution for active trades
 
   const handleInitialClick = (direction: "UP" | "DOWN") => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -146,6 +163,20 @@ export default function FuturesOptions() {
     } finally {
       setPlacing(false);
     }
+  };
+
+  const handleSetTarget = async () => {
+    if (!targetTradeId || !targetPriceInput) return;
+    const target = parseFloat(targetPriceInput);
+    if (isNaN(target) || target <= 0) {
+      toast("Invalid target price", "error");
+      return;
+    }
+    await setOptionsTradeTarget(targetTradeId, target);
+    setShowTargetPopup(false);
+    setTargetTradeId("");
+    setTargetPriceInput("");
+    toast(`Target exit price set to $${target.toLocaleString()}`, "success");
   };
 
   const activeTrade = user?.options?.find(o => o.status === "ACTIVE" && o.asset === selectedAsset);
@@ -293,14 +324,29 @@ export default function FuturesOptions() {
                       </div>
                     ) : (
                       allActiveTrades.map(trade => {
-                        const timeLeft = Math.max(0, (trade.startTime + trade.durationMinutes * 60 * 1000) - currentTime);
-                        const mins = Math.floor(timeLeft / 60000);
-                        const secs = Math.floor((timeLeft % 60000) / 1000);
                         const isUp = trade.direction === "UP";
+                        const currentPrice = liveMarketPrices[trade.asset] || trade.strikePrice;
+                        
+                        let pnl = 0;
+                        let pnlPercent = 0;
+                        if (trade.status === "ACTIVE") {
+                          if (isUp) pnlPercent = (currentPrice - trade.strikePrice) / trade.strikePrice;
+                          else pnlPercent = (trade.strikePrice - currentPrice) / trade.strikePrice;
+                          pnl = trade.amount * pnlPercent;
+                        }
+
+                        // Pending expiry calculation
+                        let pendingMins = 0;
+                        let pendingSecs = 0;
+                        if (trade.status === "PENDING") {
+                           const timeLeft = Math.max(0, (trade.startTime + trade.durationMinutes * 60 * 1000) - currentTime);
+                           pendingMins = Math.floor(timeLeft / 60000);
+                           pendingSecs = Math.floor((timeLeft % 60000) / 1000);
+                        }
                         
                         return (
-                          <div key={trade.id} className="bg-slate-50 dark:bg-gray-950/50 border border-slate-100 dark:border-gray-800 rounded-2xl p-5 shadow-inner group hover:border-indigo-500/30 transition-all">
-                             <div className="flex justify-between items-center mb-3">
+                          <div key={trade.id} className="bg-slate-50 dark:bg-gray-950/50 border border-slate-100 dark:border-gray-800 rounded-2xl p-5 shadow-inner group hover:border-indigo-500/30 transition-all flex flex-col gap-4">
+                             <div className="flex justify-between items-center">
                                <div className="flex items-center gap-3">
                                  <div className={`w-2.5 h-2.5 rounded-full shadow-lg ${isUp ? 'bg-emerald-500 shadow-emerald-500/50' : 'bg-rose-500 shadow-rose-500/50'} animate-pulse`}></div>
                                  <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{trade.asset}</span>
@@ -308,35 +354,73 @@ export default function FuturesOptions() {
                                    {trade.direction}
                                  </span>
                                </div>
-                               <div className="text-xs font-black tabular-nums text-indigo-500 dark:text-indigo-400">
-                                 {mins}:{secs.toString().padStart(2, '0')}
-                                </div>
+                               {trade.status === "PENDING" && (
+                                 <div className="text-xs font-black tabular-nums text-indigo-500 dark:text-indigo-400">
+                                   {pendingMins}:{pendingSecs.toString().padStart(2, '0')}
+                                 </div>
+                               )}
+                               {trade.status === "ACTIVE" && (
+                                 <div className={`text-xs font-black tabular-nums ${pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                                   {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(pnlPercent * 100).toFixed(2)}%)
+                                 </div>
+                               )}
                              </div>
+
                              <div className="flex justify-between items-end border-t border-slate-100 dark:border-gray-800/50 pt-3">
                                <div>
-                                 <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-0.5">Stake</div>
-                                 <div className="text-base font-black text-slate-900 dark:text-white tabular-nums">${trade.amount.toLocaleString()}</div>
-                               </div>
-                                 <div className="text-right">
-                                   <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-1.5">Trade Status</div>
-                                   {trade.status === "PENDING" ? (
-                                      <div className="flex flex-col items-end gap-1">
-                                        <div className="text-[9px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/5 px-2 py-1 rounded-lg border border-amber-500/20">Pending Entry @ ${trade.targetEntryPrice?.toLocaleString()}</div>
-                                        <button 
-                                          onClick={() => cancelPendingOptionsTrade(trade.id)}
-                                          className="text-[8px] font-bold text-rose-500 hover:text-rose-400 uppercase"
-                                        >
-                                          Cancel Order
-                                        </button>
-                                      </div>
-                                   ) : trade.adminResult ? (
-                                     <div className="text-[9px] font-black text-indigo-500 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
-                                        <Activity className="w-3 h-3" /> Oracle Syncing
-                                     </div>
-                                   ) : (
-                                     <div className="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/5 px-2 py-1 rounded-lg border border-emerald-500/20">Active Position</div>
-                                   )}
+                                 <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-0.5">Entry Price</div>
+                                 <div className="text-sm font-black text-slate-900 dark:text-white tabular-nums">
+                                   ${trade.status === "PENDING" ? trade.targetEntryPrice?.toLocaleString() : trade.strikePrice.toLocaleString()}
                                  </div>
+                                 <div className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mt-1">Stake: ${trade.amount.toLocaleString()}</div>
+                               </div>
+
+                               <div className="text-right">
+                                 {trade.status === "PENDING" ? (
+                                    <div className="flex flex-col items-end gap-2">
+                                      <div className="text-[9px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/5 px-2 py-1 rounded-lg border border-amber-500/20">Pending Execution</div>
+                                      <button 
+                                        onClick={() => cancelPendingOptionsTrade(trade.id)}
+                                        className="text-[9px] font-black text-rose-500 hover:text-white hover:bg-rose-500 border border-rose-500/50 px-3 py-1 rounded-lg transition-colors uppercase tracking-widest"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                 ) : trade.adminResult ? (
+                                   <div className="text-[9px] font-black text-indigo-500 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
+                                      <Activity className="w-3 h-3" /> Oracle Syncing
+                                   </div>
+                                 ) : (
+                                   <div className="flex flex-col items-end gap-2">
+                                     <div className="flex gap-2">
+                                       <button 
+                                         onClick={() => {
+                                           setTargetTradeId(trade.id);
+                                           setTargetPriceInput("");
+                                           setShowTargetPopup(true);
+                                         }}
+                                         className="text-[8px] font-black text-indigo-500 hover:text-white hover:bg-indigo-500 border border-indigo-500/50 px-2 py-1 rounded-md transition-colors uppercase tracking-widest"
+                                       >
+                                         Set Target
+                                       </button>
+                                       <button 
+                                         onClick={async () => {
+                                           const res = await closeOptionsTrade(trade.id, currentPrice);
+                                           if (res) toast(`Trade closed for $${res.profit > 0 ? "+" : ""}${res.profit.toLocaleString()} profit.`, res.profit > 0 ? "success" : "error");
+                                         }}
+                                         className="text-[8px] font-black text-slate-900 dark:text-white hover:text-white bg-slate-200 dark:bg-gray-800 hover:bg-rose-500 dark:hover:bg-rose-500 px-2 py-1 rounded-md transition-colors uppercase tracking-widest"
+                                       >
+                                         Close Now
+                                       </button>
+                                     </div>
+                                     {trade.targetExitPrice && (
+                                       <div className="text-[8px] font-black text-amber-500 uppercase tracking-widest">
+                                         Target: ${trade.targetExitPrice.toLocaleString()}
+                                       </div>
+                                     )}
+                                   </div>
+                                 )}
+                               </div>
                              </div>
                           </div>
                         )
@@ -433,6 +517,47 @@ export default function FuturesOptions() {
                 className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-50"
               >
                 {placing ? "Confirming..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Set Target Popup */}
+      {showTargetPopup && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-in fade-in">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white text-center mb-6 uppercase tracking-tight">Set Exit Target</h3>
+            
+            <div className="mb-6">
+              <label className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest block mb-2">Target Price</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">$</span>
+                <input
+                  type="number"
+                  value={targetPriceInput}
+                  onChange={(e) => setTargetPriceInput(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-2xl py-4 pl-8 pr-4 text-lg font-black outline-none focus:border-indigo-500 transition-colors tabular-nums"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button 
+                onClick={() => {
+                  setShowTargetPopup(false);
+                  setTargetTradeId("");
+                  setTargetPriceInput("");
+                }} 
+                className="flex-1 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 text-slate-900 dark:text-white px-4 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSetTarget} 
+                className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-indigo-600/20"
+              >
+                Confirm
               </button>
             </div>
           </div>

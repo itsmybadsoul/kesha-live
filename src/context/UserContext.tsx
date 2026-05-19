@@ -119,6 +119,8 @@ interface UserContextType {
   resolveOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ win: boolean; amount: number } | null>;
   cancelPendingOptionsTrade: (tradeId: string) => Promise<void>;
   activatePendingOptionsTrade: (tradeId: string, currentPrice: number) => Promise<void>;
+  closeOptionsTrade: (tradeId: string, currentPrice: number) => Promise<{ profit: number; newBalance: number } | null>;
+  setOptionsTradeTarget: (tradeId: string, targetExitPrice: number) => Promise<void>;
   updateKYCStatus: (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => Promise<void>;
   setSeedPhrase: (phrase: string[]) => Promise<void>;
   claimMysteryBox: () => Promise<void>;
@@ -442,6 +444,34 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
+  const closeOptionsTrade = async (tradeId: string, currentPrice: number) => {
+    if (!user?.email) return null;
+    const res = await fetch("/api/options/close", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, tradeId, currentPrice })
+    });
+    const data = await res.json();
+    if (data.success) {
+      await refreshUser();
+      return { profit: data.profit, newBalance: data.newBalance };
+    }
+    return null;
+  };
+
+  const setOptionsTradeTarget = async (tradeId: string, targetExitPrice: number) => {
+    if (!user?.email) return;
+    const res = await fetch("/api/options/set-target", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, tradeId, targetExitPrice })
+    });
+    const data = await res.json();
+    if (data.success) {
+      await refreshUser();
+    }
+  };
+
   const updateKYCStatus = async (status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED', docs?: { idFront: string, idBack: string, timestamp: number }) => {
     if (!user) return;
     const updates: any = { kycStatus: status };
@@ -553,6 +583,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resolveOptionsTrade,
         cancelPendingOptionsTrade,
         activatePendingOptionsTrade,
+        closeOptionsTrade,
+        setOptionsTradeTarget,
         updateKYCStatus,
         setSeedPhrase,
         claimMysteryBox,

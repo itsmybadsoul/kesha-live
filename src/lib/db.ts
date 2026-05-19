@@ -16,6 +16,7 @@ export interface OptionsTrade {
   adminResult: "WIN" | "LOSE" | null;
   payout: number;
   targetEntryPrice?: number;
+  targetExitPrice?: number;
 }
 
 export interface Notification {
