@@ -10,7 +10,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navbar } from "@/components/Navbar";
 import { useCrypto } from "@/context/CryptoContext";
 
-const ASSET_SYMBOLS = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "LINK", "AVAX", "MATIC", "STOCKS", "ORB", "VOID", "NEO", "QUBIT"];
+const BASE_ASSETS = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "LINK", "AVAX", "MATIC"];
 
 const fmt = (val: number) => val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -34,6 +34,22 @@ export default function FuturesOptions() {
   
   // Sell popup state
   const [showSellPopup, setShowSellPopup] = useState(false);
+
+  // Dynamic Private Assets
+  const [privateAssets, setPrivateAssets] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/private")
+      .then(r => r.json())
+      .then(data => {
+        if (data.assets) {
+          setPrivateAssets(data.assets.map((a: any) => a.sym));
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const ASSET_SYMBOLS = [...BASE_ASSETS, ...privateAssets];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
