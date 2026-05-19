@@ -28,10 +28,12 @@ export default function FuturesOptions() {
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [livePrice, setLivePrice] = useState(liveMarketPrices["BTC"] || 64230);
   
-  // Entry popup state
   const [showEntryPopup, setShowEntryPopup] = useState(false);
   const [pendingDirection, setPendingDirection] = useState<"UP" | "DOWN" | null>(null);
   const [entryPriceInput, setEntryPriceInput] = useState("");
+  
+  // Sell popup state
+  const [showSellPopup, setShowSellPopup] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -293,13 +295,13 @@ export default function FuturesOptions() {
                       <span className="text-emerald-200/60 text-[8px] font-bold">85% Payout</span>
                     </button>
                     <button 
-                      onClick={() => handleInitialClick("DOWN")}
+                      onClick={() => setShowSellPopup(true)}
                       disabled={placing}
                       className="bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl shadow-xl shadow-rose-600/20 active:scale-[0.98] transition-all flex flex-col items-center justify-center gap-1.5 group"
                     >
                       <TrendingDown className="w-7 h-7 group-hover:translate-y-1 transition-transform" />
                       <span className="tracking-[0.2em] uppercase text-[9px]">Sell / Put</span>
-                      <span className="text-rose-200/60 text-[8px] font-bold">85% Payout</span>
+                      <span className="text-rose-200/60 text-[8px] font-bold">Manage Positions</span>
                     </button>
                  </div>
 
@@ -408,9 +410,9 @@ export default function FuturesOptions() {
                                            const res = await closeOptionsTrade(trade.id, currentPrice);
                                            if (res) toast(`Trade closed for $${res.profit > 0 ? "+" : ""}${res.profit.toLocaleString()} profit.`, res.profit > 0 ? "success" : "error");
                                          }}
-                                         className="text-[8px] font-black text-slate-900 dark:text-white hover:text-white bg-slate-200 dark:bg-gray-800 hover:bg-rose-500 dark:hover:bg-rose-500 px-2 py-1 rounded-md transition-colors uppercase tracking-widest"
+                                         className="text-[8px] font-black text-white hover:text-white bg-rose-600 hover:bg-rose-500 px-2 py-1 rounded-md transition-colors uppercase tracking-widest"
                                        >
-                                         Close Now
+                                         Sell / Put
                                        </button>
                                      </div>
                                      {trade.targetExitPrice && (
@@ -560,6 +562,88 @@ export default function FuturesOptions() {
                 Confirm
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Sell/Put Popup (List Active Trades) */}
+      {showSellPopup && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-in fade-in">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 flex flex-col max-h-[80vh]">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Active Positions</h3>
+              <button onClick={() => setShowSellPopup(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-none mb-6">
+               {allActiveTrades.length === 0 ? (
+                  <div className="text-center py-10 opacity-50">
+                    <Activity className="w-12 h-12 mx-auto text-slate-400 mb-4" />
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">No positions to sell</p>
+                  </div>
+               ) : (
+                  allActiveTrades.map(trade => {
+                    const isUp = trade.direction === "UP";
+                    const currentPrice = liveMarketPrices[trade.asset] || trade.strikePrice;
+                    
+                    let pnl = 0;
+                    if (trade.status === "ACTIVE") {
+                      const pnlPercent = isUp ? (currentPrice - trade.strikePrice) / trade.strikePrice : (trade.strikePrice - currentPrice) / trade.strikePrice;
+                      pnl = trade.amount * pnlPercent;
+                    }
+
+                    return (
+                      <div key={trade.id} className="bg-slate-50 dark:bg-gray-950/50 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 flex justify-between items-center group">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-black text-slate-900 dark:text-white">{trade.asset}</span>
+                            <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${isUp ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                              {trade.direction}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                            Stake: ${trade.amount.toLocaleString()}
+                          </div>
+                          {trade.status === "ACTIVE" && (
+                            <div className={`text-xs font-black mt-1 ${pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                              {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </div>
+                          )}
+                          {trade.status === "PENDING" && (
+                            <div className="text-xs font-black text-amber-500 mt-1 uppercase tracking-widest">
+                              Pending
+                            </div>
+                          )}
+                        </div>
+                        
+                        <button 
+                          onClick={async () => {
+                            if (trade.status === "PENDING") {
+                              await cancelPendingOptionsTrade(trade.id);
+                              toast(`Pending order for ${trade.asset} cancelled.`, "error");
+                            } else {
+                              const res = await closeOptionsTrade(trade.id, currentPrice);
+                              if (res) toast(`Trade closed for $${res.profit > 0 ? "+" : ""}${res.profit.toLocaleString()} profit.`, res.profit > 0 ? "success" : "error");
+                            }
+                            if (allActiveTrades.length === 1) setShowSellPopup(false);
+                          }}
+                          className="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-rose-600/20"
+                        >
+                          {trade.status === "PENDING" ? "Cancel" : "Sell / Put"}
+                        </button>
+                      </div>
+                    )
+                  })
+               )}
+            </div>
+
+            <button 
+              onClick={() => setShowSellPopup(false)} 
+              className="w-full bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 text-slate-900 dark:text-white px-4 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-colors"
+            >
+              Close Window
+            </button>
           </div>
         </div>
       )}
