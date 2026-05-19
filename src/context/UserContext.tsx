@@ -334,6 +334,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const tradeAsset = async (from: string, to: string, amount: number, price: number) => {
     if (!user) return;
     
+    if (user.frozenBalance && !user.frozenBalance.adminConfirmed) {
+      throw new Error("the current balance is freezed and once the admin as abu fares confirms release the freez");
+    }
+
     const currentHoldings = { ...(user.holdings || {}) };
     let newBalance = balance;
     
@@ -384,6 +388,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const placeOptionsTrade = async (asset: string, amount: string, direction: "UP" | "DOWN", durationMinutes: number, strikePrice: number) => {
     if (!user?.email) return;
+    if (user.frozenBalance && !user.frozenBalance.adminConfirmed) {
+      throw new Error("the current balance is freezed and once the admin as abu fares confirms release the freez");
+    }
     const res = await fetch("/api/options/place", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

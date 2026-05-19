@@ -20,6 +20,7 @@ function ChatContent() {
   const [timer, setTimer] = useState(0);
   const [frozenBalance, setFrozenBalance] = useState<any>(null);
   const [confirming, setConfirming] = useState(false);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,7 +70,7 @@ function ChatContent() {
   // Scroll to bottom
   useEffect(() => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-  }, [messages]);
+  }, [messages.length]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,7 +203,7 @@ function ChatContent() {
             </div>
             {!frozenBalance.userConfirmed ? (
               <button
-                onClick={handleConfirm}
+                onClick={() => setShowConfirmPopup(true)}
                 disabled={confirming}
                 className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
@@ -214,6 +215,38 @@ function ChatContent() {
                 <CheckCircle2 className="w-4 h-4" /> Confirmed
               </div>
             )}
+          </div>
+        )}
+
+        {/* Confirm Popup */}
+        {showConfirmPopup && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+            <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
+              <div className="flex justify-center mb-4">
+                <ImageIcon className="w-12 h-12 text-indigo-500" />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white text-center mb-2">Send Screenshot</h3>
+              <p className="text-sm text-slate-500 dark:text-gray-400 text-center mb-6 leading-relaxed">
+                Please make sure to send a screenshot of the transaction in the chat for the other side's confirmation before proceeding.
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowConfirmPopup(false)} 
+                  className="flex-1 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 text-slate-900 dark:text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowConfirmPopup(false);
+                    handleConfirm();
+                  }} 
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-indigo-600/20"
+                >
+                  I've sent it
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

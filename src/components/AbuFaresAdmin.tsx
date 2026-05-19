@@ -88,7 +88,7 @@ export function AbuFaresAdmin() {
 
   useEffect(() => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-  }, [messages]);
+  }, [messages.length]);
 
   const handleConnect = (email: string) => {
     setActiveEmail(email);
