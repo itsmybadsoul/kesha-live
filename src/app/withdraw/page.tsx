@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { Wallet, Landmark, ArrowLeft, Info, CheckCircle2, AlertCircle, ShieldAlert } from "lucide-react";
