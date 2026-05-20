@@ -119,26 +119,6 @@ export default function WithdrawPage() {
              </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-10 relative z-10">
-            <button 
-              onClick={() => setMethod("CRYPTO")}
-              className={`p-6 rounded-2xl border transition-all flex flex-col items-center gap-4 ${
-                method === "CRYPTO" ? "bg-indigo-600/10 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "bg-slate-50 dark:bg-gray-800/40 border-slate-200 dark:border-gray-800 text-slate-400 dark:text-gray-500 hover:border-slate-300 dark:hover:border-gray-700"
-              }`}
-            >
-              <Wallet className={`w-10 h-10 ${method === "CRYPTO" ? "text-indigo-500" : "text-gray-600"}`} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Cryptocurrency</span>
-            </button>
-            <button 
-              onClick={() => setMethod("BANK")}
-              className={`p-6 rounded-2xl border transition-all flex flex-col items-center gap-4 ${
-                method === "BANK" ? "bg-indigo-600/10 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "bg-slate-50 dark:bg-gray-800/40 border-slate-200 dark:border-gray-800 text-slate-400 dark:text-gray-500 hover:border-slate-300 dark:hover:border-gray-700"
-              }`}
-            >
-              <Landmark className={`w-10 h-10 ${method === "BANK" ? "text-indigo-500" : "text-gray-600"}`} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Bank Transfer</span>
-            </button>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
             <div className="space-y-3">
