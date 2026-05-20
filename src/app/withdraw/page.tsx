@@ -38,7 +38,7 @@ export default function WithdrawPage() {
     
     const withdrawAmount = parseFloat(amount);
     if (withdrawAmount > balance) { toast("Insufficient balance.", "error"); return; }
-    if (withdrawAmount < 10) { toast("Minimum withdrawal is $10.", "warning"); return; }
+    if (withdrawAmount < 5) { toast("Minimum withdrawal is $5.", "warning"); return; }
 
     setLoading(true);
     await requestWithdraw(amount, method, finalDetails);
