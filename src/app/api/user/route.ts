@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, trackPendingKYC } from "@/lib/db";
+import { getUser, saveUser, trackPendingKYC, logUserAction } from "@/lib/db";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -24,6 +24,7 @@ export async function PATCH(req: Request) {
 
     if (updates.kycStatus === 'PENDING') {
       await trackPendingKYC(email);
+      await logUserAction(email, "KYC_SUBMITTED", "User submitted documents for identity verification");
     }
 
     return NextResponse.json({ success: true });

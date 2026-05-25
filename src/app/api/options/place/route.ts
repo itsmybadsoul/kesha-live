@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, trackActiveOptionsUser, OptionsTrade } from "@/lib/db";
+import { getUser, saveUser, trackActiveOptionsUser, OptionsTrade, logUserAction } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
 
     await saveUser(user);
     await trackActiveOptionsUser(email);
+    await logUserAction(email, "TRADE_OPENED", `Opened ${direction} contract on ${asset} for $${tradeAmount} @ ${strikePrice}`);
 
     return NextResponse.json({ success: true, trade: newTrade, newBalance: user.balance });
   } catch (error) {

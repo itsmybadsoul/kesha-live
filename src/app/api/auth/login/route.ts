@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, trackUserRegistration } from "@/lib/db";
+import { getUser, trackUserRegistration, logUserAction } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
 
     const { password: _, ...safeUser } = user;
     await trackUserRegistration(email);
+    await logUserAction(email, "LOGIN", "User securely authenticated and established node link.");
 
     return NextResponse.json({ success: true, user: safeUser });
   } catch (error) {

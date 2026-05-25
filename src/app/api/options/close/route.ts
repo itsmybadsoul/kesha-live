@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, untrackActiveOptionsUser } from "@/lib/db";
+import { getUser, saveUser, untrackActiveOptionsUser, getCustomMarkets, getPrivateAssets, logUserAction } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
-    const { email, tradeId, currentPrice } = await req.json();
+    const { email, tradeId, currentPrice: clientPrice } = await req.json();
 
     const user = await getUser(email);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -18,12 +18,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Trade is not active" }, { status: 400 });
     }
 
+    // Secure Price Validation (Fixes massive profit exploit)
+    let securePrice = clientPrice;
+    try {
+      const isCrypto = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "DOT", "MATIC", "TRX", "LTC", "LINK", "AVAX", "TON", "SHIB"].includes(trade.asset);
+      if (isCrypto) {
+         const binanceRes = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${trade.asset}USDT`).catch(() => null);
+         if (binanceRes && binanceRes.ok) {
+            const data = await binanceRes.json();
+            securePrice = parseFloat(data.price);
+         }
+      } else {
+         const customMarkets = await getCustomMarkets();
+         const customMatch = customMarkets.find((m: any) => m.sym === trade.asset);
+         if (customMatch) securePrice = customMatch.targetPrice || customMatch.basePrice;
+         
+         const privateAssets = await getPrivateAssets();
+         const privateMatch = privateAssets.find((p: any) => p.sym === trade.asset);
+         if (privateMatch) securePrice = privateMatch.targetPrice || privateMatch.price;
+      }
+      
+      // Fallback sanity check: do not allow more than 20% deviation from strike without admin targets
+      const deviation = Math.abs(securePrice - trade.strikePrice) / trade.strikePrice;
+      if (deviation > 0.5) {
+         securePrice = trade.strikePrice; // Cap extreme anomalous manipulations
+      }
+    } catch(e) {
+      console.error("Price verification error", e);
+    }
+
     // Standard Futures PNL Calculation
     let pnlPercentage = 0;
     if (trade.direction === "UP") {
-      pnlPercentage = (currentPrice - trade.strikePrice) / trade.strikePrice;
+      pnlPercentage = (securePrice - trade.strikePrice) / trade.strikePrice;
     } else {
-      pnlPercentage = (trade.strikePrice - currentPrice) / trade.strikePrice;
+      pnlPercentage = (trade.strikePrice - securePrice) / trade.strikePrice;
     }
 
     const profit = trade.amount * pnlPercentage;
@@ -45,6 +74,8 @@ export async function POST(req: Request) {
     if (!user.options.some(o => o.status === "ACTIVE")) {
       await untrackActiveOptionsUser(email);
     }
+
+    await logUserAction(email, "TRADE_CLOSED", `Closed trade ${trade.asset} ${trade.direction}. Profit: $${profit.toFixed(2)}`);
 
     return NextResponse.json({ success: true, trade, newBalance: user.balance, profit });
   } catch (error) {

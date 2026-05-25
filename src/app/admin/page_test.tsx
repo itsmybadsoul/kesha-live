@@ -432,83 +432,6 @@ export default function AdminPage() {
 
         {activeTab === "settlements" && (<>
         <div className="bg-white dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl mb-12">
-          <div className="px-8 py-6 border-b border-slate-200 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-950/20">
-             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-slate-400 dark:text-gray-500">Settlement Queue</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1000px] text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em]">
-                  <th className="px-8 py-5">Context / ID</th>
-                  <th className="px-8 py-5">Network Method</th>
-                  <th className="px-8 py-5">Amount (USD)</th>
-                  <th className="px-8 py-5">Cryptographic Proof</th>
-                  <th className="px-8 py-5 text-right">Settlement Controls</th>
-                </tr>
-              </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
-              {loading ? (
-                <tr><td colSpan={5} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-[0.4em]">Synchronizing Authority Node...</td></tr>
-              ) : deposits.length === 0 && withdrawals.length === 0 ? (
-                <tr><td colSpan={5} className="px-8 py-32 text-center text-slate-400 dark:text-gray-600 italic text-xs font-medium tracking-widest">LEGER_EMPTY: No pending settlement requests detected.</td></tr>
-              ) : (
-                <>
-                  {deposits.map((d) => (
-                    <tr key={d.email} className="hover:bg-indigo-500/[0.02] transition-colors group">
-                      <td className="px-8 py-8 font-black text-sm text-slate-900 dark:text-white">
-                         <div className="flex flex-col gap-2">
-                           <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-lg text-[9px] uppercase tracking-widest font-black border border-emerald-500/20 w-max">Funding_Inflow</span>
-                           {d.email}
-                         </div>
-                      </td>
-                      <td className="px-8 py-8 text-[10px] text-slate-400 dark:text-gray-500 font-black uppercase tracking-[0.2em]">USDT TRC20 Cluster</td>
-                      <td className="px-8 py-8 text-emerald-500 font-black text-2xl tabular-nums tracking-tighter">+${d.pendingDeposit?.amount.toLocaleString()}</td>
-                      <td className="px-8 py-8">
-                        <div className="group/code relative">
-                           <code className="text-[10px] text-slate-500 dark:text-gray-500 break-all bg-slate-50 dark:bg-gray-950/50 p-4 rounded-xl block border border-slate-200 dark:border-gray-800 font-mono tracking-tighter opacity-60 group-hover/code:opacity-100 transition-opacity">
-                             {d.pendingDeposit?.txid}
-                           </code>
-                        </div>
-                      </td>
-                      <td className="px-8 py-8 text-right">
-                        <div className="flex justify-end gap-3">
-                          <button onClick={() => handleAction(d.email, "approve")} className="p-4 bg-emerald-500 text-white rounded-2xl hover:scale-110 hover:rotate-3 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"><CheckCircle2 className="w-6 h-6" /></button>
-                          <button onClick={() => handleAction(d.email, "reject")} className="p-4 bg-white dark:bg-gray-900 text-slate-400 dark:text-gray-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-2xl border border-slate-200 dark:border-gray-800 hover:bg-rose-500/5 hover:border-rose-500/20 transition-all active:scale-95"><XCircle className="w-6 h-6" /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {withdrawals.map((w) => (
-                    <tr key={w.email} className="hover:bg-rose-500/[0.02] transition-colors group">
-                      <td className="px-8 py-8 font-black text-sm text-slate-900 dark:text-white">
-                         <div className="flex flex-col gap-2">
-                           <span className="bg-rose-500/10 text-rose-500 px-3 py-1 rounded-lg text-[9px] uppercase tracking-widest font-black border border-rose-500/20 w-max">Funding_Outflow</span>
-                           {w.email}
-                         </div>
-                      </td>
-                      <td className="px-8 py-8 text-[10px] text-slate-400 dark:text-gray-500 font-black uppercase tracking-[0.2em]">{w.pendingWithdrawal?.method} Node</td>
-                      <td className="px-8 py-8 text-rose-500 font-black text-2xl tabular-nums tracking-tighter">-${w.pendingWithdrawal?.amount.toLocaleString()}</td>
-                      <td className="px-8 py-8">
-                        <div className="group/code relative">
-                           <code className="text-[10px] text-rose-500/50 break-all bg-rose-500/5 p-4 rounded-xl block border border-rose-500/10 font-mono tracking-tighter group-hover/code:text-rose-500 transition-colors">
-                             {w.pendingWithdrawal?.details}
-                           </code>
-                        </div>
-                      </td>
-                      <td className="px-8 py-8 text-right">
-                        <div className="flex justify-end gap-3">
-                          <button onClick={() => handleAction(w.email, "approve")} className="p-4 bg-rose-500 text-white rounded-2xl hover:scale-110 hover:rotate-3 transition-all shadow-xl shadow-rose-500/20 active:scale-95"><CheckCircle2 className="w-6 h-6" /></button>
-                          <button onClick={() => handleAction(w.email, "reject")} className="p-4 bg-white dark:bg-gray-900 text-slate-400 dark:text-gray-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-2xl border border-slate-200 dark:border-gray-800 hover:bg-rose-500/5 hover:border-rose-500/20 transition-all active:scale-95"><XCircle className="w-6 h-6" /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </>
-              )}
-            </tbody>
-          </table>
-        </div>
-        </div>
 
         </>)} {/* End settlements */}
 
@@ -1246,6 +1169,7 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+      </div>
 
         </>)} {/* End support */}
 

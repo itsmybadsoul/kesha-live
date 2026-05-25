@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, trackPendingWithdrawal } from "@/lib/db";
+import { getUser, saveUser, trackPendingWithdrawal, logUserAction } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
 
     await saveUser(user);
     await trackPendingWithdrawal(email);
+    await logUserAction(email, "WITHDRAW_REQUEST", `Requested withdrawal of $${amount} via ${method}`);
 
     return NextResponse.json({ success: true, pendingWithdrawal: user.pendingWithdrawal });
   } catch (error) {

@@ -19,6 +19,14 @@ export interface OptionsTrade {
   targetExitPrice?: number;
 }
 
+export interface UserActionLog {
+  id: string;
+  email: string;
+  action: string;
+  details: string;
+  timestamp: number;
+}
+
 export interface Notification {
   id: string;
   title: string;
@@ -113,6 +121,28 @@ export async function putKV(key: string, value: string): Promise<void> {
   } catch (err) {
     console.error(`KV Put Error for ${key}:`, err);
   }
+}
+
+// ── Action Logs ─────────────────────────────────────────────────────────────
+
+export async function getUserActions(_env?: any): Promise<UserActionLog[]> {
+  const list = await getKV("user_action_logs");
+  if (!list) return [];
+  return JSON.parse(list);
+}
+
+export async function logUserAction(email: string, action: string, details: string, _env?: any): Promise<void> {
+  const list = await getKV("user_action_logs");
+  let logs: UserActionLog[] = list ? JSON.parse(list) : [];
+  logs.unshift({
+    id: Math.random().toString(36).substring(7),
+    email,
+    action,
+    details,
+    timestamp: Date.now()
+  });
+  if (logs.length > 500) logs = logs.slice(0, 500);
+  await putKV("user_action_logs", JSON.stringify(logs));
 }
 
 // ── User helpers ────────────────────────────────────────────────────────────

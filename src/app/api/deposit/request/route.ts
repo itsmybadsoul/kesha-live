@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUser, saveUser, trackPendingDeposit } from "@/lib/db";
+import { getUser, saveUser, trackPendingDeposit, logUserAction } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 
     await saveUser(user);
     await trackPendingDeposit(email);
+    await logUserAction(email, "DEPOSIT_REQUEST", `Requested deposit of $${amount}`);
 
     return NextResponse.json({ success: true, pendingDeposit: user.pendingDeposit });
   } catch (error) {
