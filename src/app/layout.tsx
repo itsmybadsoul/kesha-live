@@ -22,6 +22,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import { CryptoProvider } from "@/context/CryptoContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Footer } from "@/components/Footer";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 export default function RootLayout({
   children,
@@ -35,6 +36,7 @@ export default function RootLayout({
           <CryptoProvider>
             <UserProvider>
               <ToastProvider>
+                <AnalyticsTracker />
                 <div className="flex flex-col min-h-screen">
                   <div className="flex-1">{children}</div>
                   <Footer />

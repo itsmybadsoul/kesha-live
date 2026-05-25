@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw, Zap, Send, FileText } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw, Zap, Send, FileText, Globe, MousePointer } from "lucide-react";
 import { useCrypto } from "@/context/CryptoContext";
 import { P2PAdminTable } from "@/components/P2PAdminTable";
 import { AbuFaresAdmin } from "@/components/AbuFaresAdmin";
@@ -19,6 +19,7 @@ export default function AdminPage() {
   const [customMarkets, setCustomMarkets] = useState<any[]>([]);
   const [privateAssets, setPrivateAssets] = useState<any[]>([]);
   const [actionLogs, setActionLogs] = useState<any[]>([]);
+  const [analyticsEvents, setAnalyticsEvents] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
   const [notifModal, setNotifModal] = useState<{ open: boolean; email: string; title: string; body: string }>({ open: false, email: "", title: "", body: "" });
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ export default function AdminPage() {
     if (!isAuthorized) return;
     setLoading(true);
     try {
-      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes, marketRes, privateRes, actRes] = await Promise.all([
+      const [depRes, withRes, optRes, histRes, kycRes, userRes, supRes, marketRes, privateRes, actRes, analyticsRes] = await Promise.all([
         fetch("/api/admin/deposits"),
         fetch("/api/admin/withdrawals"),
         fetch("/api/admin/options"),
@@ -42,7 +43,8 @@ export default function AdminPage() {
         fetch("/api/support"),
         fetch("/api/admin/market"),
         fetch("/api/admin/private"),
-        fetch("/api/admin/actions")
+        fetch("/api/admin/actions"),
+        fetch("/api/admin/analytics")
       ]);
       const depData = await depRes.json();
       const withData = await withRes.json();
@@ -54,6 +56,7 @@ export default function AdminPage() {
       const marketData = await marketRes.json();
       const privateData = await privateRes.json();
       const actData = await actRes.json();
+      const analyticsData = await analyticsRes.json();
       
       if (depData.deposits) setDeposits(depData.deposits);
       if (withData.withdrawals) setWithdrawals(withData.withdrawals);
@@ -65,6 +68,7 @@ export default function AdminPage() {
       if (marketData.markets) setCustomMarkets(marketData.markets);
       if (privateData.assets) setPrivateAssets(privateData.assets);
       if (actData.logs) setActionLogs(actData.logs);
+      if (analyticsData.events) setAnalyticsEvents(analyticsData.events);
     } catch (e) {
       console.error(e);
     } finally {
@@ -373,6 +377,7 @@ export default function AdminPage() {
             { id: "options", label: "Contract Intercept" },
             { id: "assets", label: "Institutional Assets" },
             { id: "activity", label: "Activity Logs" },
+            { id: "visitors", label: "🌍 Visitor Analytics" },
             { id: "users", label: "User Registry" },
             { id: "support", label: "Support Inquiries" },
             { id: "p2p", label: "P2P Market" },
@@ -1310,6 +1315,133 @@ export default function AdminPage() {
       <div className="mt-8">
         <P2PAdminTable />
       </div>
+      </>)}
+
+      {activeTab === "visitors" && (<>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-black flex items-center gap-3 tracking-tighter uppercase italic">
+              Visitor <span className="text-indigo-500 not-italic">Analytics</span> <Globe className="w-7 h-7 text-indigo-500" />
+            </h2>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mt-1">
+              {analyticsEvents.length} events captured · page views &amp; clicks
+            </p>
+          </div>
+          <button
+            onClick={async () => {
+              if (!confirm("Clear ALL visitor analytics data? This cannot be undone.")) return;
+              const res = await fetch("/api/admin/analytics", { method: "DELETE" });
+              const data = await res.json();
+              if (data.success) {
+                setAnalyticsEvents([]);
+                toast("Analytics data cleared.", "success");
+              } else {
+                toast("Failed to clear analytics.", "error");
+              }
+            }}
+            className="flex items-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-500 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+          >
+            <Trash2 className="w-4 h-4" /> Clear All Data
+          </button>
+        </div>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Total Events", value: analyticsEvents.length, color: "indigo" },
+            { label: "Page Views", value: analyticsEvents.filter((e: any) => e.type === "pageview").length, color: "emerald" },
+            { label: "Clicks", value: analyticsEvents.filter((e: any) => e.type === "click").length, color: "amber" },
+            { label: "Unique Sessions", value: new Set(analyticsEvents.map((e: any) => e.sessionId)).size, color: "purple" },
+          ].map(stat => (
+            <div key={stat.label} className="bg-white dark:bg-gray-900/40 backdrop-blur-xl border border-slate-200 dark:border-gray-800 p-6 rounded-3xl shadow-xl">
+              <p className={`text-3xl font-black tabular-nums tracking-tighter text-${stat.color}-500`}>{stat.value}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Events Table */}
+        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <div className="px-8 py-6 border-b border-slate-200 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-950/20">
+            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-slate-400 dark:text-gray-500">Live Event Stream</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em]">
+                  <th className="px-6 py-4">Type</th>
+                  <th className="px-6 py-4">User / Session</th>
+                  <th className="px-6 py-4">Location</th>
+                  <th className="px-6 py-4">IP Address</th>
+                  <th className="px-6 py-4">Page</th>
+                  <th className="px-6 py-4">Element / Label</th>
+                  <th className="px-6 py-4 text-right">Time</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
+                {loading ? (
+                  <tr><td colSpan={7} className="px-8 py-16 text-center text-slate-400 dark:text-gray-600 animate-pulse font-black uppercase text-[10px] tracking-widest">Synchronizing...</td></tr>
+                ) : analyticsEvents.length === 0 ? (
+                  <tr><td colSpan={7} className="px-8 py-16 text-center text-slate-400 dark:text-gray-600 italic text-xs">No events recorded yet. Events will appear here as visitors browse the site.</td></tr>
+                ) : (
+                  analyticsEvents.slice(0, 200).map((ev: any) => (
+                    <tr key={ev.id} className="hover:bg-indigo-500/[0.02] transition-colors group">
+                      <td className="px-6 py-4">
+                        {ev.type === "pageview" ? (
+                          <span className="flex items-center gap-1.5 bg-indigo-500/10 text-indigo-500 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-indigo-500/20 w-max">
+                            <Globe className="w-3 h-3" /> View
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 bg-amber-500/10 text-amber-500 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-amber-500/20 w-max">
+                            <MousePointer className="w-3 h-3" /> Click
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          {ev.email ? (
+                            <span className="text-xs font-black text-slate-900 dark:text-white">{ev.email}</span>
+                          ) : (
+                            <span className="text-[10px] font-black text-slate-400 dark:text-gray-600 uppercase tracking-widest">Guest</span>
+                          )}
+                          <span className="text-[9px] text-slate-400 dark:text-gray-600 font-mono">{ev.sessionId?.substring(0, 12)}…</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-xs font-black text-slate-900 dark:text-white">{ev.country !== "unknown" ? ev.country : "—"}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-gray-600">{ev.city !== "unknown" ? ev.city : ""}{ev.region && ev.region !== "unknown" ? `, ${ev.region}` : ""}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[10px] font-mono text-slate-500 dark:text-gray-500">{ev.ip}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[10px] font-mono text-slate-600 dark:text-gray-400 max-w-[180px] truncate block">{ev.path}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[10px] text-slate-500 dark:text-gray-500 max-w-[160px] truncate block">{ev.label || ev.element || "—"}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-[10px] font-black text-slate-400 dark:text-gray-600 tabular-nums">
+                          {new Date(ev.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                          <br />
+                          <span className="font-normal opacity-60">{new Date(ev.timestamp).toLocaleDateString()}</span>
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          {analyticsEvents.length > 200 && (
+            <div className="px-8 py-4 border-t border-slate-100 dark:border-gray-800 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 text-center">
+              Showing 200 of {analyticsEvents.length} events
+            </div>
+          )}
+        </div>
       </>)}
 
       </div>
