@@ -9,6 +9,9 @@ export async function POST(req: Request) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const tradeAmount = parseFloat(amount);
+    if (isNaN(tradeAmount) || tradeAmount <= 0) {
+      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+    }
     if (tradeAmount > user.balance) {
       return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
     }

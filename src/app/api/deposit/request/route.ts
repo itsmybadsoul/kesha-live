@@ -8,8 +8,13 @@ export async function POST(req: Request) {
     const user = await getUser(email);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    const depositAmount = parseFloat(amount);
+    if (isNaN(depositAmount) || depositAmount <= 0) {
+      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+    }
+
     user.pendingDeposit = {
-      amount: parseFloat(amount),
+      amount: depositAmount,
       txid,
       timestamp: Date.now()
     };
