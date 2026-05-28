@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "Stocks Indicators",
     images: [
       {
-        url: "https://stocksindicators.online/og-image.jpg",
+        url: "https://stocksindicators.online/og-image.png",
         width: 1200,
         height: 630,
         alt: "Stocks Indicators Platform",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Stocks Indicators - Smart Trading Platform",
     description: "Advanced indicators and predictive analytics for smart stock trading.",
-    images: ["https://stocksindicators.online/og-image.jpg"],
+    images: ["https://stocksindicators.online/og-image.png"],
   },
 };
 
