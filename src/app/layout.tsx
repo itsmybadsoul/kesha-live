@@ -18,6 +18,27 @@ export const metadata: Metadata = {
   verification: {
     google: "h0GywuBp3l_gnDhZLbUTqa67KFppgBVdaYvOLXQGqcM",
   },
+  openGraph: {
+    title: "Stocks Indicators - Smart Trading Platform",
+    description: "Advanced indicators and predictive analytics for smart stock trading.",
+    url: "https://stocksindicators.online",
+    siteName: "Stocks Indicators",
+    images: [
+      {
+        url: "https://stocksindicators.online/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Stocks Indicators Platform",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Stocks Indicators - Smart Trading Platform",
+    description: "Advanced indicators and predictive analytics for smart stock trading.",
+    images: ["https://stocksindicators.online/og-image.jpg"],
+  },
 };
 
 import { UserProvider } from "@/context/UserContext";
