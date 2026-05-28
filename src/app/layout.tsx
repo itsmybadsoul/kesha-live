@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Stocks Indicators - Smart Trading Platform",
   description: "Advanced indicators and predictive analytics for smart stock trading.",
+  verification: {
+    google: "h0GywuBp3l_gnDhZLbUTqa67KFppgBVdaYvOLXQGqcM",
+  },
 };
 
 import { UserProvider } from "@/context/UserContext";
