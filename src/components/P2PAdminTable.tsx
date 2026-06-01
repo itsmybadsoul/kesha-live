@@ -8,6 +8,16 @@ import {
   Users, FileText, DollarSign, MessageCircle
 } from "lucide-react";
 
+const PAYMENT_METHODS_BY_CURRENCY: Record<string, string[]> = {
+  SAR: ["STC Pay", "Al Rajhi Bank", "NCB Bank", "Urpay", "Bank Transfer"],
+  EGP: ["InstaPay", "Vodafone Cash", "Fawry", "Orange Cash", "CIB Bank", "NBE Bank"],
+  AED: ["Etisalat Cash", "ADCB Bank", "Emirates NBD", "FAB Bank", "Bank Transfer"],
+  USD: ["Bank Transfer", "SWIFT", "Wise", "PayPal"],
+  EUR: ["SEPA Transfer", "Bank Transfer", "Revolut", "Wise"],
+  GBP: ["Bank Transfer", "Wise", "Revolut", "Monzo"],
+  TRY: ["Ziraat Bank", "Garanti BBVA", "Papara", "Bank Transfer"]
+};
+
 export function P2PAdminTable() {
   const { toast } = useToast();
   const [requests, setRequests] = useState<any[]>([]);
@@ -47,6 +57,11 @@ export function P2PAdminTable() {
   const [visPayments, setVisPayments] = useState<string[]>([]);
   const [visCustomPayment, setVisCustomPayment] = useState("");
   const [submittingVisTrade, setSubmittingVisTrade] = useState(false);
+  const [visTargetEmail, setVisTargetEmail] = useState("");
+
+  useEffect(() => {
+    setVisPayments([]);
+  }, [visCurrency]);
 
   // Send Invoice Popup
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -329,6 +344,12 @@ export function P2PAdminTable() {
       return;
     }
 
+    const targetEmail = tradeModalUserOffer.userEmail || visTargetEmail;
+    if (!targetEmail || !targetEmail.trim()) {
+      toast("Please enter a valid target user email", "warning");
+      return;
+    }
+
     const finalPayments = [...visPayments];
     if (visCustomPayment.trim()) {
       finalPayments.push(visCustomPayment.trim());
@@ -345,7 +366,7 @@ export function P2PAdminTable() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "admin_create_trade",
-          userEmail: tradeModalUserOffer.userEmail,
+          userEmail: targetEmail,
           counterpartName: visName,
           country: visCountry,
           amount: parseFloat(visAmount),
@@ -566,7 +587,7 @@ export function P2PAdminTable() {
                   onClick={() => setDirectoryType(t)}
                   className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
                     directoryType === t
-                      ? `bg-white dark:bg-gray-855 ${t === "BUY" ? "text-emerald-500" : "text-rose-500"} shadow-sm`
+                      ? `bg-white dark:bg-gray-800 ${t === "BUY" ? "text-emerald-500" : "text-rose-500"} shadow-sm`
                       : "text-slate-500 hover:text-slate-700 dark:hover:text-gray-300"
                   }`}
                 >
@@ -697,7 +718,21 @@ export function P2PAdminTable() {
                               <button onClick={() => setEditingOfferId(null)} className="px-3 py-1 bg-slate-200 dark:bg-gray-800 text-slate-600 dark:text-gray-400 rounded cursor-pointer">Cancel</button>
                             </div>
                           ) : (
-                            <button onClick={() => { setEditingOfferId(o.id); setEditForm({ ...o }); }} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-bold cursor-pointer">Edit</button>
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => {
+                                  setTradeModalUserOffer(o);
+                                  setVisPrice(o.price.toString());
+                                  setVisCurrency(o.userEmail ? "SAR" : "USD");
+                                  setVisPayments(o.paymentMethods || []);
+                                  setVisTargetEmail(o.userEmail || "");
+                                }}
+                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold cursor-pointer transition-colors"
+                              >
+                                Trade
+                              </button>
+                              <button onClick={() => { setEditingOfferId(o.id); setEditForm({ ...o }); }} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-bold cursor-pointer transition-colors">Edit</button>
+                            </div>
                           )}
                         </td>
                       </tr>
@@ -784,6 +819,7 @@ export function P2PAdminTable() {
                             setVisPrice(o.price.toString());
                             setVisCurrency("SAR");
                             setVisPayments(o.paymentMethods || []);
+                            setVisTargetEmail(o.userEmail || "");
                           }}
                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-[10px] uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer"
                         >
@@ -1036,7 +1072,7 @@ export function P2PAdminTable() {
             <div className="w-full md:w-1/3 bg-slate-50 dark:bg-gray-950/50 border-r border-slate-200 dark:border-gray-800 p-6 overflow-y-auto flex flex-col">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Manage <span className="text-indigo-500 not-italic">P2P</span></h3>
-                <button onClick={() => setActiveChat(null)} className="p-2 bg-white dark:bg-gray-855 rounded-full text-slate-400 hover:text-rose-500 shadow-sm border border-slate-200 dark:border-gray-700 transition-colors cursor-pointer">
+                <button onClick={() => setActiveChat(null)} className="p-2 bg-white dark:bg-gray-800 rounded-full text-slate-400 hover:text-rose-500 shadow-sm border border-slate-200 dark:border-gray-700 transition-colors cursor-pointer">
                   <XCircle className="w-5 h-5" />
                 </button>
               </div>
@@ -1179,6 +1215,24 @@ export function P2PAdminTable() {
             </div>
 
             <form onSubmit={handleInitiateCounterpartTrade} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Target Client User Email</label>
+                {tradeModalUserOffer.userEmail ? (
+                  <div className="bg-slate-100 dark:bg-gray-800 px-4 py-3 rounded-xl font-mono text-slate-600 dark:text-gray-300 font-bold border border-slate-200 dark:border-gray-700">
+                    {tradeModalUserOffer.userEmail}
+                  </div>
+                ) : (
+                  <input
+                    type="email"
+                    required
+                    value={visTargetEmail}
+                    onChange={(e) => setVisTargetEmail(e.target.value)}
+                    placeholder="Enter target client registered email (e.g. client@example.com)"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Your Visitor Name</label>
@@ -1238,14 +1292,17 @@ export function P2PAdminTable() {
                     <option value="USD">USD</option>
                     <option value="AED">AED</option>
                     <option value="EGP">EGP</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="TRY">TRY</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Payment Methods</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 dark:bg-gray-950 p-3 rounded-xl border border-slate-200 dark:border-gray-850">
-                  {["Bank Transfer", "Al Rajhi Bank", "NCB Bank", "STC Pay", "InstaPay", "SEPA Transfer"].map((m) => {
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 dark:bg-gray-950 p-3 rounded-xl border border-slate-200 dark:border-gray-800">
+                  {(PAYMENT_METHODS_BY_CURRENCY[visCurrency] || ["Bank Transfer", "Wise", "PayPal"]).map((m) => {
                     const sel = visPayments.includes(m);
                     return (
                       <button
@@ -1253,7 +1310,7 @@ export function P2PAdminTable() {
                         key={m}
                         onClick={() => sel ? setVisPayments(visPayments.filter(x => x !== m)) : setVisPayments([...visPayments, m])}
                         className={`px-3 py-2 text-[10px] font-black rounded-lg uppercase tracking-wider text-center transition-all cursor-pointer border ${
-                          sel ? "bg-indigo-600/10 text-indigo-500 border-indigo-500/25" : "bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-500"
+                          sel ? "bg-indigo-500/10 text-indigo-500 border-indigo-500/25" : "bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-500"
                         }`}
                       >
                         {m}

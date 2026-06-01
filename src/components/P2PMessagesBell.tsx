@@ -199,7 +199,7 @@ export function P2PMessagesBell() {
               </div>
               <button
                 onClick={() => setShowSupportModal(false)}
-                className="p-1 bg-white dark:bg-gray-855 border border-slate-200 dark:border-gray-800 text-slate-400 hover:text-rose-500 rounded-full transition-colors cursor-pointer shadow-sm"
+                className="p-1 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-800 text-slate-400 hover:text-rose-500 rounded-full transition-colors cursor-pointer shadow-sm"
               >
                 <X className="w-4 h-4" />
               </button>

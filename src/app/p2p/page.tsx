@@ -40,6 +40,16 @@ const CURRENCY_RATES: Record<string, { rate: number; symbol: string; flag: strin
   TRY: { rate: 32.5, symbol: "₺", flag: "🇹🇷", name: "Turkish Lira" }
 };
 
+const PAYMENT_METHODS_BY_CURRENCY: Record<string, string[]> = {
+  SAR: ["STC Pay", "Al Rajhi Bank", "NCB Bank", "Urpay", "Bank Transfer"],
+  EGP: ["InstaPay", "Vodafone Cash", "Fawry", "Orange Cash", "CIB Bank", "NBE Bank"],
+  AED: ["Etisalat Cash", "ADCB Bank", "Emirates NBD", "FAB Bank", "Bank Transfer"],
+  USD: ["Bank Transfer", "SWIFT", "Wise", "PayPal"],
+  EUR: ["SEPA Transfer", "Bank Transfer", "Revolut", "Wise"],
+  GBP: ["Bank Transfer", "Wise", "Revolut", "Monzo"],
+  TRY: ["Ziraat Bank", "Garanti BBVA", "Papara", "Bank Transfer"]
+};
+
 const COIN_LIST = [
   "USDT", "BTC", "USDC", "FDUSD", "BNB", "ETH", "ADA", "SHIB", "DOGE", "TRX", "SOL", "PEPE", "TRUMP", "DOLO", "XPL", "ASTER"
 ];
@@ -92,6 +102,10 @@ export default function P2PPage() {
   const [adPaymentMethods, setAdPaymentMethods] = useState<string[]>([]);
   const [adCustomPayment, setAdCustomPayment] = useState("");
   const [submittingAd, setSubmittingAd] = useState(false);
+
+  useEffect(() => {
+    setAdPaymentMethods([]);
+  }, [adCurrency]);
 
   // Support Portal state
   const [showSupportPortal, setShowSupportPortal] = useState(false);
@@ -1328,8 +1342,6 @@ export default function P2PPage() {
           </div>
         </div>
       )}
-
-      {/* P2P AD CREATION MODAL */}
       {showAdCreateModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm text-slate-900 dark:text-white">
           <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-[2rem] max-w-xl w-full shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
@@ -1347,12 +1359,12 @@ export default function P2PPage() {
               <div className="grid grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Trade Type</label>
-                  <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-gray-950 p-1 rounded-xl border border-slate-200 dark:border-gray-850">
+                  <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-gray-950 p-1 rounded-xl border border-slate-200 dark:border-gray-800">
                     <button
                       type="button"
                       onClick={() => setAdTab("BUY")}
                       className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                        adTab === "BUY" ? "bg-white dark:bg-gray-850 text-emerald-500 shadow-sm" : "text-slate-500"
+                        adTab === "BUY" ? "bg-white dark:bg-gray-800 text-emerald-500 shadow-sm" : "text-slate-500"
                       }`}
                     >
                       Buy USDT
@@ -1361,7 +1373,7 @@ export default function P2PPage() {
                       type="button"
                       onClick={() => setAdTab("SELL")}
                       className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                        adTab === "SELL" ? "bg-white dark:bg-gray-855 text-rose-500 shadow-sm" : "text-slate-500"
+                        adTab === "SELL" ? "bg-white dark:bg-gray-800 text-rose-500 shadow-sm" : "text-slate-500"
                       }`}
                     >
                       Sell USDT
@@ -1399,7 +1411,7 @@ export default function P2PPage() {
                     value={adPrice}
                     onChange={(e) => setAdPrice(e.target.value)}
                     placeholder={`e.g. ${adCurrency === "SAR" ? "3.75" : "1.00"}`}
-                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
                   />
                   {adPrice && (
                     <span className="text-[10px] text-indigo-500 font-bold block mt-1 font-mono">
@@ -1419,7 +1431,7 @@ export default function P2PPage() {
                     value={adAmount}
                     onChange={(e) => setAdAmount(e.target.value)}
                     placeholder="e.g. 500.00"
-                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
                   />
                 </div>
               </div>
@@ -1435,7 +1447,7 @@ export default function P2PPage() {
                     value={adMinLimit}
                     onChange={(e) => setAdMinLimit(e.target.value)}
                     placeholder="e.g. 50"
-                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
                   />
                 </div>
 
@@ -1449,7 +1461,7 @@ export default function P2PPage() {
                     value={adMaxLimit}
                     onChange={(e) => setAdMaxLimit(e.target.value)}
                     placeholder="e.g. 1000"
-                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
                   />
                 </div>
               </div>
@@ -1464,14 +1476,14 @@ export default function P2PPage() {
                   value={adAdvertiserName}
                   onChange={(e) => setAdAdvertiserName(e.target.value)}
                   placeholder="Your advertiser profile nickname"
-                  className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
                 <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Payment Channels</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 dark:bg-gray-950 p-3 rounded-xl border border-slate-200 dark:border-gray-850">
-                  {["Bank Transfer", "InstaPay", "Vodafone Cash", "Fawry", "CIB Bank", "NBE Bank"].map((m) => {
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 dark:bg-gray-950 p-3 rounded-xl border border-slate-200 dark:border-gray-800">
+                  {(PAYMENT_METHODS_BY_CURRENCY[adCurrency] || ["Bank Transfer", "Wise", "PayPal"]).map((m) => {
                     const selected = adPaymentMethods.includes(m);
                     return (
                       <button
@@ -1483,7 +1495,7 @@ export default function P2PPage() {
                         }}
                         className={`px-3 py-2 text-[10px] font-black rounded-lg uppercase tracking-wider text-center transition-all cursor-pointer border ${
                           selected
-                            ? "bg-indigo-650/10 text-indigo-500 border-indigo-500/25 shadow-sm"
+                            ? "bg-indigo-500/10 text-indigo-500 border-indigo-500/25 shadow-sm"
                             : "bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-500"
                         }`}
                       >
@@ -1501,14 +1513,14 @@ export default function P2PPage() {
                   value={adCustomPayment}
                   onChange={(e) => setAdCustomPayment(e.target.value)}
                   placeholder="e.g. Bank: Al Rajhi Bank, IBAN SA0328900000..."
-                  className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={submittingAd}
-                className="w-full mt-2 py-4 bg-indigo-655 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer disabled:opacity-60"
+                className="w-full mt-2 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer disabled:opacity-60"
               >
                 {submittingAd ? "Publishing Advertisement..." : "Publish P2P Advertisement"}
               </button>
@@ -1528,7 +1540,7 @@ export default function P2PPage() {
               </div>
               <button
                 onClick={() => setShowSupportPortal(false)}
-                className="p-1.5 bg-slate-50 dark:bg-gray-855 text-slate-400 hover:text-rose-500 rounded-full border border-slate-200 dark:border-gray-800 transition-colors cursor-pointer"
+                className="p-1.5 bg-slate-50 dark:bg-gray-800 text-slate-400 hover:text-rose-500 rounded-full border border-slate-200 dark:border-gray-800 transition-colors cursor-pointer"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -1553,7 +1565,7 @@ export default function P2PPage() {
                   rows={4}
                   value={supportMessage}
                   onChange={(e) => setSupportMessage(e.target.value)}
-                  placeholder="Explain exactly what happened, and attach payment transaction details or bank names. The escrow security officer will review this session chat logs."
+                  placeholder="Explain exactly what happened, and attach payment transaction details or bank names. The escrow security officer will review this session chat logs."names. The escrow security officer will review this session chat logs."
                   className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 font-semibold focus:outline-none focus:border-indigo-500"
                   required
                 />
