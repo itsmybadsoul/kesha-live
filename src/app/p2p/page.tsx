@@ -497,7 +497,15 @@ export default function P2PPage() {
                   <div className="col-span-2 border-t border-slate-100 dark:border-gray-800 my-1"></div>
                   <div className="col-span-2">
                     <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Payment Method</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">{activeRequest.banks}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                      {activeRequest.banksConfirmed ? (
+                        activeRequest.banks
+                      ) : (
+                        <span className="text-amber-500 font-bold flex items-center gap-1.5 animate-pulse">
+                          <Clock className="w-3.5 h-3.5 text-amber-500 animate-spin" /> Awaiting Admin Confirmation
+                        </span>
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -941,8 +949,8 @@ export default function P2PPage() {
               </div>
               <div className="flex justify-between items-center text-xs font-semibold">
                 <span className="text-slate-400">Payment Channel:</span>
-                <span className="text-slate-800 dark:text-slate-200 font-bold">
-                  {tradeModalOffer.paymentMethods.join(", ")}
+                <span className="text-indigo-400 font-bold flex items-center gap-1.5 uppercase text-[9px] tracking-wider bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-lg">
+                  <Lock className="w-3 h-3 text-indigo-500 animate-pulse" /> Privacy Protected
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs font-semibold">

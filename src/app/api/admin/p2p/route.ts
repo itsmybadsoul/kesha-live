@@ -36,7 +36,7 @@ export async function PUT(req: Request) {
     const index = requests.findIndex(r => r.id === id);
     if (index === -1) return NextResponse.json({ error: "Request not found" }, { status: 404 });
 
-    requests[index] = { ...requests[index], sellerName, usdPrice, banks, trustRate };
+    requests[index] = { ...requests[index], sellerName, usdPrice, banks, trustRate, banksConfirmed: true };
 
     await saveP2PRequests(requests);
 

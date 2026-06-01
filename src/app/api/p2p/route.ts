@@ -88,7 +88,8 @@ export async function POST(req: Request) {
       trustRate: "99.3% completion",
       currency: currency || "USD",
       minLimit: minLimit ? Number(minLimit) : 0,
-      maxLimit: maxLimit ? Number(maxLimit) : 0
+      maxLimit: maxLimit ? Number(maxLimit) : 0,
+      banksConfirmed: false
     };
     
     requests.push(newRequest);

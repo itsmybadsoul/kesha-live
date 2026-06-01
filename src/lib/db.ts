@@ -430,6 +430,7 @@ export interface P2PRequest {
   maxLimit?: number;
   availableAmount?: number;
   currency?: string;
+  banksConfirmed?: boolean;
 }
 
 export interface ChatMessage {
