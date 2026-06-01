@@ -53,6 +53,9 @@ export function Navbar() {
             <Link href="/withdraw" className={`flex items-center gap-2 text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors font-bold ${isActive("/withdraw") ? "border-b-2 border-amber-500 pb-1 translate-y-[2px]" : ""}`}>
               <ArrowRightLeft className="w-4 h-4" /> Withdraw
             </Link>
+            <Link href="/p2p" className={`flex items-center gap-2 text-emerald-555 dark:text-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-350 transition-colors font-bold ${isActive("/p2p") ? "text-slate-900 dark:text-white font-bold border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
+              <ArrowRightLeft className="w-4 h-4 text-emerald-400" /> P2P Desk
+            </Link>
             <Link href="/futures" className={`flex items-center gap-2 text-indigo-500 dark:text-indigo-400 font-black hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest ${isActive("/futures") ? "border-b-2 border-indigo-500 pb-1 translate-y-[2px]" : ""}`}>
               <Activity className="w-4 h-4 animate-pulse" /> Pro Options
             </Link>
@@ -141,6 +144,9 @@ export function Navbar() {
                 </Link>
                 <Link href="/deposit" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
                   <Wallet className="w-5 h-5" /> Funds & Deposits
+                </Link>
+                <Link href="/p2p" className="flex items-center gap-3 p-4 hover:bg-slate-100 dark:hover:bg-gray-800/50 rounded-2xl text-slate-600 dark:text-gray-300 font-bold transition-colors">
+                  <ArrowRightLeft className="w-5 h-5" /> P2P Trading Desk
                 </Link>
                 <div className="border-t border-slate-200 dark:border-gray-800 my-2 pt-4">
                   <button onClick={logout} className="flex items-center gap-3 p-4 text-rose-500 font-bold w-full">
