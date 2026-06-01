@@ -1565,7 +1565,7 @@ export default function P2PPage() {
                   rows={4}
                   value={supportMessage}
                   onChange={(e) => setSupportMessage(e.target.value)}
-                  placeholder="Explain exactly what happened, and attach payment transaction details or bank names. The escrow security officer will review this session chat logs."names. The escrow security officer will review this session chat logs."
+                  placeholder="Explain exactly what happened, and attach payment transaction details or bank names. The escrow security officer will review this session chat logs."
                   className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 font-semibold focus:outline-none focus:border-indigo-500"
                   required
                 />
