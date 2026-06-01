@@ -34,8 +34,8 @@ const CURRENCY_RATES: Record<string, { rate: number; symbol: string; flag: strin
   EGP: { rate: 50.0, symbol: "E£", flag: "🇪🇬", name: "Egyptian Pound" },
   EUR: { rate: 0.92, symbol: "€", flag: "🇪🇺", name: "Euro" },
   GBP: { rate: 0.79, symbol: "£", flag: "🇬🇧", name: "British Pound" },
-  AED: { rate: 3.67, symbol: "د.إ", flag: "🇦🇪", name: "UAE Dirham" },
-  SAR: { rate: 3.75, symbol: "ر.س", flag: "🇸🇦", name: "Saudi Riyal" },
+  AED: { rate: 3.67, symbol: "AED", flag: "🇦🇪", name: "UAE Dirham" },
+  SAR: { rate: 3.75, symbol: "SAR", flag: "🇸🇦", name: "Saudi Riyal" },
   TRY: { rate: 32.5, symbol: "₺", flag: "🇹🇷", name: "Turkish Lira" }
 };
 
@@ -484,13 +484,13 @@ export default function P2PPage() {
                   </div>
                   <div>
                     <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Available</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{activeRequest.availableAmount ? activeRequest.availableAmount.toLocaleString() + " USDT" : "—"}</span>
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{activeRequest.availableAmount ? activeRequest.availableAmount.toLocaleString("en-US") + " USDT" : "—"}</span>
                   </div>
                   {(activeRequest.minLimit || activeRequest.maxLimit) && (
                     <div className="col-span-2">
                       <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Order Limits</span>
                       <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
-                        {activeRequest.minLimit?.toLocaleString()} – {activeRequest.maxLimit?.toLocaleString()} {activeRequest.currency || "USD"}
+                        {activeRequest.minLimit?.toLocaleString("en-US")} – {activeRequest.maxLimit?.toLocaleString("en-US")} {activeRequest.currency || "USD"}
                       </span>
                     </div>
                   )}
@@ -799,7 +799,7 @@ export default function P2PPage() {
                     ) : (
                       finalOffersList.map((offer) => {
                         const offerFPrice = getOfferPrice(offer.price);
-                        const limitsText = `${(offer.minLimit * rateInfo.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })} ${selectedCurrency} - ${(offer.maxLimit * rateInfo.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })} ${selectedCurrency}`;
+                        const limitsText = `${(offer.minLimit * rateInfo.rate).toLocaleString("en-US", { maximumFractionDigits: 0 })} ${selectedCurrency} - ${(offer.maxLimit * rateInfo.rate).toLocaleString("en-US", { maximumFractionDigits: 0 })} ${selectedCurrency}`;
                         
                         return (
                           <tr 
@@ -852,7 +852,7 @@ export default function P2PPage() {
                                 <div className="flex items-center gap-2">
                                   <span className="text-slate-400 dark:text-gray-500 font-semibold w-16">Available:</span>
                                   <span className="font-mono font-bold text-slate-700 dark:text-slate-200">
-                                    {offer.availableAmount.toLocaleString()} USDT
+                                    {offer.availableAmount.toLocaleString("en-US")} USDT
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -948,7 +948,7 @@ export default function P2PPage() {
               <div className="flex justify-between items-center text-xs font-semibold">
                 <span className="text-slate-400">Limits Allowed:</span>
                 <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">
-                  {(tradeModalOffer.minLimit * rateInfo.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })} - {(tradeModalOffer.maxLimit * rateInfo.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })} {selectedCurrency}
+                  {(tradeModalOffer.minLimit * rateInfo.rate).toLocaleString("en-US", { maximumFractionDigits: 0 })} - {(tradeModalOffer.maxLimit * rateInfo.rate).toLocaleString("en-US", { maximumFractionDigits: 0 })} {selectedCurrency}
                 </span>
               </div>
             </div>
@@ -1023,7 +1023,7 @@ export default function P2PPage() {
 
             <div className="bg-slate-100 dark:bg-gray-950 p-4.5 rounded-2xl mb-6 font-mono text-xs text-indigo-500 font-bold border border-slate-200 dark:border-gray-800 shadow-inner">
               RESTRICTION EXPIRES: <br />
-              <span className="text-slate-800 dark:text-slate-350 text-[11px] block mt-1.5">{new Date(blockedUntil).toLocaleString()}</span>
+              <span className="text-slate-800 dark:text-slate-350 text-[11px] block mt-1.5">{new Date(blockedUntil).toLocaleString("en-US")}</span>
             </div>
 
             <button

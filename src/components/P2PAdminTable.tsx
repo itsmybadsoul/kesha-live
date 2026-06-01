@@ -319,7 +319,7 @@ export function P2PAdminTable() {
                             P2P_{r.type}
                           </span>
                           <div className="font-bold text-sm text-slate-900 dark:text-white">{r.email}</div>
-                          <div className="text-[10px] text-slate-400 font-mono opacity-60">{new Date(r.createdAt).toLocaleString()}</div>
+                          <div className="text-[10px] text-slate-400 font-mono opacity-60">{new Date(r.createdAt).toLocaleString("en-US")}</div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
@@ -331,9 +331,9 @@ export function P2PAdminTable() {
                       <td className="px-8 py-6">
                         <div className="space-y-0.5 text-[11px]">
                           <div><span className="text-slate-400">Price/USDT: </span><span className="font-mono font-bold text-indigo-500">${r.usdPrice?.toFixed(4) ?? "—"}</span></div>
-                          <div><span className="text-slate-400">Available: </span><span className="font-mono">{r.availableAmount ? r.availableAmount.toLocaleString() + " USDT" : "—"}</span></div>
+                          <div><span className="text-slate-400">Available: </span><span className="font-mono">{r.availableAmount ? r.availableAmount.toLocaleString("en-US") + " USDT" : "—"}</span></div>
                           {(r.minLimit || r.maxLimit) && (
-                            <div><span className="text-slate-400">Limits: </span><span className="font-mono">{r.minLimit?.toLocaleString()} – {r.maxLimit?.toLocaleString()} {r.currency || "USD"}</span></div>
+                            <div><span className="text-slate-400">Limits: </span><span className="font-mono">{r.minLimit?.toLocaleString("en-US")} – {r.maxLimit?.toLocaleString("en-US")} {r.currency || "USD"}</span></div>
                           )}
                         </div>
                       </td>
@@ -461,7 +461,7 @@ export function P2PAdminTable() {
                         <td className="px-6 py-4 font-mono">
                           {isEditing ? (
                             <input type="number" value={editForm.availableAmount} onChange={(e) => setEditForm({ ...editForm, availableAmount: parseFloat(e.target.value) })} className="bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded px-2 py-1 font-mono w-24" />
-                          ) : `${o.availableAmount.toLocaleString()} USDT`}
+                          ) : `${o.availableAmount.toLocaleString("en-US")} USDT`}
                         </td>
                         <td className="px-6 py-4 font-mono">
                           {isEditing ? (
@@ -470,7 +470,7 @@ export function P2PAdminTable() {
                               <span>–</span>
                               <input type="number" value={editForm.maxLimit} onChange={(e) => setEditForm({ ...editForm, maxLimit: parseInt(e.target.value) })} className="bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded px-1.5 py-0.5 w-20" />
                             </div>
-                          ) : `${o.minLimit.toLocaleString()} – ${o.maxLimit.toLocaleString()}`}
+                          ) : `${o.minLimit.toLocaleString("en-US")} – ${o.maxLimit.toLocaleString("en-US")}`}
                         </td>
                         <td className="px-6 py-4">
                           {isEditing ? (
@@ -609,9 +609,9 @@ export function P2PAdminTable() {
                 <div className="mt-2 space-y-0.5 text-[11px]">
                   <div><span className="text-slate-400">Price/USDT: </span><span className="font-mono font-bold">${activeRequestObj.usdPrice?.toFixed(4) ?? "—"}</span></div>
                   <div><span className="text-slate-400">Currency: </span><span className="font-mono">{activeRequestObj.currency || "USD"}</span></div>
-                  {activeRequestObj.availableAmount && <div><span className="text-slate-400">Available: </span><span className="font-mono">{activeRequestObj.availableAmount.toLocaleString()} USDT</span></div>}
+                  {activeRequestObj.availableAmount && <div><span className="text-slate-400">Available: </span><span className="font-mono">{activeRequestObj.availableAmount.toLocaleString("en-US")} USDT</span></div>}
                   {(activeRequestObj.minLimit || activeRequestObj.maxLimit) && (
-                    <div><span className="text-slate-400">Limits: </span><span className="font-mono">{activeRequestObj.minLimit?.toLocaleString()} – {activeRequestObj.maxLimit?.toLocaleString()} {activeRequestObj.currency || "USD"}</span></div>
+                    <div><span className="text-slate-400">Limits: </span><span className="font-mono">{activeRequestObj.minLimit?.toLocaleString("en-US")} – {activeRequestObj.maxLimit?.toLocaleString("en-US")} {activeRequestObj.currency || "USD"}</span></div>
                   )}
                 </div>
               </div>
