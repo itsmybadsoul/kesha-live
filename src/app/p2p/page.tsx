@@ -264,15 +264,15 @@ export default function P2PPage() {
       return;
     }
 
-    // Validate SELL ads: available amount cannot exceed user's actual USDT holdings
+    // Validate SELL ads: available amount cannot exceed user's actual balance (USD ≈ USDT)
     if (adTab === "SELL") {
-      const usdtHoldings = user.holdings?.["USDT"] || 0;
-      if (parseFloat(adAmount) > usdtHoldings) {
-        toast(`Insufficient USDT balance. You only have ${usdtHoldings.toFixed(4)} USDT available.`, "error");
+      const usdtBalance = user.balance || 0;
+      if (parseFloat(adAmount) > usdtBalance) {
+        toast(`Insufficient balance. You only have ${usdtBalance.toFixed(4)} USDT available.`, "error");
         return;
       }
-      if (usdtHoldings <= 0) {
-        toast("You have no USDT balance to sell.", "error");
+      if (usdtBalance <= 0) {
+        toast("You have no balance to sell.", "error");
         return;
       }
     }
@@ -1446,7 +1446,7 @@ export default function P2PPage() {
                     </label>
                     {adTab === "SELL" && (
                       <span className="text-[10px] text-indigo-400 font-bold">
-                        Balance: {(user?.holdings?.["USDT"] || 0).toFixed(4)} USDT
+                        Balance: {(user?.balance || 0).toFixed(4)} USDT
                       </span>
                     )}
                   </div>
@@ -1456,10 +1456,10 @@ export default function P2PPage() {
                       step="0.01"
                       required
                       value={adAmount}
-                      max={adTab === "SELL" ? (user?.holdings?.["USDT"] || 0) : undefined}
+                      max={adTab === "SELL" ? (user?.balance || 0) : undefined}
                       onChange={(e) => {
                         if (adTab === "SELL") {
-                          const maxUSDT = user?.holdings?.["USDT"] || 0;
+                          const maxUSDT = user?.balance || 0;
                           const val = parseFloat(e.target.value);
                           if (!isNaN(val) && val > maxUSDT) {
                             setAdAmount(maxUSDT.toFixed(4));
@@ -1470,22 +1470,22 @@ export default function P2PPage() {
                           setAdAmount(e.target.value);
                         }
                       }}
-                      placeholder={adTab === "SELL" ? `Max: ${(user?.holdings?.["USDT"] || 0).toFixed(2)} USDT` : "e.g. 500.00"}
+                      placeholder={adTab === "SELL" ? `Max: ${(user?.balance || 0).toFixed(2)} USDT` : "e.g. 500.00"}
                       className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 pr-16 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
                     />
                     {adTab === "SELL" && (
                       <button
                         type="button"
-                        onClick={() => setAdAmount((user?.holdings?.["USDT"] || 0).toFixed(4))}
+                        onClick={() => setAdAmount((user?.balance || 0).toFixed(4))}
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase tracking-wider bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 px-2 py-1 rounded-lg transition-colors cursor-pointer"
                       >
                         MAX
                       </button>
                     )}
                   </div>
-                  {adTab === "SELL" && parseFloat(adAmount) > (user?.holdings?.["USDT"] || 0) && (
+                  {adTab === "SELL" && parseFloat(adAmount) > (user?.balance || 0) && (
                     <p className="text-[10px] text-rose-500 font-bold mt-1">
-                      ⚠ Exceeds your USDT balance of {(user?.holdings?.["USDT"] || 0).toFixed(4)} USDT
+                      ⚠ Exceeds your balance of {(user?.balance || 0).toFixed(4)} USDT
                     </p>
                   )}
                 </div>
