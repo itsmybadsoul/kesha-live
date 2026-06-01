@@ -425,7 +425,7 @@ export function P2PAdminTable() {
               <thead>
                 <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em] border-b border-slate-100 dark:border-gray-800">
                   <th className="px-6 py-4">Advertiser</th>
-                  <th className="px-6 py-4">Price (USD/USDT)</th>
+                  <th className="px-6 py-4">Price (USD / SAR)</th>
                   <th className="px-6 py-4">Available (USDT)</th>
                   <th className="px-6 py-4">Limits (Fiat Range)</th>
                   <th className="px-6 py-4">Payment Methods (Visible Here)</th>
@@ -455,8 +455,39 @@ export function P2PAdminTable() {
                         </td>
                         <td className="px-6 py-4 font-mono font-bold text-emerald-500">
                           {isEditing ? (
-                            <input type="number" step="0.001" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: parseFloat(e.target.value) })} className="bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded px-2 py-1 font-mono w-24" />
-                          ) : `$${o.price.toFixed(4)}`}
+                            <div className="flex flex-col gap-1.5 w-28">
+                              <div className="flex items-center gap-1">
+                                <span className="text-[9px] text-slate-400 w-7 font-bold">USD:</span>
+                                <input 
+                                  type="number" 
+                                  step="0.0001" 
+                                  value={editForm.price} 
+                                  onChange={(e) => setEditForm({ ...editForm, price: parseFloat(e.target.value) })} 
+                                  className="bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded px-1.5 py-0.5 font-mono text-xs w-full" 
+                                />
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[9px] text-emerald-500 font-bold w-7">SAR:</span>
+                                <input 
+                                  type="number" 
+                                  step="0.01" 
+                                  value={(editForm.price * 3.75).toFixed(2)} 
+                                  onChange={(e) => {
+                                    const val = parseFloat(e.target.value);
+                                    if (!isNaN(val)) {
+                                      setEditForm({ ...editForm, price: val / 3.75 });
+                                    }
+                                  }} 
+                                  className="bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded px-1.5 py-0.5 font-mono text-xs w-full text-emerald-500 font-bold" 
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-0.5 font-mono">
+                              <span className="text-slate-900 dark:text-white">${o.price.toFixed(4)}</span>
+                              <span className="text-[10px] text-emerald-500 font-bold">{(o.price * 3.75).toFixed(2)} SAR</span>
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4 font-mono">
                           {isEditing ? (
@@ -524,27 +555,78 @@ export function P2PAdminTable() {
             <div className="space-y-4">
               <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 border-b border-emerald-500/20 pb-2">BUY Offers</div>
               <div>
-                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5">Min Price (USD/USDT)</label>
-                <input
-                  type="number"
-                  step="0.001"
-                  value={priceRange.buyMin}
-                  onChange={(e) => setPriceRange({ ...priceRange, buyMin: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-emerald-500 transition-colors"
-                />
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 flex justify-between">
+                  <span>Min Price</span>
+                  <span className="text-emerald-500 font-bold font-mono">~{(Number(priceRange.buyMin) * 3.75).toFixed(2)} SAR</span>
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-slate-400 font-mono">USD</span>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={priceRange.buyMin}
+                      onChange={(e) => setPriceRange({ ...priceRange, buyMin: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-emerald-500 transition-colors"
+                      placeholder="USD"
+                    />
+                  </div>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-emerald-500 font-mono">SAR</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={(Number(priceRange.buyMin) * 3.75).toFixed(2)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          setPriceRange({ ...priceRange, buyMin: (val / 3.75).toFixed(4) });
+                        }
+                      }}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-emerald-500/20 dark:border-emerald-950/20 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-emerald-500 transition-colors text-emerald-500 font-bold"
+                      placeholder="SAR"
+                    />
+                  </div>
+                </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5">Max Price (USD/USDT)</label>
-                <input
-                  type="number"
-                  step="0.001"
-                  value={priceRange.buyMax}
-                  onChange={(e) => setPriceRange({ ...priceRange, buyMax: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-emerald-500 transition-colors"
-                />
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 flex justify-between">
+                  <span>Max Price</span>
+                  <span className="text-emerald-500 font-bold font-mono">~{(Number(priceRange.buyMax) * 3.75).toFixed(2)} SAR</span>
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-slate-400 font-mono">USD</span>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={priceRange.buyMax}
+                      onChange={(e) => setPriceRange({ ...priceRange, buyMax: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-emerald-500 transition-colors"
+                      placeholder="USD"
+                    />
+                  </div>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-emerald-500 font-mono">SAR</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={(Number(priceRange.buyMax) * 3.75).toFixed(2)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          setPriceRange({ ...priceRange, buyMax: (val / 3.75).toFixed(4) });
+                        }
+                      }}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-emerald-500/20 dark:border-emerald-950/20 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-emerald-500 transition-colors text-emerald-500 font-bold"
+                      placeholder="SAR"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="text-[10px] text-slate-400 bg-slate-50 dark:bg-gray-900 p-3 rounded-xl border border-slate-200 dark:border-gray-800">
-                Example prices: <span className="font-mono text-emerald-500">${priceRange.buyMin} → ${priceRange.buyMax}</span>
+              <div className="text-[10px] text-slate-400 bg-slate-50 dark:bg-gray-900 p-3 rounded-xl border border-slate-200 dark:border-gray-800 space-y-1">
+                <div>USD Range: <span className="font-mono text-emerald-500">${priceRange.buyMin} → ${priceRange.buyMax}</span></div>
+                <div>SAR Range: <span className="font-mono text-emerald-500">{(Number(priceRange.buyMin) * 3.75).toFixed(2)} SAR → {(Number(priceRange.buyMax) * 3.75).toFixed(2)} SAR</span></div>
               </div>
             </div>
 
@@ -552,27 +634,78 @@ export function P2PAdminTable() {
             <div className="space-y-4">
               <div className="text-[10px] font-black uppercase tracking-widest text-rose-500 border-b border-rose-500/20 pb-2">SELL Offers</div>
               <div>
-                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5">Min Price (USD/USDT)</label>
-                <input
-                  type="number"
-                  step="0.001"
-                  value={priceRange.sellMin}
-                  onChange={(e) => setPriceRange({ ...priceRange, sellMin: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-rose-500 transition-colors"
-                />
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 flex justify-between">
+                  <span>Min Price</span>
+                  <span className="text-rose-500 font-bold font-mono">~{(Number(priceRange.sellMin) * 3.75).toFixed(2)} SAR</span>
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-slate-400 font-mono">USD</span>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={priceRange.sellMin}
+                      onChange={(e) => setPriceRange({ ...priceRange, sellMin: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-rose-500 transition-colors"
+                      placeholder="USD"
+                    />
+                  </div>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-rose-500 font-mono">SAR</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={(Number(priceRange.sellMin) * 3.75).toFixed(2)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          setPriceRange({ ...priceRange, sellMin: (val / 3.75).toFixed(4) });
+                        }
+                      }}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-rose-500/20 dark:border-rose-950/20 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-rose-500 transition-colors text-rose-500 font-bold"
+                      placeholder="SAR"
+                    />
+                  </div>
+                </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5">Max Price (USD/USDT)</label>
-                <input
-                  type="number"
-                  step="0.001"
-                  value={priceRange.sellMax}
-                  onChange={(e) => setPriceRange({ ...priceRange, sellMax: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-rose-500 transition-colors"
-                />
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 flex justify-between">
+                  <span>Max Price</span>
+                  <span className="text-rose-500 font-bold font-mono">~{(Number(priceRange.sellMax) * 3.75).toFixed(2)} SAR</span>
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-slate-400 font-mono">USD</span>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={priceRange.sellMax}
+                      onChange={(e) => setPriceRange({ ...priceRange, sellMax: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-rose-500 transition-colors"
+                      placeholder="USD"
+                    />
+                  </div>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 text-[10px] font-bold text-rose-500 font-mono">SAR</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={(Number(priceRange.sellMax) * 3.75).toFixed(2)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          setPriceRange({ ...priceRange, sellMax: (val / 3.75).toFixed(4) });
+                        }
+                      }}
+                      className="w-full bg-slate-50 dark:bg-gray-900 border border-rose-500/20 dark:border-rose-950/20 rounded-xl pl-12 pr-3 py-3 text-xs font-mono focus:outline-none focus:border-rose-500 transition-colors text-rose-500 font-bold"
+                      placeholder="SAR"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="text-[10px] text-slate-400 bg-slate-50 dark:bg-gray-900 p-3 rounded-xl border border-slate-200 dark:border-gray-800">
-                Example prices: <span className="font-mono text-rose-500">${priceRange.sellMin} → ${priceRange.sellMax}</span>
+              <div className="text-[10px] text-slate-400 bg-slate-50 dark:bg-gray-900 p-3 rounded-xl border border-slate-200 dark:border-gray-800 space-y-1">
+                <div>USD Range: <span className="font-mono text-rose-500">${priceRange.sellMin} → ${priceRange.sellMax}</span></div>
+                <div>SAR Range: <span className="font-mono text-rose-500">{(Number(priceRange.sellMin) * 3.75).toFixed(2)} SAR → {(Number(priceRange.sellMax) * 3.75).toFixed(2)} SAR</span></div>
               </div>
             </div>
           </div>
