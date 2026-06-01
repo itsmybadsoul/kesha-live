@@ -1154,16 +1154,22 @@ export default function P2PPage() {
 
                             {/* Actions */}
                             <td className="px-8 py-6.5 text-right">
-                              <button
-                                onClick={() => handleStartTrade(offer)}
-                                className={`px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl hover:-translate-y-0.5 hover:scale-[1.03] active:scale-95 cursor-pointer text-white ${
-                                  activeTab === "BUY" 
-                                    ? "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/10" 
-                                    : "bg-rose-600 hover:bg-rose-500 shadow-rose-600/10"
-                                }`}
-                              >
-                                {activeTab === "BUY" ? "Buy USDT" : "Sell USDT"}
-                              </button>
+                              {offer.userEmail && offer.userEmail === user?.email ? (
+                                <span className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 select-none">
+                                  <ShieldCheck className="w-3.5 h-3.5" /> Your Ad
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleStartTrade(offer)}
+                                  className={`px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl hover:-translate-y-0.5 hover:scale-[1.03] active:scale-95 cursor-pointer text-white ${
+                                    activeTab === "BUY" 
+                                      ? "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/10" 
+                                      : "bg-rose-600 hover:bg-rose-500 shadow-rose-600/10"
+                                  }`}
+                                >
+                                  {activeTab === "BUY" ? "Buy USDT" : "Sell USDT"}
+                                </button>
+                              )}
                             </td>
 
                           </tr>
