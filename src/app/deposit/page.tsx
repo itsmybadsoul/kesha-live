@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
-import { Wallet, Copy, CheckCircle2, ArrowLeft, Info, ArrowRightLeft } from "lucide-react";
+import { Wallet, Copy, CheckCircle2, ArrowLeft, Info, ArrowRightLeft, Globe, Building2, Lock } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navbar } from "@/components/Navbar";
 export default function DepositPage() {
@@ -16,6 +16,39 @@ export default function DepositPage() {
   const [txid, setTxid] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<"crypto" | "bank">("crypto");
+  const [location, setLocation] = useState<{
+    country: string;
+    city: string;
+    region: string;
+    countryCode: string;
+  } | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
+  useEffect(() => {
+    async function fetchLocation() {
+      setLoadingLocation(true);
+      try {
+        const res = await fetch("/api/location");
+        if (res.ok) {
+          const data = await res.json();
+          setLocation(data);
+        }
+      } catch (e) {
+        console.error("Failed to fetch location:", e);
+      } finally {
+        setLoadingLocation(false);
+      }
+    }
+    fetchLocation();
+  }, []);
+
+  const locationString = location
+    ? [location.city, location.region, location.country]
+        .filter(Boolean)
+        .filter(val => val !== "unknown")
+        .join(", ")
+    : "your region";
 
   const address = "TBVNCbZkHMxYT2A8hgY5j3SarjQmipTjny";
 
@@ -93,7 +126,34 @@ export default function DepositPage() {
             Deposit Funds <Wallet className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
           </h1>
 
-          <>
+          {/* Deposit Method Tabs */}
+          <div className="grid grid-cols-2 gap-4 mb-8 bg-slate-100/80 dark:bg-gray-900/60 p-1.5 rounded-2xl border border-slate-200/50 dark:border-gray-800/80 backdrop-blur-md">
+            <button
+              onClick={() => setActiveTab("crypto")}
+              className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-sm font-black transition-all duration-300 cursor-pointer ${
+                activeTab === "crypto"
+                  ? "bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200/50 dark:border-gray-700/30 scale-[1.02]"
+                  : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              <ArrowRightLeft className="w-4 h-4 shrink-0" />
+              USDT (TRC20)
+            </button>
+            <button
+              onClick={() => setActiveTab("bank")}
+              className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-sm font-black transition-all duration-300 cursor-pointer ${
+                activeTab === "bank"
+                  ? "bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200/50 dark:border-gray-700/30 scale-[1.02]"
+                  : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              <Building2 className="w-4 h-4 shrink-0" />
+              Bank Deposit
+            </button>
+          </div>
+
+          {activeTab === "crypto" ? (
+            <>
               <p className="text-slate-500 dark:text-gray-400 mb-10 text-base">Send USDT (TRC20) to the address below. Your funds will be credited after verification.</p>
 
               <div className="bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 md:p-8 mb-10 shadow-inner">
@@ -104,7 +164,7 @@ export default function DepositPage() {
                   </div>
                   <button
                     onClick={handleCopy}
-                    className="w-full sm:w-auto p-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl transition-all active:scale-95 shrink-0 shadow-lg shadow-indigo-600/20 flex items-center justify-center"
+                    className="w-full sm:w-auto p-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl transition-all active:scale-95 shrink-0 shadow-lg shadow-indigo-600/20 flex items-center justify-center cursor-pointer"
                   >
                     {copied ? <CheckCircle2 className="w-6 h-6 text-white" /> : <Copy className="w-6 h-6 text-white" />}
                   </button>
@@ -150,12 +210,59 @@ export default function DepositPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-lg py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-lg py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] flex items-center justify-center gap-3 cursor-pointer"
                 >
                   {loading ? <span className="animate-pulse">Verifying Transaction...</span> : "Confirm Payment Submission"}
                 </button>
               </form>
             </>
+          ) : (
+            <div className="space-y-6 relative z-10 py-2">
+              {loadingLocation ? (
+                <div className="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-gray-500">
+                  <span className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
+                  <p className="text-sm font-black animate-pulse">Checking local banking gateways...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="w-14 h-14 shrink-0 bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+                      <Lock className="w-6 h-6 text-white animate-pulse" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-black text-rose-500 tracking-tight">
+                        Service Restricted
+                      </h3>
+                      <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-slate-400 dark:text-gray-500" />
+                        Detected Region: <span className="text-slate-700 dark:text-gray-300 normal-case font-black">{locationString || "your region"}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-inner space-y-4">
+                    <h4 className="text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-indigo-500" /> Direct Bank Transfer (ACH / SEPA / SWIFT)
+                    </h4>
+                    <p className="text-sm text-slate-500 dark:text-gray-400 leading-relaxed">
+                      Direct Bank Deposits are currently restricted in your detected region of{" "}
+                      <strong className="text-slate-900 dark:text-white">{locationString || "your region"}</strong>. Due to strict compliance guidelines, local banking licensing, and international anti-money laundering regulations, standard wire options cannot be processed in your jurisdiction.
+                    </p>
+                    <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl flex gap-3.5 items-start mt-4">
+                      <Info className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h5 className="text-xs font-black text-slate-800 dark:text-white mb-0.5">Recommended Alternative</h5>
+                        <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">
+                          To deposit instantly, please switch to the <strong className="text-indigo-500 dark:text-indigo-400 cursor-pointer hover:underline" onClick={() => setActiveTab("crypto")}>USDT (TRC20)</strong> method. Cryptocurrency deposits are globally accessible, execute in under 15 minutes, and incur zero local transaction processing fees.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
