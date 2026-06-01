@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, type, amount, advertiserName, price, paymentMethods, action } = body;
+    const { email, type, amount, advertiserName, price, paymentMethods, action, currency, minLimit, maxLimit } = body;
     if (!email) return NextResponse.json({ error: "Missing email" }, { status: 400 });
 
     const user = await getUser(email);
@@ -35,6 +35,19 @@ export async function POST(req: Request) {
         blockedUntil,
         confirmed: (user as any).p2pBlockedConfirmed || false
       }, { status: 403 });
+    }
+
+    // CHECK_BLOCK: verify incomplete trade count without creating a record
+    if (action === "check_block") {
+      const requests = await getP2PRequests();
+      const userIncomplete = requests.filter((r: any) => r.email === email && r.status !== "COMPLETED");
+      if (userIncomplete.length >= 3) {
+        const blockTime = Date.now() + 12 * 60 * 60 * 1000;
+        const updatedUser = { ...user, p2pBlockedUntil: blockTime, p2pBlockedConfirmed: false };
+        await saveUser(updatedUser);
+        return NextResponse.json({ error: "BLOCKED", blockedUntil: blockTime, confirmed: false }, { status: 403 });
+      }
+      return NextResponse.json({ ok: true });
     }
 
     if (!type || !amount) {
@@ -72,7 +85,10 @@ export async function POST(req: Request) {
       sellerName: advertiserName || "UEA_EXCHANGE",
       usdPrice: price ? Number(price) : 1.00,
       banks: paymentMethods ? (Array.isArray(paymentMethods) ? paymentMethods.join(", ") : paymentMethods) : "Bank Transfer",
-      trustRate: "99.3% completion"
+      trustRate: "99.3% completion",
+      currency: currency || "USD",
+      minLimit: minLimit ? Number(minLimit) : 0,
+      maxLimit: maxLimit ? Number(maxLimit) : 0
     };
     
     requests.push(newRequest);

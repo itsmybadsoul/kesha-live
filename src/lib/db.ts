@@ -426,6 +426,10 @@ export interface P2PRequest {
   usdPrice?: number;
   banks?: string;
   trustRate?: string;
+  minLimit?: number;
+  maxLimit?: number;
+  availableAmount?: number;
+  currency?: string;
 }
 
 export interface ChatMessage {

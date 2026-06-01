@@ -191,12 +191,12 @@ export default function P2PPage() {
       return;
     }
     
-    // Check if user is blocked or has too many active trades
+    // Check if user is blocked or has too many active trades (no trade is created here)
     try {
       const checkRes = await fetch("/api/p2p", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email, type: "CHECK_BLOCK", amount: 1 })
+        body: JSON.stringify({ email: user.email, action: "check_block" })
       });
       const checkData = await checkRes.json();
       if (!checkRes.ok && checkData.error === "BLOCKED") {
@@ -230,10 +230,14 @@ export default function P2PPage() {
         body: JSON.stringify({
           email: user?.email,
           type: activeTab,
-          amount: parseFloat(usdEquivalent.toFixed(2)),
+          amount: parseFloat(usdEquivalent.toFixed(4)),
           advertiserName: tradeModalOffer.advertiserName,
           price: tradeModalOffer.price,
-          paymentMethods: tradeModalOffer.paymentMethods
+          paymentMethods: tradeModalOffer.paymentMethods,
+          minLimit: tradeModalOffer.minLimit,
+          maxLimit: tradeModalOffer.maxLimit,
+          availableAmount: tradeModalOffer.availableAmount,
+          currency: selectedCurrency
         })
       });
       
@@ -459,24 +463,41 @@ export default function P2PPage() {
                 </h2>
               </div>
 
-              <div className="space-y-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800/80 p-4 rounded-2xl mb-6 shadow-sm">
+              <div className="space-y-3 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800/80 p-4 rounded-2xl mb-6 shadow-sm">
                 <div className="grid grid-cols-2 gap-y-3.5 text-xs font-semibold">
-                  <div>
+                  <div className="col-span-2">
                     <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Trading Partner</span>
                     <span className="font-bold text-slate-800 dark:text-slate-200">{activeRequest.sellerName}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">USD Rate</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">${activeRequest.usdPrice}</span>
-                  </div>
                   <div className="col-span-2 border-t border-slate-100 dark:border-gray-800 my-1"></div>
                   <div>
-                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Amount</span>
-                    <span className="font-mono font-bold text-emerald-500">${activeRequest.amount} USDT</span>
+                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Price / USDT</span>
+                    <span className="font-mono font-bold text-indigo-500">${activeRequest.usdPrice?.toFixed(4)}</span>
                   </div>
                   <div>
+                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Currency</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{activeRequest.currency || "USD"}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Your Amount</span>
+                    <span className="font-mono font-bold text-emerald-500">{activeRequest.amount?.toFixed(4)} USDT</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Available</span>
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{activeRequest.availableAmount ? activeRequest.availableAmount.toLocaleString() + " USDT" : "—"}</span>
+                  </div>
+                  {(activeRequest.minLimit || activeRequest.maxLimit) && (
+                    <div className="col-span-2">
+                      <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Order Limits</span>
+                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
+                        {activeRequest.minLimit?.toLocaleString()} – {activeRequest.maxLimit?.toLocaleString()} {activeRequest.currency || "USD"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="col-span-2 border-t border-slate-100 dark:border-gray-800 my-1"></div>
+                  <div className="col-span-2">
                     <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Payment Method</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 truncate block max-w-[120px]">{activeRequest.banks}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">{activeRequest.banks}</span>
                   </div>
                 </div>
               </div>
@@ -758,7 +779,7 @@ export default function P2PPage() {
                       <th className="px-8 py-5">Advertisers</th>
                       <th className="px-8 py-5">Price per USDT</th>
                       <th className="px-8 py-5">Available / Order Limits</th>
-                      <th className="px-8 py-5">Payment Channels (Hover/Click)</th>
+                      <th className="px-8 py-5">Payment Channels</th>
                       <th className="px-8 py-5 text-right">Trade Desk</th>
                     </tr>
                   </thead>
@@ -843,26 +864,23 @@ export default function P2PPage() {
                               </div>
                             </td>
 
-                            {/* Payment Methods (Hidden/Blurred) */}
+                            {/* Payment Methods — permanently blurred, only admin sees them */}
                             <td className="px-8 py-6.5">
-                              <div className="relative group/payment w-fit">
-                                <div 
-                                  className="flex flex-wrap gap-1.5 transition-all duration-300 filter blur-md hover:blur-none select-none cursor-pointer"
-                                  title="Privacy Locked: Hover to reveal payment details"
-                                >
+                              <div className="relative w-fit select-none">
+                                <div className="flex flex-wrap gap-1.5 filter blur-md pointer-events-none" aria-hidden="true">
                                   {offer.paymentMethods.map((m) => (
-                                    <span 
-                                      key={m} 
-                                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/5 text-indigo-550 dark:text-indigo-400 border border-indigo-500/10 rounded-xl text-[10px] font-black uppercase tracking-wider"
+                                    <span
+                                      key={m}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/5 text-indigo-400 border border-indigo-500/10 rounded-xl text-[10px] font-black uppercase tracking-wider"
                                     >
                                       <Building2 className="w-3 h-3" />
                                       {m}
                                     </span>
                                   ))}
                                 </div>
-                                <div className="absolute inset-0 bg-transparent group-hover/payment:hidden flex items-center justify-center pointer-events-none">
-                                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-450 dark:text-gray-500 bg-white/80 dark:bg-gray-900/90 px-2 py-1 rounded border border-slate-200 dark:border-gray-800 shadow-sm flex items-center gap-1">
-                                    <Lock className="w-2.5 h-2.5" /> Hidden Payment
+                                <div className="absolute inset-0 flex items-center justify-start pointer-events-none">
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-500 bg-white/80 dark:bg-gray-900/90 px-2 py-1 rounded border border-slate-200 dark:border-gray-800 shadow-sm flex items-center gap-1">
+                                    <Lock className="w-2.5 h-2.5" /> Privacy Protected
                                   </span>
                                 </div>
                               </div>
