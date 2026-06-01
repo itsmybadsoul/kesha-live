@@ -264,6 +264,19 @@ export default function P2PPage() {
       return;
     }
 
+    // Validate SELL ads: available amount cannot exceed user's actual USDT holdings
+    if (adTab === "SELL") {
+      const usdtHoldings = user.holdings?.["USDT"] || 0;
+      if (parseFloat(adAmount) > usdtHoldings) {
+        toast(`Insufficient USDT balance. You only have ${usdtHoldings.toFixed(4)} USDT available.`, "error");
+        return;
+      }
+      if (usdtHoldings <= 0) {
+        toast("You have no USDT balance to sell.", "error");
+        return;
+      }
+    }
+
     const finalPayments = [...adPaymentMethods];
     if (adCustomPayment.trim()) {
       finalPayments.push(adCustomPayment.trim());
@@ -1421,18 +1434,54 @@ export default function P2PPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
-                    Available Amount (USDT Volume)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={adAmount}
-                    onChange={(e) => setAdAmount(e.target.value)}
-                    placeholder="e.g. 500.00"
-                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      Available Amount (USDT Volume)
+                    </label>
+                    {adTab === "SELL" && (
+                      <span className="text-[10px] text-indigo-400 font-bold">
+                        Balance: {(user?.holdings?.["USDT"] || 0).toFixed(4)} USDT
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      required
+                      value={adAmount}
+                      max={adTab === "SELL" ? (user?.holdings?.["USDT"] || 0) : undefined}
+                      onChange={(e) => {
+                        if (adTab === "SELL") {
+                          const maxUSDT = user?.holdings?.["USDT"] || 0;
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val) && val > maxUSDT) {
+                            setAdAmount(maxUSDT.toFixed(4));
+                          } else {
+                            setAdAmount(e.target.value);
+                          }
+                        } else {
+                          setAdAmount(e.target.value);
+                        }
+                      }}
+                      placeholder={adTab === "SELL" ? `Max: ${(user?.holdings?.["USDT"] || 0).toFixed(2)} USDT` : "e.g. 500.00"}
+                      className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 pr-16 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                    />
+                    {adTab === "SELL" && (
+                      <button
+                        type="button"
+                        onClick={() => setAdAmount((user?.holdings?.["USDT"] || 0).toFixed(4))}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase tracking-wider bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                      >
+                        MAX
+                      </button>
+                    )}
+                  </div>
+                  {adTab === "SELL" && parseFloat(adAmount) > (user?.holdings?.["USDT"] || 0) && (
+                    <p className="text-[10px] text-rose-500 font-bold mt-1">
+                      ⚠ Exceeds your USDT balance of {(user?.holdings?.["USDT"] || 0).toFixed(4)} USDT
+                    </p>
+                  )}
                 </div>
               </div>
 
