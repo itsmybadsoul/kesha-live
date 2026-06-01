@@ -15,6 +15,8 @@ export interface P2POffer {
   maxLimit: number;
   paymentMethods: string[];
   isPromoted: boolean;
+  userEmail?: string;
+  isUserOffer?: boolean;
 }
 
 interface PriceRange {
@@ -29,6 +31,16 @@ const DEFAULT_PRICE_RANGE: PriceRange = {
   buyMax: 1.045,
   sellMin: 0.960,
   sellMax: 0.998,
+};
+
+const CURRENCY_RATES: Record<string, number> = {
+  USD: 1.0,
+  EGP: 50.0,
+  EUR: 0.92,
+  GBP: 0.79,
+  AED: 3.67,
+  SAR: 3.75,
+  TRY: 32.5
 };
 
 /** Generates a natural-looking fractional price within [min, max] */
@@ -176,6 +188,38 @@ export async function POST(req: NextRequest) {
 
     const raw = await getKV("p2p_offers_v2");
     let offers: P2POffer[] = raw ? JSON.parse(raw) : generateDefaultOffers(range);
+
+    if (action === "create_user_offer") {
+      const { advertiserName, type, price, availableAmount, minLimit, maxLimit, paymentMethods, currency, userEmail } = body;
+      if (!advertiserName || !type || !price || !availableAmount || !userEmail) {
+        return NextResponse.json({ error: "Missing required fields for user advertisement" }, { status: 400 });
+      }
+
+      const rate = CURRENCY_RATES[currency || "USD"] || 1.0;
+      const usdPrice = Number(price) / rate;
+
+      const newOffer: P2POffer = {
+        id: `user_offer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type,
+        advertiserName,
+        ordersCount: 0,
+        completionRate: 0,
+        likeRate: 0,
+        timeLimit: 15,
+        price: parseFloat(usdPrice.toFixed(4)),
+        availableAmount: Number(availableAmount),
+        minLimit: Number(minLimit) / rate,
+        maxLimit: Number(maxLimit) / rate,
+        paymentMethods: Array.isArray(paymentMethods) ? paymentMethods : [paymentMethods],
+        isPromoted: false,
+        userEmail,
+        isUserOffer: true
+      };
+
+      offers.unshift(newOffer);
+      await putKV("p2p_offers_v2", JSON.stringify(offers));
+      return NextResponse.json({ success: true, offer: newOffer });
+    }
 
     if (action === "update") {
       const idx = offers.findIndex(o => o.id === offer.id);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getP2PRequests, saveP2PRequests, P2PRequest, getUser, saveUser } from "@/lib/db";
+import { getP2PRequests, saveP2PRequests, P2PRequest, getUser, saveUser, getP2PChat, saveP2PChat, ChatMessage } from "@/lib/db";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -14,7 +14,40 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, type, amount, advertiserName, price, paymentMethods, action, currency, minLimit, maxLimit } = body;
+    const { email, type, amount, advertiserName, price, paymentMethods, action, currency, minLimit, maxLimit, userEmail, counterpartName, country } = body;
+
+    if (action === "admin_create_trade") {
+      const targetEmail = userEmail || email;
+      if (!targetEmail) return NextResponse.json({ error: "Missing user email" }, { status: 400 });
+
+      const clientUser = await getUser(targetEmail);
+      if (!clientUser) return NextResponse.json({ error: "Client user not found" }, { status: 404 });
+
+      const requests = await getP2PRequests();
+      const newRequest: P2PRequest = {
+        id: `p2p_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        email: targetEmail,
+        type: type || "SELL",
+        amount: Number(amount),
+        status: "APPROVED",
+        createdAt: Date.now(),
+        sellerName: counterpartName || "Visitor",
+        usdPrice: price ? Number(price) : 1.00,
+        banks: paymentMethods ? (Array.isArray(paymentMethods) ? paymentMethods.join(", ") : paymentMethods) : "Bank Transfer",
+        trustRate: "New Trader",
+        currency: currency || "USD",
+        minLimit: 0,
+        maxLimit: 0,
+        banksConfirmed: true,
+        country: country || "Unknown",
+        isVisitorChat: true
+      };
+
+      requests.push(newRequest);
+      await saveP2PRequests(requests);
+      return NextResponse.json({ success: true, request: newRequest });
+    }
+
     if (!email) return NextResponse.json({ error: "Missing email" }, { status: 400 });
 
     const user = await getUser(email);
@@ -104,7 +137,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { id, action } = await req.json();
+    const { id, action, messageId } = await req.json();
     if (!id || !action) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
     const requests = await getP2PRequests();
@@ -113,7 +146,26 @@ export async function PUT(req: Request) {
 
     const reqData = requests[index];
 
-    if (action === "complete") {
+    if (action === "accept_payment_request") {
+      if (!messageId) return NextResponse.json({ error: "Missing messageId" }, { status: 400 });
+      const messages = await getP2PChat(id);
+      const msgIndex = messages.findIndex(m => m.id === messageId);
+      if (msgIndex !== -1 && messages[msgIndex].isPaymentRequest) {
+        messages[msgIndex].paymentRequestStatus = "PAID";
+        const requestedAmount = messages[msgIndex].paymentRequestAmount;
+        if (requestedAmount) {
+          requests[index].amount = requestedAmount;
+        }
+        messages.push({
+          id: `msg_sys_${Date.now()}`,
+          sender: "ADMIN",
+          senderName: "System",
+          text: `Payment request of $${requestedAmount} USDT accepted and paid. Escrow amount has been updated.`,
+          timestamp: Date.now()
+        });
+        await saveP2PChat(id, messages);
+      }
+    } else if (action === "complete") {
       requests[index].status = "COMPLETED";
       
       const user = await getUser(reqData.email);

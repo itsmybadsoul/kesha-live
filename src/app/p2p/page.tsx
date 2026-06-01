@@ -10,7 +10,8 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { 
   ArrowLeft, Wallet, Globe, Lock, Info, CheckCircle2, Copy, 
   Building2, ShieldCheck, XCircle, Search, HelpCircle, 
-  ArrowRightLeft, Send, Image as ImageIcon, ChevronDown, Check, Clock 
+  ArrowRightLeft, Send, Image as ImageIcon, ChevronDown, Check, Clock,
+  LifeBuoy, ShieldAlert
 } from "lucide-react";
 
 interface P2POffer {
@@ -73,6 +74,31 @@ export default function P2PPage() {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockedUntil, setBlockedUntil] = useState(0);
 
+  // New Ad Creation states
+  const [showAdRulesModal, setShowAdRulesModal] = useState(false);
+  const [showAdCreateModal, setShowAdCreateModal] = useState(false);
+  const [rulesText, setRulesText] = useState("");
+  const [loadingRules, setLoadingRules] = useState(false);
+  const [rulesAccepted, setRulesAccepted] = useState(false);
+
+  // Ad Form states
+  const [adTab, setAdTab] = useState<"BUY" | "SELL">("BUY");
+  const [adCurrency, setAdCurrency] = useState("SAR");
+  const [adPrice, setAdPrice] = useState("");
+  const [adAmount, setAdAmount] = useState("");
+  const [adMinLimit, setAdMinLimit] = useState("");
+  const [adMaxLimit, setAdMaxLimit] = useState("");
+  const [adAdvertiserName, setAdAdvertiserName] = useState("");
+  const [adPaymentMethods, setAdPaymentMethods] = useState<string[]>([]);
+  const [adCustomPayment, setAdCustomPayment] = useState("");
+  const [submittingAd, setSubmittingAd] = useState(false);
+
+  // Support Portal state
+  const [showSupportPortal, setShowSupportPortal] = useState(false);
+  const [supportSubject, setSupportSubject] = useState("P2P Dispute");
+  const [supportMessage, setSupportMessage] = useState("");
+  const [submittingSupport, setSubmittingSupport] = useState(false);
+
   // Chat timers & refs
   const [elapsed, setElapsed] = useState(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -122,10 +148,20 @@ export default function P2PPage() {
   const fetchActiveRequest = async () => {
     if (!user) return;
     try {
+      const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const chatIdParam = searchParams?.get("chatId");
+
       const res = await fetch(`/api/p2p?email=${encodeURIComponent(user.email)}`);
       if (res.ok) {
         const data = await res.json();
         if (data.requests) {
+          if (chatIdParam) {
+            const specific = data.requests.find((r: any) => r.id === chatIdParam);
+            if (specific) {
+              setActiveRequest(specific);
+              return;
+            }
+          }
           const active = data.requests.find((r: any) => r.status !== "COMPLETED");
           if (active) {
             setActiveRequest(active);
@@ -184,6 +220,132 @@ export default function P2PPage() {
   useEffect(() => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   }, [chatMessages]);
+
+  // Fetch rules disclaimer text
+  useEffect(() => {
+    if (showAdRulesModal) {
+      setLoadingRules(true);
+      fetch("/api/p2p/rules")
+        .then(res => res.json())
+        .then(data => {
+          if (data.rules) setRulesText(data.rules);
+        })
+        .catch(err => console.error(err))
+        .finally(() => setLoadingRules(false));
+    }
+  }, [showAdRulesModal]);
+
+  // Pre-fill user pseudonym
+  useEffect(() => {
+    if (user && !adAdvertiserName) {
+      const prefix = user.email.split("@")[0];
+      setAdAdvertiserName(prefix);
+    }
+  }, [user, adAdvertiserName]);
+
+  const handlePostAd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adAdvertiserName.trim() || !adPrice || !adAmount || !user?.email) {
+      toast("Please fill in all required fields", "warning");
+      return;
+    }
+
+    const finalPayments = [...adPaymentMethods];
+    if (adCustomPayment.trim()) {
+      finalPayments.push(adCustomPayment.trim());
+    }
+    if (finalPayments.length === 0) {
+      toast("Please select at least one payment method", "warning");
+      return;
+    }
+
+    setSubmittingAd(true);
+    try {
+      const res = await fetch("/api/p2p/offers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create_user_offer",
+          advertiserName: adAdvertiserName,
+          type: adTab,
+          price: parseFloat(adPrice),
+          availableAmount: parseFloat(adAmount),
+          minLimit: parseFloat(adMinLimit || "0"),
+          maxLimit: parseFloat(adMaxLimit || "0"),
+          paymentMethods: finalPayments,
+          currency: adCurrency,
+          userEmail: user.email
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast("Advertisement published successfully!", "success");
+        setShowAdCreateModal(false);
+        setAdPrice("");
+        setAdAmount("");
+        setAdMinLimit("");
+        setAdMaxLimit("");
+        setAdPaymentMethods([]);
+        setAdCustomPayment("");
+        fetchOffers();
+      } else {
+        toast(data.error || "Failed to post advertisement", "error");
+      }
+    } catch (err) {
+      toast("Error communicating with P2P server", "error");
+    } finally {
+      setSubmittingAd(false);
+    }
+  };
+
+  const handleSupportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportMessage.trim() || !user?.email) return;
+    setSubmittingSupport(true);
+    try {
+      const res = await fetch("/api/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          subject: `[P2P Active Trade] ${supportSubject}`,
+          message: `Trade ID: ${activeRequest ? activeRequest.id : "None"} | Counterpart: ${activeRequest ? activeRequest.sellerName : "None"} | Issue: ${supportMessage}`
+        })
+      });
+      if (res.ok) {
+        toast("Support request submitted successfully!", "success");
+        setSupportMessage("");
+        setShowSupportPortal(false);
+      } else {
+        toast("Failed to submit support ticket", "error");
+      }
+    } catch (err) {
+      toast("Error submitting support request", "error");
+    } finally {
+      setSubmittingSupport(false);
+    }
+  };
+
+  const handleAcceptPaymentRequest = async (msgId: string) => {
+    if (!activeRequest) return;
+    if (!confirm("Confirm and accept this updated payment amount? This will adjust the escrow amount of the active trade.")) return;
+    try {
+      const res = await fetch("/api/p2p", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: activeRequest.id, action: "accept_payment_request", messageId: msgId })
+      });
+      if (res.ok) {
+        toast("Payment request accepted and updated!", "success");
+        fetchActiveRequest();
+        fetchChat();
+      } else {
+        toast("Failed to accept payment request", "error");
+      }
+    } catch (err) {
+      toast("Error updating transaction details", "error");
+    }
+  };
 
   const handleStartTrade = async (offer: P2POffer) => {
     if (!user) {
@@ -551,6 +713,12 @@ export default function P2PPage() {
                 >
                   Cancel Trade Session
                 </button>
+                <button
+                  onClick={() => setShowSupportPortal(true)}
+                  className="w-full bg-indigo-600/10 hover:bg-indigo-650/20 text-indigo-500 font-bold py-3 rounded-xl transition-all cursor-pointer text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 border border-indigo-500/10"
+                >
+                  <LifeBuoy className="w-4 h-4 text-indigo-500" /> Contact Support Portal
+                </button>
               </div>
             </div>
 
@@ -578,20 +746,66 @@ export default function P2PPage() {
                 ) : (
                   chatMessages.map((msg, i) => {
                     const isUser = msg.sender === "USER";
+                    const displayName = msg.senderName || (isUser ? "You" : activeRequest.sellerName);
+                    const isSystem = msg.senderName === "System";
+
+                    if (isSystem) {
+                      return (
+                        <div key={i} className="flex justify-center my-3 w-full">
+                          <div className="bg-slate-100 dark:bg-gray-800/60 text-slate-500 dark:text-gray-400 border border-slate-200 dark:border-gray-800 text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-2xl">
+                            {msg.text}
+                          </div>
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={i} className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}>
                         <div className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1.5">
-                          {isUser ? "You" : activeRequest.sellerName} • {new Date(msg.timestamp).toLocaleTimeString()}
+                          {displayName} • {new Date(msg.timestamp).toLocaleTimeString()}
                         </div>
                         <div className={`max-w-[70%] rounded-2xl p-4 text-sm shadow-md ${
                           isUser 
                             ? "bg-indigo-600 text-white rounded-br-none" 
                             : "bg-white dark:bg-gray-800 text-slate-900 dark:text-white rounded-bl-none border border-slate-200 dark:border-gray-700/80"
                         }`}>
-                          {msg.image && (
-                            <img src={msg.image} alt="attachment" className="max-w-full h-auto rounded-xl mb-3 border border-black/10 shadow-sm" />
+                          {msg.isPaymentRequest ? (
+                            <div className="space-y-3 text-left">
+                              <div className="flex items-center gap-2 text-amber-500 font-black uppercase text-[10px] tracking-wider border-b border-amber-500/10 pb-1.5">
+                                <ShieldCheck className="w-4 h-4" /> Peer Invoice Request
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-lg font-mono font-black text-slate-900 dark:text-white">
+                                  ${msg.paymentRequestAmount?.toFixed(2)} USDT
+                                </div>
+                                <div className="text-[10px] text-slate-450 dark:text-gray-400 font-bold font-mono">
+                                  ~{(Number(msg.paymentRequestAmount) * 3.75).toFixed(2)} SAR (Saudi Riyal equivalent)
+                                </div>
+                              </div>
+                              {msg.text && <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed italic">{msg.text}</p>}
+                              <div className="pt-1">
+                                {msg.paymentRequestStatus === "PAID" ? (
+                                  <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg">
+                                    ✓ Accepted & Escrow Updated
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => handleAcceptPaymentRequest(msg.id)}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow transition-all active:scale-95 cursor-pointer"
+                                  >
+                                    Accept & Pay Invoice
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              {msg.image && (
+                                <img src={msg.image} alt="attachment" className="max-w-full h-auto rounded-xl mb-3 border border-black/10 shadow-sm" />
+                              )}
+                              {msg.text && <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.text}</p>}
+                            </>
                           )}
-                          {msg.text && <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.text}</p>}
                         </div>
                       </div>
                     );
@@ -645,7 +859,7 @@ export default function P2PPage() {
           <div className="space-y-6">
             
             {/* Header section with description */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-gray-900/40 p-6 md:p-8 rounded-[2.5rem] border border-slate-200 dark:border-gray-800 shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white dark:bg-gray-900/40 p-6 md:p-8 rounded-[2.5rem] border border-slate-200 dark:border-gray-800 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] pointer-events-none"></div>
               <div>
                 <h1 className="text-3xl font-black tracking-tight mb-2 uppercase italic flex items-center gap-3">
@@ -655,27 +869,38 @@ export default function P2PPage() {
                   Peer-to-Peer trading board. Buy or sell USDT directly with regional payment channels. Security is assured via lockbox smart contracts.
                 </p>
               </div>
-              <div className="flex bg-slate-100 dark:bg-gray-900/60 p-1.5 rounded-2xl border border-slate-200/50 dark:border-gray-800/80 backdrop-blur-md">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
                 <button
-                  onClick={() => setActiveTab("BUY")}
-                  className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                    activeTab === "BUY"
-                      ? "bg-white dark:bg-gray-800 text-emerald-500 shadow-md scale-[1.02] border border-slate-200/50 dark:border-gray-700/30"
-                      : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-slate-200"
-                  }`}
+                  onClick={() => {
+                    setRulesAccepted(false);
+                    setShowAdRulesModal(true);
+                  }}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-600/10 active:scale-95 cursor-pointer whitespace-nowrap"
                 >
-                  Buy
+                  Post My Advertisement
                 </button>
-                <button
-                  onClick={() => setActiveTab("SELL")}
-                  className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                    activeTab === "SELL"
-                      ? "bg-white dark:bg-gray-800 text-rose-500 shadow-md scale-[1.02] border border-slate-200/50 dark:border-gray-700/30"
-                      : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-slate-200"
-                  }`}
-                >
-                  Sell
-                </button>
+                <div className="flex bg-slate-100 dark:bg-gray-900/60 p-1.5 rounded-2xl border border-slate-200/50 dark:border-gray-800/80 backdrop-blur-md shrink-0">
+                  <button
+                    onClick={() => setActiveTab("BUY")}
+                    className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                      activeTab === "BUY"
+                        ? "bg-white dark:bg-gray-800 text-emerald-500 shadow-md scale-[1.02] border border-slate-200/50 dark:border-gray-700/30"
+                        : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-slate-200"
+                    }`}
+                  >
+                    Buy
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("SELL")}
+                    className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                      activeTab === "SELL"
+                        ? "bg-white dark:bg-gray-800 text-rose-500 shadow-md scale-[1.02] border border-slate-200/50 dark:border-gray-700/30"
+                        : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-slate-200"
+                    }`}
+                  >
+                    Sell
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -834,9 +1059,15 @@ export default function P2PPage() {
                                     )}
                                   </div>
                                   <div className="text-[10px] text-slate-450 dark:text-gray-500 font-semibold tracking-wide">
-                                    {offer.ordersCount} orders <span className="text-slate-300 dark:text-gray-800">|</span> {offer.completionRate}% completion
-                                    <br />
-                                    👍 {offer.likeRate}% thumbs up <span className="text-slate-300 dark:text-gray-800">|</span> ⏳ {offer.timeLimit} min limit
+                                    {offer.ordersCount === 0 ? (
+                                      <span className="text-amber-500 font-black uppercase text-[9px] tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/10">New User (No rating yet)</span>
+                                    ) : (
+                                      <>
+                                        {offer.ordersCount} orders <span className="text-slate-300 dark:text-gray-800">|</span> {offer.completionRate}% completion
+                                        <br />
+                                        👍 {offer.likeRate}% thumbs up <span className="text-slate-300 dark:text-gray-800">|</span> ⏳ {offer.timeLimit} min limit
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -1040,6 +1271,301 @@ export default function P2PPage() {
             >
               I Confirm & Acknowledge
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* P2P RULES ACCEPTANCE MODAL */}
+      {showAdRulesModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-[2rem] max-w-lg w-full shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-gray-800">
+              <h3 className="text-lg font-black uppercase tracking-wider text-indigo-500">P2P Secure Trading Rules</h3>
+              <button 
+                onClick={() => setShowAdRulesModal(false)}
+                className="p-1.5 bg-slate-50 dark:bg-gray-800 text-slate-400 hover:text-rose-500 rounded-full cursor-pointer border border-slate-200 dark:border-gray-700 shadow-sm"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            {loadingRules ? (
+              <div className="py-12 text-center">
+                <Clock className="w-8 h-8 mx-auto mb-2 text-indigo-400 animate-spin" />
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Loading rules disclaimer...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-xs text-slate-650 dark:text-gray-300 space-y-2 bg-slate-50 dark:bg-gray-950 p-4 rounded-xl border border-slate-200 dark:border-gray-850 max-h-60 overflow-y-auto whitespace-pre-wrap leading-relaxed font-medium">
+                  {rulesText}
+                </div>
+
+                <div className="flex items-start gap-2.5 pt-2">
+                  <input
+                    type="checkbox"
+                    id="accept-rules"
+                    checked={rulesAccepted}
+                    onChange={(e) => setRulesAccepted(e.target.checked)}
+                    className="mt-1 accent-indigo-500 w-4 h-4 shrink-0 cursor-pointer"
+                  />
+                  <label htmlFor="accept-rules" className="text-[11px] text-slate-505 dark:text-gray-400 leading-normal font-semibold cursor-pointer">
+                    I have read, understood, and explicitly agree to the P2P Secure Trading Rules and Escrow Lockup policy.
+                  </label>
+                </div>
+
+                <button
+                  disabled={!rulesAccepted}
+                  onClick={() => {
+                    setShowAdRulesModal(false);
+                    setShowAdCreateModal(true);
+                  }}
+                  className="w-full mt-3 py-3.5 bg-indigo-600 hover:bg-indigo-550 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
+                >
+                  Accept & Continue to Create Ad
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* P2P AD CREATION MODAL */}
+      {showAdCreateModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-[2rem] max-w-xl w-full shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-100 dark:border-gray-800">
+              <h3 className="text-lg font-black uppercase tracking-wider text-indigo-500">Post My P2P Advertisement</h3>
+              <button 
+                onClick={() => setShowAdCreateModal(false)}
+                className="p-1.5 bg-slate-50 dark:bg-gray-800 text-slate-400 hover:text-rose-500 rounded-full cursor-pointer border border-slate-200 dark:border-gray-700 shadow-sm"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handlePostAd} className="space-y-4 text-xs font-semibold">
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Trade Type</label>
+                  <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-gray-950 p-1 rounded-xl border border-slate-200 dark:border-gray-850">
+                    <button
+                      type="button"
+                      onClick={() => setAdTab("BUY")}
+                      className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        adTab === "BUY" ? "bg-white dark:bg-gray-850 text-emerald-500 shadow-sm" : "text-slate-500"
+                      }`}
+                    >
+                      Buy USDT
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdTab("SELL")}
+                      className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        adTab === "SELL" ? "bg-white dark:bg-gray-855 text-rose-500 shadow-sm" : "text-slate-500"
+                      }`}
+                    >
+                      Sell USDT
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Target Currency</label>
+                  <select
+                    value={adCurrency}
+                    onChange={(e) => setAdCurrency(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="SAR">SAR - Saudi Riyal</option>
+                    <option value="AED">AED - UAE Dirham</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EGP">EGP - Egyptian Pound</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="TRY">TRY - Turkish Lira</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                    Price Rate (Per USDT in {adCurrency})
+                  </label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    required
+                    value={adPrice}
+                    onChange={(e) => setAdPrice(e.target.value)}
+                    placeholder={`e.g. ${adCurrency === "SAR" ? "3.75" : "1.00"}`}
+                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                  {adPrice && (
+                    <span className="text-[10px] text-indigo-500 font-bold block mt-1 font-mono">
+                      USD rate: ${(parseFloat(adPrice) / (CURRENCY_RATES[adCurrency]?.rate || 1.0)).toFixed(4)} USD/USDT
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                    Available Amount (USDT Volume)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={adAmount}
+                    onChange={(e) => setAdAmount(e.target.value)}
+                    placeholder="e.g. 500.00"
+                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                    Min Trade Limit ({adCurrency})
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    value={adMinLimit}
+                    onChange={(e) => setAdMinLimit(e.target.value)}
+                    placeholder="e.g. 50"
+                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                    Max Trade Limit ({adCurrency})
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    value={adMaxLimit}
+                    onChange={(e) => setAdMaxLimit(e.target.value)}
+                    placeholder="e.g. 1000"
+                    className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">
+                  Pseudonym Advertiser Nickname
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={adAdvertiserName}
+                  onChange={(e) => setAdAdvertiserName(e.target.value)}
+                  placeholder="Your advertiser profile nickname"
+                  className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Payment Channels</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 dark:bg-gray-950 p-3 rounded-xl border border-slate-200 dark:border-gray-850">
+                  {["Bank Transfer", "InstaPay", "Vodafone Cash", "Fawry", "CIB Bank", "NBE Bank"].map((m) => {
+                    const selected = adPaymentMethods.includes(m);
+                    return (
+                      <button
+                        type="button"
+                        key={m}
+                        onClick={() => {
+                          if (selected) setAdPaymentMethods(adPaymentMethods.filter(x => x !== m));
+                          else setAdPaymentMethods([...adPaymentMethods, m]);
+                        }}
+                        className={`px-3 py-2 text-[10px] font-black rounded-lg uppercase tracking-wider text-center transition-all cursor-pointer border ${
+                          selected
+                            ? "bg-indigo-650/10 text-indigo-500 border-indigo-500/25 shadow-sm"
+                            : "bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-500"
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Custom Bank Transfer Instructions (Optional)</label>
+                <input
+                  type="text"
+                  value={adCustomPayment}
+                  onChange={(e) => setAdCustomPayment(e.target.value)}
+                  placeholder="e.g. Bank: Al Rajhi Bank, IBAN SA0328900000..."
+                  className="w-full bg-slate-50 dark:bg-gray-955 border border-slate-205 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submittingAd}
+                className="w-full mt-2 py-4 bg-indigo-655 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer disabled:opacity-60"
+              >
+                {submittingAd ? "Publishing Advertisement..." : "Publish P2P Advertisement"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* SUPPORT DISPUTE MODAL */}
+      {showSupportPortal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-[2rem] max-w-md w-full shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <div className="p-1 border-b border-slate-100 dark:border-gray-800 flex justify-between items-center mb-4 bg-slate-50 dark:bg-gray-950/20">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-indigo-500 animate-pulse" />
+                <span className="font-black text-xs uppercase tracking-wider">P2P Escrow Dispute Center</span>
+              </div>
+              <button
+                onClick={() => setShowSupportPortal(false)}
+                className="p-1.5 bg-slate-50 dark:bg-gray-855 text-slate-400 hover:text-rose-500 rounded-full border border-slate-200 dark:border-gray-800 transition-colors cursor-pointer"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSupportSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Reason for Dispute</label>
+                <select
+                  value={supportSubject}
+                  onChange={(e) => setSupportSubject(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 font-semibold focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="P2P Dispute">Counterpart is unresponsive</option>
+                  <option value="Payment Issue">Payment sent but assets not released</option>
+                  <option value="Fraud Hold">Third-party payment detected</option>
+                  <option value="Disagreement">Trade amount or exchange rate dispute</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Describe the Dispute</label>
+                <textarea
+                  rows={4}
+                  value={supportMessage}
+                  onChange={(e) => setSupportMessage(e.target.value)}
+                  placeholder="Explain exactly what happened, and attach payment transaction details or bank names. The escrow security officer will review this session chat logs."
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 font-semibold focus:outline-none focus:border-indigo-500"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submittingSupport}
+                className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer disabled:opacity-60"
+              >
+                {submittingSupport ? "Filing Official Dispute Ticket..." : "File Dispute Ticket"}
+              </button>
+            </form>
           </div>
         </div>
       )}

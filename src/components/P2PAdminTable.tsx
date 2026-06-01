@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/context/ToastContext";
 import {
   CheckCircle2, XCircle, ArrowRightLeft, ShieldCheck,
-  Send, Image as ImageIcon, Trash2, Settings2, RefreshCw
+  Send, Image as ImageIcon, Trash2, Settings2, RefreshCw,
+  Users, FileText, DollarSign, MessageCircle
 } from "lucide-react";
 
 export function P2PAdminTable() {
@@ -19,7 +20,7 @@ export function P2PAdminTable() {
   const [balanceAmount, setBalanceAmount] = useState("");
 
   // P2P Directory offers state
-  const [adminSubTab, setAdminSubTab] = useState<"sessions" | "directory" | "settings">("sessions");
+  const [adminSubTab, setAdminSubTab] = useState<"sessions" | "directory" | "userads" | "settings">("sessions");
   const [directoryType, setDirectoryType] = useState<"BUY" | "SELL">("BUY");
   const [offers, setOffers] = useState<any[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(false);
@@ -30,6 +31,27 @@ export function P2PAdminTable() {
   // Price range settings
   const [priceRange, setPriceRange] = useState({ buyMin: "1.005", buyMax: "1.045", sellMin: "0.960", sellMax: "0.998" });
   const [savingRange, setSavingRange] = useState(false);
+
+  // New Admin states
+  const [replyAsName, setReplyAsName] = useState("");
+  const [adminRulesText, setAdminRulesText] = useState("");
+  const [savingRules, setSavingRules] = useState(false);
+
+  // Counterpart trade modal
+  const [tradeModalUserOffer, setTradeModalUserOffer] = useState<any | null>(null);
+  const [visName, setVisName] = useState("Sarah");
+  const [visCountry, setVisCountry] = useState("Saudi Arabia");
+  const [visAmount, setVisAmount] = useState("500");
+  const [visPrice, setVisPrice] = useState("");
+  const [visCurrency, setVisCurrency] = useState("SAR");
+  const [visPayments, setVisPayments] = useState<string[]>([]);
+  const [visCustomPayment, setVisCustomPayment] = useState("");
+  const [submittingVisTrade, setSubmittingVisTrade] = useState(false);
+
+  // Send Invoice Popup
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceAmount, setInvoiceAmount] = useState("");
+  const [invoiceNote, setInvoiceNote] = useState("");
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -95,6 +117,26 @@ export function P2PAdminTable() {
   useEffect(() => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   }, [chatMessages]);
+
+  useEffect(() => {
+    if (activeChat) {
+      const activeObj = requests.find(r => r.id === activeChat);
+      if (activeObj) {
+        setReplyAsName(activeObj.sellerName || "");
+      }
+    }
+  }, [activeChat, requests]);
+
+  useEffect(() => {
+    if (adminSubTab === "settings") {
+      fetch("/api/p2p/rules")
+        .then(res => res.json())
+        .then(data => {
+          if (data.rules) setAdminRulesText(data.rules);
+        })
+        .catch(err => console.error(err));
+    }
+  }, [adminSubTab]);
 
   const handleApprove = async (id: string) => {
     try {
@@ -234,17 +276,141 @@ export function P2PAdminTable() {
     setNewMessage("");
     setSelectedImage(null);
 
-    const optimisticMsg = { id: "temp_" + Date.now(), sender: "ADMIN", text: msgText, image: msgImage, timestamp: Date.now() };
+    const optimisticMsg = { 
+      id: "temp_" + Date.now(), 
+      sender: "ADMIN", 
+      text: msgText, 
+      image: msgImage, 
+      timestamp: Date.now(),
+      senderName: replyAsName 
+    };
     setChatMessages((prev) => [...prev, optimisticMsg]);
 
     try {
       await fetch("/api/p2p/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: activeChat, sender: "ADMIN", text: msgText, image: msgImage })
+        body: JSON.stringify({ 
+          id: activeChat, 
+          sender: "ADMIN", 
+          text: msgText, 
+          image: msgImage,
+          senderName: replyAsName 
+        })
       });
       fetchChat(activeChat);
     } catch (e) { toast("Failed to send message", "error"); }
+  };
+
+  const handleSaveRules = async () => {
+    setSavingRules(true);
+    try {
+      const res = await fetch("/api/p2p/rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rules: adminRulesText })
+      });
+      if (res.ok) {
+        toast("P2P Rules Disclaimer updated successfully!", "success");
+      } else {
+        toast("Failed to save rules disclaimer", "error");
+      }
+    } catch (err) {
+      toast("Error communicating with server", "error");
+    } finally {
+      setSavingRules(false);
+    }
+  };
+
+  const handleInitiateCounterpartTrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tradeModalUserOffer || !visName.trim()) {
+      toast("Please fill in required fields", "warning");
+      return;
+    }
+
+    const finalPayments = [...visPayments];
+    if (visCustomPayment.trim()) {
+      finalPayments.push(visCustomPayment.trim());
+    }
+    if (finalPayments.length === 0) {
+      toast("Please select/enter at least one payment method", "warning");
+      return;
+    }
+
+    setSubmittingVisTrade(true);
+    try {
+      const res = await fetch("/api/p2p", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "admin_create_trade",
+          userEmail: tradeModalUserOffer.userEmail,
+          counterpartName: visName,
+          country: visCountry,
+          amount: parseFloat(visAmount),
+          price: parseFloat(visPrice || tradeModalUserOffer.price.toString()),
+          currency: visCurrency,
+          paymentMethods: finalPayments,
+          type: tradeModalUserOffer.type
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.request) {
+        toast("Counterpart trade session created!", "success");
+        setTradeModalUserOffer(null);
+        fetchRequests();
+        
+        // Direct open this chat workspace
+        setActiveChat(data.request.id);
+        setSellerDetails({ 
+          name: data.request.sellerName || "", 
+          price: data.request.usdPrice?.toString() || "", 
+          banks: data.request.banks || "", 
+          trustRate: data.request.trustRate || "" 
+        });
+        setBalanceAmount(data.request.amount?.toFixed(4) || data.request.amount?.toString() || "");
+      } else {
+        toast(data.error || "Failed to initiate counterpart trade", "error");
+      }
+    } catch (err) {
+      toast("Error starting counterpart trade", "error");
+    } finally {
+      setSubmittingVisTrade(false);
+    }
+  };
+
+  const handleSendInvoice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!invoiceAmount || !activeChat) return;
+
+    try {
+      const res = await fetch("/api/p2p/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: activeChat,
+          sender: "ADMIN",
+          senderName: replyAsName || "Advertiser",
+          text: invoiceNote.trim() || `Invoice payment request for ${invoiceAmount} USDT`,
+          isPaymentRequest: true,
+          paymentRequestAmount: parseFloat(invoiceAmount),
+          paymentRequestCurrency: "USDT",
+          paymentRequestStatus: "PENDING"
+        })
+      });
+      if (res.ok) {
+        toast("Payment request card sent in chat!", "success");
+        setInvoiceAmount("");
+        setInvoiceNote("");
+        setShowInvoiceModal(false);
+        fetchChat(activeChat);
+      } else {
+        toast("Failed to send payment request card", "error");
+      }
+    } catch (err) {
+      toast("Error sending invoice request card", "error");
+    }
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,17 +441,22 @@ export function P2PAdminTable() {
 
       {/* Sub tabs */}
       <div className="flex gap-3 mb-6 px-4 flex-wrap">
-        {(["sessions", "directory", "settings"] as const).map((tab) => (
+        {([
+          { key: "sessions", label: "Active Sessions & Chats" },
+          { key: "directory", label: "Manage Offers" },
+          { key: "userads", label: "Client Ads" },
+          { key: "settings", label: "⚙ P2P Settings" },
+        ] as const).map(({ key, label }) => (
           <button
-            key={tab}
-            onClick={() => setAdminSubTab(tab)}
+            key={key}
+            onClick={() => setAdminSubTab(key as any)}
             className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border ${
-              adminSubTab === tab
+              adminSubTab === key
                 ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20"
                 : "bg-white dark:bg-gray-900 text-slate-500 hover:text-emerald-500 border-slate-200 dark:border-gray-800"
             }`}
           >
-            {tab === "sessions" ? "Active Sessions & Chats" : tab === "directory" ? "Manage P2P Offers" : "⚙ Price Settings"}
+            {label}
           </button>
         ))}
       </div>
@@ -539,6 +710,95 @@ export function P2PAdminTable() {
         </div>
       )}
 
+      {/* ── CLIENT ADS (USER POSTED OFFERS) ── */}
+      {adminSubTab === "userads" && (
+        <div className="bg-white dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] p-6 shadow-2xl mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <Users className="w-5 h-5 text-indigo-500" />
+            <h3 className="text-lg font-black uppercase tracking-tighter">Client Posted Advertisements</h3>
+            <span className="bg-indigo-500/10 text-indigo-500 text-[9px] font-black px-2.5 py-1 rounded-xl border border-indigo-500/20 uppercase tracking-wider">
+              {offers.filter(o => o.isUserOffer).length} Live
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-gray-400 mb-6 leading-relaxed">
+            These are advertisements posted by registered users. You can initiate a counterpart trade session as a visitor — the user will see a regular trader in their chat inbox.
+          </p>
+
+          {loadingOffers ? (
+            <div className="py-16 text-center text-slate-400 animate-pulse font-black uppercase tracking-[0.2em] text-[10px]">Loading client ads...</div>
+          ) : offers.filter(o => o.isUserOffer).length === 0 ? (
+            <div className="py-20 text-center">
+              <MessageCircle className="w-10 h-10 mx-auto mb-3 text-slate-300 dark:text-gray-700" />
+              <p className="text-slate-400 dark:text-gray-500 text-sm font-bold">No user-posted advertisements yet.</p>
+              <p className="text-slate-400 dark:text-gray-500 text-xs mt-1">When users post their own buy/sell ads, they will appear here.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[900px] text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 dark:bg-gray-950/40 text-slate-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-[0.25em] border-b border-slate-100 dark:border-gray-800">
+                    <th className="px-6 py-4">User / Advertiser</th>
+                    <th className="px-6 py-4">Trade Type</th>
+                    <th className="px-6 py-4">Price / Limits</th>
+                    <th className="px-6 py-4">Payment Methods</th>
+                    <th className="px-6 py-4">Posted At</th>
+                    <th className="px-6 py-4 text-right">Initiate Trade</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-gray-800 text-xs">
+                  {offers.filter(o => o.isUserOffer).map((o) => (
+                    <tr key={o.id} className="hover:bg-indigo-500/[0.02] transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-black text-sm text-slate-900 dark:text-white">{o.advertiserName}</span>
+                          <span className="text-[10px] text-slate-400 font-mono">{o.userEmail}</span>
+                          <span className="bg-indigo-500/10 text-indigo-500 text-[8px] font-black uppercase px-1.5 py-0.5 rounded border border-indigo-500/20 w-max">Client Ad</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border ${
+                          o.type === "BUY" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                        }`}>{o.type} USDT</span>
+                      </td>
+                      <td className="px-6 py-4 font-mono">
+                        <div className="space-y-0.5">
+                          <div className="font-bold text-slate-900 dark:text-white">${o.price.toFixed(4)}</div>
+                          <div className="text-emerald-500 font-bold">{(o.price * 3.75).toFixed(2)} SAR</div>
+                          <div className="text-slate-400">{o.minLimit.toFixed(0)} – {o.maxLimit.toFixed(0)} units</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {o.paymentMethods.map((m: string) => (
+                            <span key={m} className="bg-indigo-500/10 text-indigo-500 text-[9px] px-2 py-0.5 rounded border border-indigo-500/20 font-black uppercase">{m}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-400 font-mono text-[10px]">
+                        {new Date(Number(o.id.split('_')[2] || Date.now())).toLocaleDateString("en-US")}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => {
+                            setTradeModalUserOffer(o);
+                            setVisPrice(o.price.toString());
+                            setVisCurrency("SAR");
+                            setVisPayments(o.paymentMethods || []);
+                          }}
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-[10px] uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer"
+                        >
+                          Initiate Trade
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── PRICE SETTINGS ── */}
       {adminSubTab === "settings" && (
         <div className="bg-white dark:bg-gray-900/40 backdrop-blur-3xl border border-slate-200 dark:border-gray-800 rounded-[2.5rem] p-8 shadow-2xl mb-16 max-w-2xl">
@@ -717,6 +977,53 @@ export function P2PAdminTable() {
           >
             {savingRange ? "Saving & Regenerating..." : "Save Range & Regenerate All Offers"}
           </button>
+
+          {/* Rules Disclaimer Editor */}
+          <div className="mt-12 border-t border-slate-200 dark:border-gray-800 pt-8">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-5 h-5 text-amber-500" />
+              <h4 className="text-lg font-black uppercase tracking-tighter">P2P Rules Disclaimer</h4>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-gray-400 mb-4 leading-relaxed">
+              This text is shown to users when they click "Post My Advertisement". They must accept these rules before creating their ad.
+            </p>
+            <textarea
+              rows={8}
+              value={adminRulesText}
+              onChange={(e) => setAdminRulesText(e.target.value)}
+              placeholder="Enter P2P trading rules here..."
+              className="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-xs font-mono focus:outline-none focus:border-amber-500 transition-colors dark:text-white text-slate-900 leading-relaxed"
+            />
+            <button
+              onClick={handleSaveRules}
+              disabled={savingRules}
+              className="mt-4 w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-900 dark:text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer disabled:opacity-60"
+            >
+              {savingRules ? "Saving Rules..." : "Save P2P Rules Disclaimer"}
+            </button>
+          </div>
+
+          {/* Negotiation Controls */}
+          <div className="mt-10 border-t border-slate-200 dark:border-gray-800 pt-8">
+            <div className="flex items-center gap-3 mb-4">
+              <DollarSign className="w-5 h-5 text-emerald-500" />
+              <h4 className="text-lg font-black uppercase tracking-tighter">Negotiation Controls</h4>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 text-xs">
+                <div className="font-black uppercase tracking-wider text-emerald-500 mb-2 text-[10px]">Invoice / Payment Request</div>
+                <p className="text-slate-500 dark:text-gray-400 leading-relaxed">
+                  In active chat workspace → click the invoice icon to send a <strong>Peer Invoice Request</strong> card directly in the chat. The user sees it as a natural trade step, not as an admin control.
+                </p>
+              </div>
+              <div className="bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl p-4 text-xs">
+                <div className="font-black uppercase tracking-wider text-indigo-500 mb-2 text-[10px]">Custom Pseudonym</div>
+                <p className="text-slate-500 dark:text-gray-400 leading-relaxed">
+                  When opening a client chat workspace, you choose a name (e.g. "Sarah from Riyadh"). All your messages appear under that name — fully natural and indistinguishable from a real trader.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -779,6 +1086,12 @@ export function P2PAdminTable() {
                 <input type="number" placeholder="Exact Balance to Send" value={balanceAmount} onChange={(e) => setBalanceAmount(e.target.value)} className="w-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-colors" />
                 <button onClick={() => handleSendBalance(activeChat)} className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer">
                   Send Balance
+                </button>
+                <button
+                  onClick={() => setShowInvoiceModal(true)}
+                  className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 rounded-xl font-black text-xs uppercase tracking-widest transition-all cursor-pointer"
+                >
+                  💳 Send Peer Invoice Request
                 </button>
               </div>
             </div>
@@ -844,6 +1157,188 @@ export function P2PAdminTable() {
                 </form>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── COUNTERPART TRADE INITIATION MODAL ── */}
+      {tradeModalUserOffer && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-[2rem] max-w-xl w-full shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-100 dark:border-gray-800">
+              <div>
+                <h3 className="text-lg font-black uppercase tracking-wider text-indigo-500">Initiate Counterpart Trade</h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">Enter your visitor profile to appear as a regular user to <strong className="text-slate-700 dark:text-white">{tradeModalUserOffer.advertiserName}</strong></p>
+              </div>
+              <button
+                onClick={() => setTradeModalUserOffer(null)}
+                className="p-1.5 bg-slate-50 dark:bg-gray-800 text-slate-400 hover:text-rose-500 rounded-full cursor-pointer border border-slate-200 dark:border-gray-700"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleInitiateCounterpartTrade} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Your Visitor Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={visName}
+                    onChange={(e) => setVisName(e.target.value)}
+                    placeholder="e.g. Sarah Al-Rashidi"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Country</label>
+                  <input
+                    type="text"
+                    value={visCountry}
+                    onChange={(e) => setVisCountry(e.target.value)}
+                    placeholder="e.g. Saudi Arabia"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Amount (USDT)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={visAmount}
+                    onChange={(e) => setVisAmount(e.target.value)}
+                    placeholder="e.g. 500"
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Price Rate (USD)</label>
+                  <input
+                    type="number"
+                    step="0.0001"
+                    value={visPrice}
+                    onChange={(e) => setVisPrice(e.target.value)}
+                    placeholder={tradeModalUserOffer.price?.toFixed(4)}
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Currency</label>
+                  <select
+                    value={visCurrency}
+                    onChange={(e) => setVisCurrency(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="SAR">SAR</option>
+                    <option value="USD">USD</option>
+                    <option value="AED">AED</option>
+                    <option value="EGP">EGP</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Payment Methods</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 dark:bg-gray-950 p-3 rounded-xl border border-slate-200 dark:border-gray-850">
+                  {["Bank Transfer", "Al Rajhi Bank", "NCB Bank", "STC Pay", "InstaPay", "SEPA Transfer"].map((m) => {
+                    const sel = visPayments.includes(m);
+                    return (
+                      <button
+                        type="button"
+                        key={m}
+                        onClick={() => sel ? setVisPayments(visPayments.filter(x => x !== m)) : setVisPayments([...visPayments, m])}
+                        className={`px-3 py-2 text-[10px] font-black rounded-lg uppercase tracking-wider text-center transition-all cursor-pointer border ${
+                          sel ? "bg-indigo-600/10 text-indigo-500 border-indigo-500/25" : "bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-500"
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Custom Payment / Bank Details (Optional)</label>
+                <input
+                  type="text"
+                  value={visCustomPayment}
+                  onChange={(e) => setVisCustomPayment(e.target.value)}
+                  placeholder="e.g. Al Rajhi Bank, IBAN SA0328900000..."
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs dark:text-white text-slate-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-3 text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed">
+                <strong className="text-indigo-500">Privacy Note:</strong> The user will only see your visitor name (<strong>{visName}</strong>) — they will not know this is initiated by platform admin.
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setTradeModalUserOffer(null)}
+                  className="flex-1 py-3 bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-400 font-bold rounded-xl cursor-pointer text-xs uppercase tracking-wider"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingVisTrade}
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl shadow-lg transition-all active:scale-95 cursor-pointer text-xs uppercase tracking-wider disabled:opacity-60"
+                >
+                  {submittingVisTrade ? "Creating Session..." : "Initiate Counterpart Trade"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── INVOICE MODAL ── */}
+      {showInvoiceModal && activeChat && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-[2rem] max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="font-black text-sm uppercase tracking-wider text-amber-500">Send Peer Invoice</h4>
+              <button onClick={() => setShowInvoiceModal(false)} className="p-1.5 bg-slate-100 dark:bg-gray-800 rounded-full text-slate-400 hover:text-rose-500 cursor-pointer border border-slate-200 dark:border-gray-700">
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleSendInvoice} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Invoice Amount (USDT)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  value={invoiceAmount}
+                  onChange={(e) => setInvoiceAmount(e.target.value)}
+                  placeholder="e.g. 250.00"
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-amber-500 dark:text-white text-slate-900"
+                />
+                {invoiceAmount && !isNaN(Number(invoiceAmount)) && (
+                  <p className="text-[10px] text-amber-500 font-bold mt-1 font-mono">~{(Number(invoiceAmount) * 3.75).toFixed(2)} SAR equivalent</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5">Invoice Note (Optional)</label>
+                <input
+                  type="text"
+                  value={invoiceNote}
+                  onChange={(e) => setInvoiceNote(e.target.value)}
+                  placeholder="e.g. Updated amount per negotiation"
+                  className="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-amber-500 dark:text-white text-slate-900"
+                />
+              </div>
+              <button type="submit" className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-900 font-black text-xs uppercase tracking-widest rounded-xl shadow-md transition-all cursor-pointer">
+                Send Peer Invoice Card
+              </button>
+            </form>
           </div>
         </div>
       )}

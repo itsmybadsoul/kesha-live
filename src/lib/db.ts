@@ -431,6 +431,9 @@ export interface P2PRequest {
   availableAmount?: number;
   currency?: string;
   banksConfirmed?: boolean;
+  country?: string;
+  isVisitorChat?: boolean;
+  userEmail?: string;
 }
 
 export interface ChatMessage {
@@ -439,6 +442,11 @@ export interface ChatMessage {
   text: string;
   image?: string; // base64
   timestamp: number;
+  isPaymentRequest?: boolean;
+  paymentRequestAmount?: number;
+  paymentRequestCurrency?: string;
+  paymentRequestStatus?: "PENDING" | "PAID";
+  senderName?: string;
 }
 
 export async function getP2PRequests(_env?: any): Promise<P2PRequest[]> {

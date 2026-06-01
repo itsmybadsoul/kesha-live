@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { id, sender, text, image } = await req.json();
+    const { id, sender, text, image, isPaymentRequest, paymentRequestAmount, paymentRequestCurrency, paymentRequestStatus, senderName } = await req.json();
     if (!id || !sender) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
     const messages = await getP2PChat(id);
@@ -22,7 +22,12 @@ export async function POST(req: Request) {
       sender,
       text: text || "",
       image: image || "",
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      isPaymentRequest: !!isPaymentRequest,
+      paymentRequestAmount: paymentRequestAmount ? Number(paymentRequestAmount) : undefined,
+      paymentRequestCurrency: paymentRequestCurrency || undefined,
+      paymentRequestStatus: paymentRequestStatus || undefined,
+      senderName: senderName || undefined
     };
     
     messages.push(newMessage);

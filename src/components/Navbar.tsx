@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { NotificationBell } from "@/components/NotificationBell";
+import { P2PMessagesBell } from "@/components/P2PMessagesBell";
 import { UsdtIcon } from "@/components/UsdtIcon";
 import { useTheme } from "next-themes";
 import { 
@@ -98,6 +99,7 @@ export function Navbar() {
                   <Link href="/admin" className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></Link>
                 </div>
 
+                <P2PMessagesBell />
                 <NotificationBell />
 
                 <button onClick={logout} className="hidden md:block p-2 text-slate-400 dark:text-gray-500 hover:text-rose-400 transition-colors" title="Logout">
