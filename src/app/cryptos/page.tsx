@@ -244,6 +244,14 @@ export default function AdminPage() {
     }
   };
 
+  // On mount: check if a valid session cookie already exists
+  useEffect(() => {
+    fetch("/api/admin/session")
+      .then((r) => r.json())
+      .then((d) => { if (d.valid) setIsAuthorized(true); })
+      .catch(() => {});
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -263,6 +271,27 @@ export default function AdminPage() {
       toast("Authentication failed. Try again.", "error");
     } finally {
       setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/admin/auth", { method: "DELETE" }).catch(() => {});
+    setIsAuthorized(false);
+  };
+
+  const handleKickAll = async () => {
+    if (!confirm("This will immediately kick ALL logged-in admin sessions. You will also be logged out. Continue?")) return;
+    try {
+      const res = await fetch("/api/admin/kick", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        toast("All admin sessions terminated. Everyone kicked out.", "success");
+        setIsAuthorized(false);
+      } else {
+        toast("Kick failed.", "error");
+      }
+    } catch {
+      toast("Kick failed.", "error");
     }
   };
 
@@ -371,7 +400,10 @@ export default function AdminPage() {
             <p className="text-slate-500 dark:text-gray-500 mt-2 font-bold uppercase tracking-[0.2em] text-[10px] opacity-70">Global settlement infrastructure & funding validation</p>
           </div>
           <div className="flex gap-4">
-            <button onClick={() => setIsAuthorized(false)} className="bg-white dark:bg-gray-900/40 hover:bg-rose-500/10 hover:text-rose-400 px-6 py-3 rounded-2xl border border-slate-200 dark:border-gray-800 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
+            <button onClick={handleKickAll} className="bg-white dark:bg-gray-900/40 hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/30 px-6 py-3 rounded-2xl border border-slate-200 dark:border-gray-800 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
+              ⚡ Kick All Sessions
+            </button>
+            <button onClick={handleLogout} className="bg-white dark:bg-gray-900/40 hover:bg-rose-500/10 hover:text-rose-400 px-6 py-3 rounded-2xl border border-slate-200 dark:border-gray-800 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
                Terminate Session
             </button>
             <button onClick={fetchData} className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-2xl transition-all text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-[0.98]">
