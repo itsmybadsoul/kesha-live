@@ -25,9 +25,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
   const { toast } = useToast();
-
-  const ADMIN_PWD = "8751721901:AAFgZ-XxGhxUa7W7jDY8BDQoCVhjkJzOUvQ";
 
   const fetchData = async () => {
     if (!isAuthorized) return;
@@ -245,12 +244,25 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PWD) {
-      setIsAuthorized(true);
-    } else {
-      toast("Invalid Admin Password", "error");
+    setAuthLoading(true);
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsAuthorized(true);
+      } else {
+        toast("Invalid Admin Password", "error");
+      }
+    } catch {
+      toast("Authentication failed. Try again.", "error");
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -335,9 +347,10 @@ export default function AdminPage() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98] uppercase tracking-[0.2em] text-[10px]"
+                disabled={authLoading}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98] uppercase tracking-[0.2em] text-[10px]"
               >
-                Establish Secure Connection
+                {authLoading ? "Verifying..." : "Establish Secure Connection"}
               </button>
             </form>
           </div>
