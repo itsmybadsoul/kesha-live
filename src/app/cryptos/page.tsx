@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/context/ToastContext";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw, Zap, Send, FileText, Globe, MousePointer } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, Database, ArrowRightLeft, Activity, TrendingUp, TrendingDown, User, MessageSquare, Trash2, Target, Settings2, BarChart3, RefreshCw, Zap, Send, FileText, Globe, MousePointer, Eye, X } from "lucide-react";
 import { useCrypto } from "@/context/CryptoContext";
 import { P2PAdminTable } from "@/components/P2PAdminTable";
 import { AbuFaresAdmin } from "@/components/AbuFaresAdmin";
@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [analyticsEvents, setAnalyticsEvents] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
   const [notifModal, setNotifModal] = useState<{ open: boolean; email: string; title: string; body: string }>({ open: false, email: "", title: "", body: "" });
+  const [viewUser, setViewUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -1220,6 +1221,9 @@ export default function AdminPage() {
                       </td>
                       <td className="px-8 py-8 text-right">
                          <div className="flex justify-end gap-3">
+                            <button onClick={() => setViewUser(u)} className="p-4 bg-white dark:bg-gray-900 text-slate-400 dark:text-gray-600 hover:text-emerald-500 rounded-2xl border-2 border-slate-200 dark:border-gray-800 hover:border-emerald-500 transition-all shadow-xl active:scale-95" title="View User Profile">
+                               <Eye className="w-6 h-6" />
+                            </button>
                            <button onClick={() => setNotifModal({ open: true, email: u.email, title: "", body: "" })} className="p-4 bg-white dark:bg-gray-900 text-slate-400 dark:text-gray-600 hover:text-indigo-500 rounded-2xl border-2 border-slate-200 dark:border-gray-800 hover:border-indigo-500 transition-all shadow-xl active:scale-95" title="Push Protocol Alert">
                               <MessageSquare className="w-6 h-6" />
                            </button>
@@ -1298,6 +1302,156 @@ export default function AdminPage() {
         </div>
 
         </>)} {/* End support */}
+
+      {/* ── User Profile Viewer Modal ── */}
+      {viewUser && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setViewUser(null)} />
+          <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0D0D10] border border-slate-200 dark:border-gray-800 rounded-[2.5rem] shadow-2xl">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-[#0D0D10] border-b border-slate-200 dark:border-gray-800 px-8 py-6 rounded-t-[2.5rem] flex items-center justify-between z-10">
+              <div className="flex items-center gap-4">
+                <img src={viewUser.avatar} alt="avatar" className="w-14 h-14 rounded-full border-2 border-indigo-500/30 shadow-lg" />
+                <div>
+                  <div className="font-black text-xl text-slate-900 dark:text-white tracking-tighter">{viewUser.firstName} {viewUser.lastName}</div>
+                  <div className="text-[10px] text-slate-400 dark:text-gray-500 font-mono">{viewUser.email}</div>
+                </div>
+              </div>
+              <button onClick={() => setViewUser(null)} className="p-3 rounded-2xl bg-slate-100 dark:bg-gray-900 hover:bg-rose-500/10 hover:text-rose-400 transition-all">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-8 space-y-6">
+
+              {/* Balance Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6">
+                  <div className="text-[9px] font-black uppercase tracking-widest text-emerald-500 mb-2">Net Equity (what user sees)</div>
+                  <div className="text-3xl font-black text-emerald-400 tabular-nums">${viewUser.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 }) ?? '0.00'}</div>
+                  <div className="text-[9px] text-slate-400 dark:text-gray-600 mt-1 uppercase tracking-widest">USDT Liquid</div>
+                </div>
+                <div className={`rounded-2xl p-6 border ${viewUser.frozenBalance ? 'bg-cyan-500/5 border-cyan-500/20' : 'bg-slate-50 dark:bg-gray-900/50 border-slate-200 dark:border-gray-800'}`}>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-cyan-400 mb-2">Frozen Balance</div>
+                  {viewUser.frozenBalance ? (
+                    <>
+                      <div className="text-3xl font-black text-cyan-400 tabular-nums">❄️ ${viewUser.frozenBalance.amount?.toLocaleString()}</div>
+                      <div className="flex gap-3 mt-2 text-[9px] font-black uppercase tracking-widest">
+                        <span className={viewUser.frozenBalance.adminConfirmed ? 'text-emerald-500' : 'text-slate-400'}>Admin: {viewUser.frozenBalance.adminConfirmed ? '✅' : '⏳'}</span>
+                        <span className={viewUser.frozenBalance.userConfirmed ? 'text-emerald-500' : 'text-slate-400'}>User: {viewUser.frozenBalance.userConfirmed ? '✅' : '⏳'}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-slate-400 dark:text-gray-600 text-sm font-black uppercase tracking-widest">None</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Pending Deposit / Withdrawal */}
+              {(viewUser.pendingDeposit || viewUser.pendingWithdrawal) && (
+                <div className="space-y-3">
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600">Pending Transactions</div>
+                  {viewUser.pendingDeposit && (
+                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5 flex justify-between items-center">
+                      <div>
+                        <div className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Deposit Pending</div>
+                        <div className="font-black text-2xl text-emerald-400">+${viewUser.pendingDeposit.amount?.toLocaleString()}</div>
+                        <div className="text-[9px] font-mono text-slate-400 mt-1 break-all">{viewUser.pendingDeposit.txid}</div>
+                      </div>
+                      <Clock className="w-8 h-8 text-emerald-500/40" />
+                    </div>
+                  )}
+                  {viewUser.pendingWithdrawal && (
+                    <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-5 flex justify-between items-center">
+                      <div>
+                        <div className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1">Withdrawal Pending · {viewUser.pendingWithdrawal.method}</div>
+                        <div className="font-black text-2xl text-rose-400">-${viewUser.pendingWithdrawal.amount?.toLocaleString()}</div>
+                        <div className="text-[9px] font-mono text-slate-400 mt-1">{viewUser.pendingWithdrawal.details}</div>
+                      </div>
+                      <ArrowRightLeft className="w-8 h-8 text-rose-500/40" />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* KYC + Seed */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl p-5">
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mb-3">KYC Status</div>
+                  <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                    viewUser.kycStatus === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                    viewUser.kycStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                    'bg-slate-100 dark:bg-gray-800 text-slate-400 border-slate-200 dark:border-gray-700'
+                  }`}>{viewUser.kycStatus || 'UNVERIFIED'}</span>
+                </div>
+                <div className="bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl p-5">
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mb-3">Seed Phrase</div>
+                  {viewUser.seedPhrase ? (
+                    <div className="text-[9px] font-mono text-slate-500 dark:text-gray-400 break-all leading-relaxed">{viewUser.seedPhrase.join(' ')}</div>
+                  ) : (
+                    <span className="text-rose-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-2"><div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping" />UNSECURED</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Holdings */}
+              {viewUser.holdings && Object.keys(viewUser.holdings).length > 0 && (
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mb-3">Crypto Holdings</div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {Object.entries(viewUser.holdings).map(([sym, amt]: [string, any]) => (
+                      <div key={sym} className="bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-4">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-indigo-500 mb-1">{sym}</div>
+                        <div className="font-black text-slate-900 dark:text-white tabular-nums text-sm">{Number(amt).toFixed(6)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Active Options */}
+              {viewUser.options?.filter((o: any) => o.status === 'ACTIVE').length > 0 && (
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mb-3">Active Options Trades</div>
+                  <div className="space-y-2">
+                    {viewUser.options.filter((o: any) => o.status === 'ACTIVE').map((o: any) => (
+                      <div key={o.id} className={`flex items-center justify-between p-4 rounded-2xl border ${ o.direction === 'UP' ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-rose-500/5 border-rose-500/20'}`}>
+                        <div>
+                          <div className="font-black text-sm text-slate-900 dark:text-white">{o.asset}/USD</div>
+                          <div className={`text-[9px] font-black uppercase tracking-widest ${ o.direction === 'UP' ? 'text-emerald-500' : 'text-rose-500'}`}>{o.direction === 'UP' ? '↑ BUY / CALL' : '↓ SELL / PUT'}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-black text-indigo-500">${o.amount?.toLocaleString()}</div>
+                          {o.adminResult && <div className={`text-[9px] font-black uppercase ${ o.adminResult === 'WIN' ? 'text-emerald-500' : 'text-rose-500'}`}>FORCED {o.adminResult}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Notifications */}
+              {viewUser.notifications?.length > 0 && (
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-600 mb-3">Recent Notifications ({viewUser.notifications.length})</div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {viewUser.notifications.slice(0, 10).map((n: any) => (
+                      <div key={n.id} className={`p-4 rounded-2xl border text-left ${ n.read ? 'bg-slate-50 dark:bg-gray-900/30 border-slate-200 dark:border-gray-800 opacity-50' : 'bg-indigo-500/5 border-indigo-500/20'}`}>
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="font-black text-xs text-slate-900 dark:text-white">{n.title}</div>
+                          <div className="text-[8px] text-slate-400 shrink-0">{n.read ? 'Read' : '🔴 Unread'}</div>
+                        </div>
+                        <div className="text-[10px] text-slate-500 dark:text-gray-400 mt-1">{n.body}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Notification Modal */}
       {notifModal.open && (

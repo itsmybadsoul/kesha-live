@@ -96,7 +96,6 @@ export function Navbar() {
                   <div className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 p-1 rounded-full border border-gray-900 shadow-lg" title="VIP Status">
                     <ShieldCheck className="w-2.5 h-2.5 text-slate-900 dark:text-white" fill="currentColor" />
                   </div>
-                  <Link href="/cryptos" className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-transparent hover:bg-indigo-500 transition-colors" title="Admin"></Link>
                 </div>
 
                 <P2PMessagesBell />
