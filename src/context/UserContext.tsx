@@ -203,6 +203,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.email]);
 
+  // Sync balance from server every 30s so admin overrides reflect immediately
+  useEffect(() => {
+    if (!user?.email) return;
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [user?.email]);
+
   const login = (userData: User) => {
     // Set 24h welcome bonus expiry on first ever appearance
     if (!userData.welcomeExpiry) {
